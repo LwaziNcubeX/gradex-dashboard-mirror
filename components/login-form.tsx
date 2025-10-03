@@ -1,26 +1,32 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function LoginForm() {
-  const router = useRouter()
-  const [email, setEmail] = useState("")
-  const [otp, setOtp] = useState("")
-  const [step, setStep] = useState<"email" | "otp">("email")
-  const [error, setError] = useState("")
-  const [loading, setLoading] = useState(false)
+  const router = useRouter();
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [step, setStep] = useState<"email" | "otp">("email");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const handleRequestOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
       const response = await fetch("/api/auth/request-otp", {
@@ -29,57 +35,65 @@ export function LoginForm() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        setStep("otp")
+        setStep("otp");
       } else {
-        setError(data.error || "Failed to send OTP. Please try again.")
+        setError(data.error || "Failed to send OTP. Please try again.");
       }
     } catch (err) {
-      setError("Network error. Please try again.")
+      setError("Network error. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleVerifyOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
+      console.log("[Login] Submitting OTP for:", email);
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ email, otp }),
-      })
+      });
 
-      const data = await response.json()
+      console.log("[Login] Response status:", response.status);
+      const data = await response.json();
+      console.log("[Login] Response data:", data);
 
       if (response.ok) {
-        router.push("/dashboard")
-        router.refresh()
+        console.log("[Login] Login successful, redirecting to dashboard...");
+        // Use window.location for a full page reload to ensure cookies are set
+        window.location.href = "/dashboard";
       } else {
-        setError(data.error || "Invalid OTP. Please try again.")
+        console.error("[Login] Login failed:", data.error);
+        setError(data.error || "Invalid OTP. Please try again.");
+        setLoading(false);
       }
     } catch (err) {
-      setError("Network error. Please try again.")
-    } finally {
-      setLoading(false)
+      console.error("[Login] Network error:", err);
+      setError("Network error. Please try again.");
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Card>
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
         <CardDescription>
-          {step === "email" ? "Enter your email to receive a one-time password" : "Enter the OTP sent to your email"}
+          {step === "email"
+            ? "Enter your email to receive a one-time password"
+            : "Enter the OTP sent to your email"}
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -97,7 +111,11 @@ export function LoginForm() {
                 disabled={loading}
               />
             </div>
-            {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
+            {error && (
+              <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                {error}
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Sending OTP..." : "Send OTP"}
             </Button>
@@ -116,18 +134,24 @@ export function LoginForm() {
                 disabled={loading}
                 maxLength={6}
               />
-              <p className="text-xs text-muted-foreground">OTP sent to {email}</p>
+              <p className="text-xs text-muted-foreground">
+                OTP sent to {email}
+              </p>
             </div>
-            {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
+            {error && (
+              <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+                {error}
+              </div>
+            )}
             <div className="flex gap-2">
               <Button
                 type="button"
                 variant="outline"
                 className="flex-1 bg-transparent"
                 onClick={() => {
-                  setStep("email")
-                  setOtp("")
-                  setError("")
+                  setStep("email");
+                  setOtp("");
+                  setError("");
                 }}
                 disabled={loading}
               >
@@ -141,5 +165,5 @@ export function LoginForm() {
         )}
       </CardContent>
     </Card>
-  )
+  );
 }
