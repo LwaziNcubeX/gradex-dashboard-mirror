@@ -31,9 +31,12 @@ export function QuizForm() {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch("http://0.0.0.0:8000/questions", {
-        credentials: "include",
-      });
+      const response = await fetch(
+        "https://api-gradex.rapidshyft.com/questions",
+        {
+          credentials: "include",
+        }
+      );
       const data = await response.json();
       if (data.success) {
         setQuestions(data.questions);
@@ -55,17 +58,20 @@ export function QuizForm() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://0.0.0.0:8000/quiz/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          ...formData,
-          questions: selectedQuestions,
-        }),
-      });
+      const response = await fetch(
+        "https://api-gradex.rapidshyft.com/quiz/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            ...formData,
+            questions: selectedQuestions,
+          }),
+        }
+      );
 
       const data = await response.json();
 

@@ -1,6 +1,6 @@
 import { getAuthToken } from "./auth";
 
-const API_BASE_URL = "http://0.0.0.0:8000";
+const API_BASE_URL = "https://api-gradex.rapidshyft.com";
 
 export class ApiClient {
   private baseUrl: string;

@@ -28,7 +28,7 @@ export function LevelsTable({ levels }: LevelsTableProps) {
   const handleDelete = async (levelId: string) => {
     if (confirm("Are you sure you want to delete this level?")) {
       try {
-        await fetch(`http://0.0.0.0:8000/level/${levelId}`, {
+        await fetch(`https://api-gradex.rapidshyft.com/level/${levelId}`, {
           method: "DELETE",
           credentials: "include",
         });

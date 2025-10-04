@@ -53,10 +53,13 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
   const handleDelete = async (questionId: string) => {
     if (confirm("Are you sure you want to delete this question?")) {
       try {
-        await fetch(`http://0.0.0.0:8000/question/${questionId}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
+        await fetch(
+          `https://api-gradex.rapidshyft.com/question/${questionId}`,
+          {
+            method: "DELETE",
+            credentials: "include",
+          }
+        );
         window.location.reload();
       } catch (error) {
         alert("Failed to delete question");

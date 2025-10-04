@@ -61,17 +61,20 @@ export function QuestionForm() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://0.0.0.0:8000/question/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          ...formData,
-          subtopics: formData.subtopics.filter((s) => s.trim() !== ""),
-        }),
-      });
+      const response = await fetch(
+        "https://api-gradex.rapidshyft.com/question/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            ...formData,
+            subtopics: formData.subtopics.filter((s) => s.trim() !== ""),
+          }),
+        }
+      );
 
       const data = await response.json();
 

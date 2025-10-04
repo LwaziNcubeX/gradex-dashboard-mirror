@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_BASE_URL = "http://0.0.0.0:8000/";
+const API_BASE_URL = "https://api-gradex.rapidshyft.com/";
 const TOKEN_COOKIE_NAME = "gradex_admin_token";
 const REFRESH_TOKEN_COOKIE_NAME = "gradex_refresh_token";
 

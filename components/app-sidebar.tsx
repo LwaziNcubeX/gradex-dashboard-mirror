@@ -1,160 +1,140 @@
-"use client"
+"use client";
 
-import * as React from "react"
+import * as React from "react";
 import {
-  AudioWaveform,
   BookOpen,
-  Bot,
-  Command,
-  Frame,
+  HelpCircle,
   GalleryVerticalEnd,
-  Map,
-  PieChart,
+  LayoutDashboard,
+  Layers,
   Settings2,
-  SquareTerminal,
-} from "lucide-react"
+  BarChart3,
+  Users,
+} from "lucide-react";
 
-import { NavMain } from '@/components/nav-main'
-import { NavProjects } from '@/components/nav-projects'
-import { NavUser } from '@/components/nav-user'
-import { TeamSwitcher } from '@/components/team-switcher'
+import { NavMain } from "@/components/nav-main";
+import { NavProjects } from "@/components/nav-projects";
+import { NavUser } from "@/components/nav-user";
+import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
   SidebarHeader,
   SidebarRail,
-} from '@/components/ui/sidebar'
+} from "@/components/ui/sidebar";
 
-// This is sample data.
+// GradeX dashboard data
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Admin",
+    email: "admin@gradex.com",
+    avatar: "/avatars/admin.jpg",
   },
   teams: [
     {
-      name: "Acme Inc",
+      name: "GradeX",
       logo: GalleryVerticalEnd,
-      plan: "Enterprise",
-    },
-    {
-      name: "Acme Corp.",
-      logo: AudioWaveform,
-      plan: "Startup",
-    },
-    {
-      name: "Evil Corp.",
-      logo: Command,
-      plan: "Free",
+      plan: "Pro",
     },
   ],
   navMain: [
     {
-      title: "Playground",
-      url: "#",
-      icon: SquareTerminal,
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: LayoutDashboard,
       isActive: true,
+      items: [],
+    },
+    {
+      title: "Questions",
+      url: "/dashboard/questions",
+      icon: HelpCircle,
       items: [
         {
-          title: "History",
-          url: "#",
+          title: "All Questions",
+          url: "/dashboard/questions",
         },
         {
-          title: "Starred",
-          url: "#",
-        },
-        {
-          title: "Settings",
-          url: "#",
+          title: "Create Question",
+          url: "/dashboard/questions/create",
         },
       ],
     },
     {
-      title: "Models",
-      url: "#",
-      icon: Bot,
-      items: [
-        {
-          title: "Genesis",
-          url: "#",
-        },
-        {
-          title: "Explorer",
-          url: "#",
-        },
-        {
-          title: "Quantum",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Documentation",
-      url: "#",
+      title: "Quizzes",
+      url: "/dashboard/quizzes",
       icon: BookOpen,
       items: [
         {
-          title: "Introduction",
-          url: "#",
+          title: "All Quizzes",
+          url: "/dashboard/quizzes",
         },
         {
-          title: "Get Started",
-          url: "#",
+          title: "Create Quiz",
+          url: "/dashboard/quizzes/create",
+        },
+      ],
+    },
+    {
+      title: "Levels",
+      url: "/dashboard/levels",
+      icon: Layers,
+      items: [
+        {
+          title: "All Levels",
+          url: "/dashboard/levels",
         },
         {
-          title: "Tutorials",
-          url: "#",
+          title: "Create Level",
+          url: "/dashboard/levels/create",
+        },
+      ],
+    },
+    {
+      title: "Analytics",
+      url: "/dashboard/analytics",
+      icon: BarChart3,
+      items: [
+        {
+          title: "Overview",
+          url: "/dashboard/analytics",
         },
         {
-          title: "Changelog",
-          url: "#",
+          title: "User Progress",
+          url: "/dashboard/analytics/users",
         },
       ],
     },
     {
       title: "Settings",
-      url: "#",
+      url: "/dashboard/settings",
       icon: Settings2,
       items: [
         {
           title: "General",
-          url: "#",
+          url: "/dashboard/settings",
         },
         {
-          title: "Team",
-          url: "#",
-        },
-        {
-          title: "Billing",
-          url: "#",
-        },
-        {
-          title: "Limits",
-          url: "#",
+          title: "Profile",
+          url: "/dashboard/settings/profile",
         },
       ],
     },
   ],
   projects: [
     {
-      name: "Design Engineering",
-      url: "#",
-      icon: Frame,
+      name: "Active Quizzes",
+      url: "/dashboard/quizzes",
+      icon: BookOpen,
     },
     {
-      name: "Sales & Marketing",
-      url: "#",
-      icon: PieChart,
-    },
-    {
-      name: "Travel",
-      url: "#",
-      icon: Map,
+      name: "Student Management",
+      url: "/dashboard/students",
+      icon: Users,
     },
   ],
-}
+};
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
@@ -171,5 +151,5 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>
-  )
+  );
 }

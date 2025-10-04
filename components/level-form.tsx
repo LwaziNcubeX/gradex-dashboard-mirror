@@ -29,9 +29,12 @@ export function LevelForm() {
 
   const fetchQuizzes = async () => {
     try {
-      const response = await fetch("http://0.0.0.0:8000/quizzes", {
-        credentials: "include",
-      });
+      const response = await fetch(
+        "https://api-gradex.rapidshyft.com/quizzes",
+        {
+          credentials: "include",
+        }
+      );
       const data = await response.json();
       if (data.success) {
         setQuizzes(data.quizzes);
@@ -53,17 +56,20 @@ export function LevelForm() {
     setLoading(true);
 
     try {
-      const response = await fetch("http://0.0.0.0:8000/level/create", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include",
-        body: JSON.stringify({
-          ...formData,
-          quizzes: selectedQuizzes,
-        }),
-      });
+      const response = await fetch(
+        "https://api-gradex.rapidshyft.com/level/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+          body: JSON.stringify({
+            ...formData,
+            quizzes: selectedQuizzes,
+          }),
+        }
+      );
 
       const data = await response.json();
 

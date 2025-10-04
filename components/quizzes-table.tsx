@@ -31,7 +31,7 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
   const handleDelete = async (quizId: string) => {
     if (confirm("Are you sure you want to delete this quiz?")) {
       try {
-        await fetch(`http://0.0.0.0:8000/quiz/${quizId}`, {
+        await fetch(`https://api-gradex.rapidshyft.com/quiz/${quizId}`, {
           method: "DELETE",
           credentials: "include",
         });
