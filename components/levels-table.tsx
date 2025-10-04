@@ -1,34 +1,43 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Eye, Trash2, Search } from "lucide-react"
-import type { Level } from "@/app/dashboard/levels/page"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Eye, Trash2, Search } from "lucide-react";
+import type { Level } from "@/app/dashboard/levels/page";
 
 interface LevelsTableProps {
-  levels: Level[]
+  levels: Level[];
 }
 
 export function LevelsTable({ levels }: LevelsTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const filteredLevels = levels.filter((level) => level.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredLevels = levels.filter((level) =>
+    level.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleDelete = async (levelId: string) => {
     if (confirm("Are you sure you want to delete this level?")) {
       try {
-        await fetch(`https://api-gradex.rapidshyft.com/level/${levelId}`, {
+        await fetch(`http://0.0.0.0:8000/level/${levelId}`, {
           method: "DELETE",
           credentials: "include",
-        })
-        window.location.reload()
+        });
+        window.location.reload();
       } catch (error) {
-        alert("Failed to delete level")
+        alert("Failed to delete level");
       }
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -55,7 +64,10 @@ export function LevelsTable({ levels }: LevelsTableProps) {
           <TableBody>
             {filteredLevels.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={4} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={4}
+                  className="text-center text-muted-foreground"
+                >
                   No levels found
                 </TableCell>
               </TableRow>
@@ -72,7 +84,11 @@ export function LevelsTable({ levels }: LevelsTableProps) {
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(level.level_id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(level.level_id)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -84,5 +100,5 @@ export function LevelsTable({ levels }: LevelsTableProps) {
         </Table>
       </div>
     </div>
-  )
+  );
 }

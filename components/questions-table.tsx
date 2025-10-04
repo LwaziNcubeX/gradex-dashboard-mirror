@@ -1,56 +1,73 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Eye, Trash2, Search } from "lucide-react"
-import type { Question } from "@/app/dashboard/questions/page"
-import { QuestionViewDialog } from "./question-view-dialog"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Eye, Trash2, Search } from "lucide-react";
+import type { Question } from "@/app/dashboard/questions/page";
+import { QuestionViewDialog } from "./question-view-dialog";
 
 interface QuestionsTableProps {
-  questions: Question[]
+  questions: Question[];
 }
 
 export function QuestionsTable({ questions }: QuestionsTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [subjectFilter, setSubjectFilter] = useState<string>("all")
-  const [levelFilter, setLevelFilter] = useState<string>("all")
-  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(null)
-  const [viewDialogOpen, setViewDialogOpen] = useState(false)
+  const [searchTerm, setSearchTerm] = useState("");
+  const [subjectFilter, setSubjectFilter] = useState<string>("all");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
+  const [selectedQuestion, setSelectedQuestion] = useState<Question | null>(
+    null
+  );
+  const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
-  const subjects = Array.from(new Set(questions.map((q) => q.subject)))
-  const levels = ["Form 1", "Form 2", "Form 3", "Form 4"]
+  const subjects = Array.from(new Set(questions.map((q) => q.subject)));
+  const levels = ["Form 1", "Form 2", "Form 3", "Form 4"];
 
   const filteredQuestions = questions.filter((question) => {
     const matchesSearch =
       question.question_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      question.topic.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesSubject = subjectFilter === "all" || question.subject === subjectFilter
-    const matchesLevel = levelFilter === "all" || question.level === levelFilter
-    return matchesSearch && matchesSubject && matchesLevel
-  })
+      question.topic.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSubject =
+      subjectFilter === "all" || question.subject === subjectFilter;
+    const matchesLevel =
+      levelFilter === "all" || question.level === levelFilter;
+    return matchesSearch && matchesSubject && matchesLevel;
+  });
 
   const handleDelete = async (questionId: string) => {
     if (confirm("Are you sure you want to delete this question?")) {
       try {
-        await fetch(`https://api-gradex.rapidshyft.com/question/${questionId}`, {
+        await fetch(`http://0.0.0.0:8000/question/${questionId}`, {
           method: "DELETE",
           credentials: "include",
-        })
-        window.location.reload()
+        });
+        window.location.reload();
       } catch (error) {
-        alert("Failed to delete question")
+        alert("Failed to delete question");
       }
     }
-  }
+  };
 
   const handleView = (question: Question) => {
-    setSelectedQuestion(question)
-    setViewDialogOpen(true)
-  }
+    setSelectedQuestion(question);
+    setViewDialogOpen(true);
+  };
 
   return (
     <div className="space-y-4">
@@ -106,7 +123,10 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
           <TableBody>
             {filteredQuestions.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-muted-foreground"
+                >
                   No questions found
                 </TableCell>
               </TableRow>
@@ -125,10 +145,18 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">
-                      <Button variant="ghost" size="sm" onClick={() => handleView(question)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleView(question)}
+                      >
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(question.question_id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(question.question_id)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -141,8 +169,12 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
       </div>
 
       {selectedQuestion && (
-        <QuestionViewDialog question={selectedQuestion} open={viewDialogOpen} onOpenChange={setViewDialogOpen} />
+        <QuestionViewDialog
+          question={selectedQuestion}
+          open={viewDialogOpen}
+          onOpenChange={setViewDialogOpen}
+        />
       )}
     </div>
-  )
+  );
 }

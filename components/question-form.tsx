@@ -1,21 +1,27 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useState } from "react"
-import { useRouter } from "next/navigation"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Plus, X } from "lucide-react"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Plus, X } from "lucide-react";
 
 export function QuestionForm() {
-  const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
+  const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const [formData, setFormData] = useState({
     subject: "",
@@ -26,36 +32,36 @@ export function QuestionForm() {
     correct_answer: "",
     hint: "",
     level: "Form 1" as "Form 1" | "Form 2" | "Form 3" | "Form 4",
-  })
+  });
 
   const handleSubtopicChange = (index: number, value: string) => {
-    const newSubtopics = [...formData.subtopics]
-    newSubtopics[index] = value
-    setFormData({ ...formData, subtopics: newSubtopics })
-  }
+    const newSubtopics = [...formData.subtopics];
+    newSubtopics[index] = value;
+    setFormData({ ...formData, subtopics: newSubtopics });
+  };
 
   const addSubtopic = () => {
-    setFormData({ ...formData, subtopics: [...formData.subtopics, ""] })
-  }
+    setFormData({ ...formData, subtopics: [...formData.subtopics, ""] });
+  };
 
   const removeSubtopic = (index: number) => {
-    const newSubtopics = formData.subtopics.filter((_, i) => i !== index)
-    setFormData({ ...formData, subtopics: newSubtopics })
-  }
+    const newSubtopics = formData.subtopics.filter((_, i) => i !== index);
+    setFormData({ ...formData, subtopics: newSubtopics });
+  };
 
   const handleAnswerChange = (index: number, value: string) => {
-    const newAnswers = [...formData.answers]
-    newAnswers[index] = value
-    setFormData({ ...formData, answers: newAnswers })
-  }
+    const newAnswers = [...formData.answers];
+    newAnswers[index] = value;
+    setFormData({ ...formData, answers: newAnswers });
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setError("")
-    setLoading(true)
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
     try {
-      const response = await fetch("https://api-gradex.rapidshyft.com/question/create", {
+      const response = await fetch("http://0.0.0.0:8000/question/create", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -65,22 +71,22 @@ export function QuestionForm() {
           ...formData,
           subtopics: formData.subtopics.filter((s) => s.trim() !== ""),
         }),
-      })
+      });
 
-      const data = await response.json()
+      const data = await response.json();
 
       if (response.ok) {
-        router.push("/dashboard/questions")
-        router.refresh()
+        router.push("/dashboard/questions");
+        router.refresh();
       } else {
-        setError(data.message || "Failed to create question")
+        setError(data.message || "Failed to create question");
       }
     } catch (err) {
-      setError("Network error. Please try again.")
+      setError("Network error. Please try again.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <form onSubmit={handleSubmit}>
@@ -95,7 +101,9 @@ export function QuestionForm() {
               <Input
                 id="subject"
                 value={formData.subject}
-                onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, subject: e.target.value })
+                }
                 placeholder="e.g., Geography"
                 required
               />
@@ -103,7 +111,12 @@ export function QuestionForm() {
 
             <div className="space-y-2">
               <Label htmlFor="level">Level *</Label>
-              <Select value={formData.level} onValueChange={(value: any) => setFormData({ ...formData, level: value })}>
+              <Select
+                value={formData.level}
+                onValueChange={(value: any) =>
+                  setFormData({ ...formData, level: value })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
@@ -122,7 +135,9 @@ export function QuestionForm() {
             <Input
               id="topic"
               value={formData.topic}
-              onChange={(e) => setFormData({ ...formData, topic: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, topic: e.target.value })
+              }
               placeholder="e.g., Climate"
               required
             />
@@ -139,13 +154,23 @@ export function QuestionForm() {
                   required
                 />
                 {formData.subtopics.length > 1 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => removeSubtopic(index)}>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => removeSubtopic(index)}
+                  >
                     <X className="h-4 w-4" />
                   </Button>
                 )}
               </div>
             ))}
-            <Button type="button" variant="outline" size="sm" onClick={addSubtopic}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={addSubtopic}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Add Subtopic
             </Button>
@@ -156,7 +181,9 @@ export function QuestionForm() {
             <Textarea
               id="question_text"
               value={formData.question_text}
-              onChange={(e) => setFormData({ ...formData, question_text: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, question_text: e.target.value })
+              }
               placeholder="Enter your question here..."
               rows={3}
               required
@@ -180,7 +207,9 @@ export function QuestionForm() {
             <Label htmlFor="correct_answer">Correct Answer *</Label>
             <Select
               value={formData.correct_answer}
-              onValueChange={(value) => setFormData({ ...formData, correct_answer: value })}
+              onValueChange={(value) =>
+                setFormData({ ...formData, correct_answer: value })
+              }
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select the correct answer" />
@@ -202,25 +231,35 @@ export function QuestionForm() {
             <Textarea
               id="hint"
               value={formData.hint}
-              onChange={(e) => setFormData({ ...formData, hint: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, hint: e.target.value })
+              }
               placeholder="Provide a helpful hint..."
               rows={2}
               required
             />
           </div>
 
-          {error && <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">{error}</div>}
+          {error && (
+            <div className="text-sm text-destructive bg-destructive/10 p-3 rounded-md">
+              {error}
+            </div>
+          )}
 
           <div className="flex gap-4">
             <Button type="submit" disabled={loading}>
               {loading ? "Creating..." : "Create Question"}
             </Button>
-            <Button type="button" variant="outline" onClick={() => router.back()}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => router.back()}
+            >
               Cancel
             </Button>
           </div>
         </CardContent>
       </Card>
     </form>
-  )
+  );
 }

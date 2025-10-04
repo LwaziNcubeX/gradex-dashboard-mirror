@@ -1,39 +1,46 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Eye, Trash2, Search } from "lucide-react"
-import type { Quiz } from "@/app/dashboard/quizzes/page"
+import { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { Eye, Trash2, Search } from "lucide-react";
+import type { Quiz } from "@/app/dashboard/quizzes/page";
 
 interface QuizzesTableProps {
-  quizzes: Quiz[]
+  quizzes: Quiz[];
 }
 
 export function QuizzesTable({ quizzes }: QuizzesTableProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredQuizzes = quizzes.filter(
     (quiz) =>
       quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quiz.subject.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      quiz.subject.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleDelete = async (quizId: string) => {
     if (confirm("Are you sure you want to delete this quiz?")) {
       try {
-        await fetch(`https://api-gradex.rapidshyft.com/quiz/${quizId}`, {
+        await fetch(`http://0.0.0.0:8000/quiz/${quizId}`, {
           method: "DELETE",
           credentials: "include",
-        })
-        window.location.reload()
+        });
+        window.location.reload();
       } catch (error) {
-        alert("Failed to delete quiz")
+        alert("Failed to delete quiz");
       }
     }
-  }
+  };
 
   return (
     <div className="space-y-4">
@@ -61,7 +68,10 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
           <TableBody>
             {filteredQuizzes.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center text-muted-foreground">
+                <TableCell
+                  colSpan={5}
+                  className="text-center text-muted-foreground"
+                >
                   No quizzes found
                 </TableCell>
               </TableRow>
@@ -81,7 +91,11 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
                       <Button variant="ghost" size="sm">
                         <Eye className="h-4 w-4" />
                       </Button>
-                      <Button variant="ghost" size="sm" onClick={() => handleDelete(quiz.quiz_id)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleDelete(quiz.quiz_id)}
+                      >
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
@@ -93,5 +107,5 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
         </Table>
       </div>
     </div>
-  )
+  );
 }

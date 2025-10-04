@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
-const API_BASE_URL = "https://api-gradex.rapidshyft.com";
+const API_BASE_URL = "http://0.0.0.0:8000";
 
 export async function middleware(request: NextRequest) {
   const token = request.cookies.get("gradex_admin_token")?.value;

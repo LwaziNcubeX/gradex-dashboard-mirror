@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import { setAuthToken } from "@/lib/auth";
 
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-gradex.rapidshyft.com";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://0.0.0.0:8000";
 
 export async function POST(request: NextRequest) {
   try {

@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const API_BASE_URL = "https://api-gradex.rapidshyft.com/";
+const API_BASE_URL = "http://0.0.0.0:8000/";
 const TOKEN_COOKIE_NAME = "gradex_admin_token";
 const REFRESH_TOKEN_COOKIE_NAME = "gradex_refresh_token";
 
@@ -70,7 +70,7 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+    const response = await fetch(`${API_BASE_URL}auth/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
