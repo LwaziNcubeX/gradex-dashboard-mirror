@@ -1,13 +1,23 @@
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
 import { serverApiClient } from "@/lib/server-api-client";
+import { CONFIG } from "@/lib/config";
 
 async function getDashboardStats() {
   try {
     const [questionsRes, quizzesRes, levelsRes] = await Promise.all([
-      serverApiClient.get<{ success: boolean; questions: any[] }>("/questions"),
-      serverApiClient.get<{ success: boolean; quizzes: any[] }>("/quizzes"),
-      serverApiClient.get<{ success: boolean; levels: any[] }>("/levels"),
+      serverApiClient.get<{ success: boolean; questions: any[] }>(
+        "/questions",
+        { cache: "force-cache", revalidate: CONFIG.CACHE.REVALIDATE_TIME }
+      ),
+      serverApiClient.get<{ success: boolean; quizzes: any[] }>("/quizzes", {
+        cache: "force-cache",
+        revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+      }),
+      serverApiClient.get<{ success: boolean; levels: any[] }>("/levels", {
+        cache: "force-cache",
+        revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+      }),
     ]);
 
     return {

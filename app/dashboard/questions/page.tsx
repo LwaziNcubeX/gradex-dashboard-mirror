@@ -1,40 +1,51 @@
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import Link from "next/link"
-import { QuestionsTable } from "@/components/questions-table"
-import { serverApiClient } from "@/lib/server-api-client"
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import { QuestionsTable } from "@/components/questions-table";
+import { serverApiClient } from "@/lib/server-api-client";
 
 export interface Question {
-  question_id: string
-  subject: string
-  topic: string
-  subtopics: string[]
-  question_text: string
-  answers: string[]
-  correct_answer: string
-  hint: string
-  level: "Form 1" | "Form 2" | "Form 3" | "Form 4"
-  created_at: string
+  question_id: string;
+  subject: string;
+  topic: string;
+  subtopics: string[];
+  question_text: string;
+  answers: string[];
+  correct_answer: string;
+  hint: string;
+  level: "Form 1" | "Form 2" | "Form 3" | "Form 4";
+  created_at: string;
 }
+
+import { CONFIG } from "@/lib/config";
 
 async function getQuestions() {
   try {
-    const response = await serverApiClient.get<{ success: boolean; questions: Question[] }>("/questions")
-    return response.questions || []
+    const response = await serverApiClient.get<{
+      success: boolean;
+      questions: Question[];
+    }>("/questions", {
+      cache: "force-cache",
+      revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+    });
+    return response.questions || [];
   } catch (error) {
-    return []
+    console.error("Failed to fetch questions:", error);
+    return [];
   }
 }
 
 export default async function QuestionsPage() {
-  const questions = await getQuestions()
+  const questions = await getQuestions();
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Question Bank</h2>
-          <p className="text-muted-foreground">Manage all questions for your quizzes</p>
+          <p className="text-muted-foreground">
+            Manage all questions for your quizzes
+          </p>
         </div>
         <Link href="/dashboard/questions/create">
           <Button>
@@ -46,5 +57,5 @@ export default async function QuestionsPage() {
 
       <QuestionsTable questions={questions} />
     </div>
-  )
+  );
 }

@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-
-const API_BASE_URL = "https://api-gradex.rapidshyft.com";
+import { CONFIG } from "./lib/config";
 
 export async function middleware(request: NextRequest) {
-  const token = request.cookies.get("gradex_admin_token")?.value;
+  // Clone the request headers
+  const requestHeaders = new Headers(request.headers);
+
+  // Add request ID for tracking
+  const requestId = crypto.randomUUID();
+  requestHeaders.set("x-request-id", requestId);
+
+  const token = request.cookies.get(CONFIG.AUTH.TOKEN_COOKIE_NAME)?.value;
 
   // If no token and trying to access protected routes, redirect to login
   if (!token && !request.nextUrl.pathname.startsWith("/login")) {
@@ -19,7 +25,7 @@ export async function middleware(request: NextRequest) {
   // Verify token and role for protected routes
   if (token && !request.nextUrl.pathname.startsWith("/login")) {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/profile`, {
+      const response = await fetch(`${CONFIG.API.BASE_URL}/auth/profile`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -62,7 +68,37 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  return NextResponse.next();
+  // Create response with enhanced headers
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
+
+  // Security headers
+  response.headers.set("X-Frame-Options", "DENY");
+  response.headers.set("X-Content-Type-Options", "nosniff");
+  response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  response.headers.set("X-Request-ID", requestId);
+  response.headers.set(
+    "Permissions-Policy",
+    "camera=(), microphone=(), geolocation=()"
+  );
+
+  // CORS headers for API routes
+  if (request.nextUrl.pathname.startsWith("/api/")) {
+    response.headers.set("Access-Control-Allow-Origin", "*");
+    response.headers.set(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, DELETE, OPTIONS"
+    );
+    response.headers.set(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, X-Request-ID"
+    );
+  }
+
+  return response;
 }
 
 export const config = {

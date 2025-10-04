@@ -1,8 +1,5 @@
 import { cookies } from "next/headers";
-
-const API_BASE_URL = "https://api-gradex.rapidshyft.com/";
-const TOKEN_COOKIE_NAME = "gradex_admin_token";
-const REFRESH_TOKEN_COOKIE_NAME = "gradex_refresh_token";
+import { CONFIG } from "./config";
 
 export interface User {
   user_id: string;
@@ -23,42 +20,45 @@ export async function setAuthToken(accessToken: string, refreshToken?: string) {
     refreshToken ? "present" : "missing"
   );
 
-  cookieStore.set(TOKEN_COOKIE_NAME, accessToken, {
+  cookieStore.set(CONFIG.AUTH.TOKEN_COOKIE_NAME, accessToken, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: CONFIG.APP.IS_PRODUCTION,
     sameSite: "lax",
-    maxAge: 60 * 60 * 24, // 1 day for access token
+    maxAge: CONFIG.AUTH.ACCESS_TOKEN_EXPIRY,
     path: "/",
   });
 
-  console.log("[Auth] Access token cookie set:", TOKEN_COOKIE_NAME);
+  console.log("[Auth] Access token cookie set:", CONFIG.AUTH.TOKEN_COOKIE_NAME);
 
   if (refreshToken) {
-    cookieStore.set(REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
+    cookieStore.set(CONFIG.AUTH.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: CONFIG.APP.IS_PRODUCTION,
       sameSite: "lax",
-      maxAge: 60 * 60 * 24 * 7, // 7 days for refresh token
+      maxAge: CONFIG.AUTH.REFRESH_TOKEN_EXPIRY,
       path: "/",
     });
-    console.log("[Auth] Refresh token cookie set:", REFRESH_TOKEN_COOKIE_NAME);
+    console.log(
+      "[Auth] Refresh token cookie set:",
+      CONFIG.AUTH.REFRESH_TOKEN_COOKIE_NAME
+    );
   }
 }
 
 export async function getAuthToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
-  return cookieStore.get(TOKEN_COOKIE_NAME)?.value;
+  return cookieStore.get(CONFIG.AUTH.TOKEN_COOKIE_NAME)?.value;
 }
 
 export async function getRefreshToken(): Promise<string | undefined> {
   const cookieStore = await cookies();
-  return cookieStore.get(REFRESH_TOKEN_COOKIE_NAME)?.value;
+  return cookieStore.get(CONFIG.AUTH.REFRESH_TOKEN_COOKIE_NAME)?.value;
 }
 
 export async function removeAuthToken() {
   const cookieStore = await cookies();
-  cookieStore.delete(TOKEN_COOKIE_NAME);
-  cookieStore.delete(REFRESH_TOKEN_COOKIE_NAME);
+  cookieStore.delete(CONFIG.AUTH.TOKEN_COOKIE_NAME);
+  cookieStore.delete(CONFIG.AUTH.REFRESH_TOKEN_COOKIE_NAME);
 }
 
 export async function getCurrentUser(): Promise<User | null> {
@@ -70,7 +70,7 @@ export async function getCurrentUser(): Promise<User | null> {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}auth/profile`, {
+    const response = await fetch(`${CONFIG.API.BASE_URL}/auth/profile`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },

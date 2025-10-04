@@ -1,18 +1,20 @@
 import { getAuthToken } from "./auth";
-
-const API_BASE_URL = "https://api-gradex.rapidshyft.com";
+import { CONFIG } from "./config";
 
 export class ServerApiClient {
   private baseUrl: string;
+  private timeout: number;
 
-  constructor(baseUrl: string = API_BASE_URL) {
+  constructor(baseUrl: string = CONFIG.API.BASE_URL) {
     this.baseUrl = baseUrl;
+    this.timeout = CONFIG.API.TIMEOUT;
   }
 
   private async getHeaders(): Promise<HeadersInit> {
     const token = await getAuthToken();
     const headers: HeadersInit = {
       "Content-Type": "application/json",
+      "X-Server-Version": CONFIG.APP.VERSION,
     };
 
     if (token) {
@@ -22,18 +24,58 @@ export class ServerApiClient {
     return headers;
   }
 
-  async get<T>(endpoint: string): Promise<T> {
+  private async fetchWithTimeout(
+    url: string,
+    options: RequestInit
+  ): Promise<Response> {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
+
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal,
+      });
+      clearTimeout(timeoutId);
+      return response;
+    } catch (error) {
+      clearTimeout(timeoutId);
+      throw error;
+    }
+  }
+
+  async get<T>(
+    endpoint: string,
+    options: {
+      cache?: RequestCache;
+      revalidate?: number | false;
+    } = {}
+  ): Promise<T> {
     const headers = await this.getHeaders();
-    const response = await fetch(`${this.baseUrl}${endpoint}`, {
+    const fetchOptions: RequestInit = {
       headers,
-      cache: "no-store",
-    });
+      cache: options.cache || "no-store",
+    };
+
+    if (options.revalidate !== undefined) {
+      fetchOptions["next"] = { revalidate: options.revalidate };
+    }
+
+    const response = await this.fetchWithTimeout(
+      `${this.baseUrl}${endpoint}`,
+      fetchOptions
+    );
 
     if (!response.ok) {
       const error = await response
         .json()
-        .catch(() => ({ message: "Request failed" }));
-      throw new Error(error.message || "Request failed");
+        .catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+
+      const errorMessage =
+        error.message || `Request failed with status ${response.status}`;
+      throw new Error(errorMessage);
     }
 
     return response.json();
