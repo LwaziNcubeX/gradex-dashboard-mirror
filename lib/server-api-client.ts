@@ -1,18 +1,8 @@
+import { getAuthToken } from "./auth";
+
 const API_BASE_URL = "https://api-gradex.rapidshyft.com";
 
-// Client-side function to get auth token from cookies
-function getClientAuthToken(): string | undefined {
-  if (typeof window === "undefined") return undefined;
-
-  const cookies = document.cookie.split(";");
-  const tokenCookie = cookies.find((cookie) =>
-    cookie.trim().startsWith("gradex_admin_token=")
-  );
-
-  return tokenCookie ? tokenCookie.split("=")[1] : undefined;
-}
-
-export class ApiClient {
+export class ServerApiClient {
   private baseUrl: string;
 
   constructor(baseUrl: string = API_BASE_URL) {
@@ -20,14 +10,7 @@ export class ApiClient {
   }
 
   private async getHeaders(): Promise<HeadersInit> {
-    let token: string | undefined;
-
-    // Get token from client-side cookies
-    if (typeof window !== "undefined") {
-      token = getClientAuthToken();
-      console.log("Client-side token:", token ? "present" : "missing");
-    }
-
+    const token = await getAuthToken();
     const headers: HeadersInit = {
       "Content-Type": "application/json",
     };
@@ -92,4 +75,4 @@ export class ApiClient {
   }
 }
 
-export const apiClient = new ApiClient();
+export const serverApiClient = new ServerApiClient();

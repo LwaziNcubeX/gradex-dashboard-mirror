@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import { QuestionsTable } from "@/components/questions-table"
-import { apiClient } from "@/lib/api-client"
+import { serverApiClient } from "@/lib/server-api-client"
 
 export interface Question {
   question_id: string
@@ -19,7 +19,7 @@ export interface Question {
 
 async function getQuestions() {
   try {
-    const response = await apiClient.get<{ success: boolean; questions: Question[] }>("/questions")
+    const response = await serverApiClient.get<{ success: boolean; questions: Question[] }>("/questions")
     return response.questions || []
   } catch (error) {
     return []

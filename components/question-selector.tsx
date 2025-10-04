@@ -1,60 +1,82 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Search } from "lucide-react"
-import type { Question } from "@/app/dashboard/questions/page"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Search } from "lucide-react";
+import type { Question } from "@/app/dashboard/questions/page";
 
 interface QuestionSelectorProps {
-  questions: Question[]
-  selectedQuestions: string[]
-  onSelectionChange: (selected: string[]) => void
+  questions: Question[];
+  selectedQuestions: string[];
+  onSelectionChange: (selected: string[]) => void;
+  isLoading?: boolean;
 }
 
-export function QuestionSelector({ questions, selectedQuestions, onSelectionChange }: QuestionSelectorProps) {
-  const [searchTerm, setSearchTerm] = useState("")
-  const [subjectFilter, setSubjectFilter] = useState<string>("all")
-  const [levelFilter, setLevelFilter] = useState<string>("all")
+export function QuestionSelector({
+  questions,
+  selectedQuestions,
+  onSelectionChange,
+  isLoading = false,
+}: QuestionSelectorProps) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [subjectFilter, setSubjectFilter] = useState<string>("all");
+  const [levelFilter, setLevelFilter] = useState<string>("all");
 
-  const subjects = Array.from(new Set(questions.map((q) => q.subject)))
-  const levels = ["Form 1", "Form 2", "Form 3", "Form 4"]
+  const subjects = Array.from(new Set(questions.map((q) => q.subject)));
+  const levels = ["Form 1", "Form 2", "Form 3", "Form 4"];
 
   const filteredQuestions = questions.filter((question) => {
     const matchesSearch =
       question.question_text.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      question.topic.toLowerCase().includes(searchTerm.toLowerCase())
-    const matchesSubject = subjectFilter === "all" || question.subject === subjectFilter
-    const matchesLevel = levelFilter === "all" || question.level === levelFilter
-    return matchesSearch && matchesSubject && matchesLevel
-  })
+      question.topic.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSubject =
+      subjectFilter === "all" || question.subject === subjectFilter;
+    const matchesLevel =
+      levelFilter === "all" || question.level === levelFilter;
+    return matchesSearch && matchesSubject && matchesLevel;
+  });
 
   const handleToggle = (questionId: string) => {
     if (selectedQuestions.includes(questionId)) {
-      onSelectionChange(selectedQuestions.filter((id) => id !== questionId))
+      onSelectionChange(selectedQuestions.filter((id) => id !== questionId));
     } else {
-      onSelectionChange([...selectedQuestions, questionId])
+      onSelectionChange([...selectedQuestions, questionId]);
     }
-  }
+  };
 
   const handleSelectAll = () => {
     if (selectedQuestions.length === filteredQuestions.length) {
-      onSelectionChange([])
+      onSelectionChange([]);
     } else {
-      onSelectionChange(filteredQuestions.map((q) => q.question_id))
+      onSelectionChange(filteredQuestions.map((q) => q.question_id));
     }
-  }
+  };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Select Questions ({selectedQuestions.length} selected)</CardTitle>
-          <button type="button" onClick={handleSelectAll} className="text-sm text-primary hover:underline">
-            {selectedQuestions.length === filteredQuestions.length ? "Deselect All" : "Select All"}
+          <CardTitle>
+            Select Questions ({selectedQuestions.length} selected)
+          </CardTitle>
+          <button
+            type="button"
+            onClick={handleSelectAll}
+            className="text-sm text-primary hover:underline"
+          >
+            {selectedQuestions.length === filteredQuestions.length
+              ? "Deselect All"
+              : "Select All"}
           </button>
         </div>
       </CardHeader>
@@ -98,8 +120,16 @@ export function QuestionSelector({ questions, selectedQuestions, onSelectionChan
         </div>
 
         <div className="space-y-2 max-h-[500px] overflow-y-auto">
-          {filteredQuestions.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8">No questions found</div>
+          {isLoading ? (
+            <div className="text-center text-muted-foreground py-8">
+              Loading questions...
+            </div>
+          ) : filteredQuestions.length === 0 ? (
+            <div className="text-center text-muted-foreground py-8">
+              {questions.length === 0
+                ? "No questions available"
+                : "No questions found"}
+            </div>
           ) : (
             filteredQuestions.map((question) => (
               <div
@@ -131,5 +161,5 @@ export function QuestionSelector({ questions, selectedQuestions, onSelectionChan
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

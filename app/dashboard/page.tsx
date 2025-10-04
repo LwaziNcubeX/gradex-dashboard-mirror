@@ -1,13 +1,13 @@
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
-import { apiClient } from "@/lib/api-client";
+import { serverApiClient } from "@/lib/server-api-client";
 
 async function getDashboardStats() {
   try {
     const [questionsRes, quizzesRes, levelsRes] = await Promise.all([
-      apiClient.get<{ success: boolean; questions: any[] }>("/questions"),
-      apiClient.get<{ success: boolean; quizzes: any[] }>("/quizzes"),
-      apiClient.get<{ success: boolean; levels: any[] }>("/levels"),
+      serverApiClient.get<{ success: boolean; questions: any[] }>("/questions"),
+      serverApiClient.get<{ success: boolean; quizzes: any[] }>("/quizzes"),
+      serverApiClient.get<{ success: boolean; levels: any[] }>("/levels"),
     ]);
 
     return {

@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button"
 import { Plus } from "lucide-react"
 import Link from "next/link"
 import { LevelsTable } from "@/components/levels-table"
-import { apiClient } from "@/lib/api-client"
+import { serverApiClient } from "@/lib/server-api-client"
 
 export interface Level {
   level_id: string
@@ -14,7 +14,7 @@ export interface Level {
 
 async function getLevels() {
   try {
-    const response = await apiClient.get<{ success: boolean; levels: Level[] }>("/levels")
+    const response = await serverApiClient.get<{ success: boolean; levels: Level[] }>("/levels")
     return response.levels || []
   } catch (error) {
     return []

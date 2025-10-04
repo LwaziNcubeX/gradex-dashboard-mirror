@@ -10,10 +10,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QuestionSelector } from "@/components/question-selector";
 import type { Question } from "@/app/dashboard/questions/page";
+import { apiClient } from "@/lib/api-client";
 
 export function QuizForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [questionsLoading, setQuestionsLoading] = useState(true);
   const [error, setError] = useState("");
   const [questions, setQuestions] = useState<Question[]>([]);
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
@@ -31,18 +33,29 @@ export function QuizForm() {
 
   const fetchQuestions = async () => {
     try {
-      const response = await fetch(
-        "https://api-gradex.rapidshyft.com/questions",
-        {
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
+      setQuestionsLoading(true);
+      console.log("Fetching questions..."); // Debug log
+      const data = await apiClient.get<{
+        success: boolean;
+        questions: Question[];
+      }>("/questions");
+      console.log("Fetched questions response:", data); // Debug log
+      console.log("Questions array:", data.questions); // Debug log
+      console.log("Questions count:", data.questions?.length || 0); // Debug log
+
       if (data.success) {
-        setQuestions(data.questions);
+        setQuestions(data.questions || []);
+      } else {
+        console.error("Failed to fetch questions: API returned success: false");
+        setError("Failed to load questions from server.");
       }
     } catch (error) {
       console.error("Failed to fetch questions:", error);
+      setError(
+        "Failed to load questions. Please check your connection and try again."
+      );
+    } finally {
+      setQuestionsLoading(false);
     }
   };
 
@@ -58,31 +71,24 @@ export function QuizForm() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://api-gradex.rapidshyft.com/quiz/create",
+      const data = await apiClient.post<{ success: boolean; message?: string }>(
+        "/quiz/create",
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            ...formData,
-            questions: selectedQuestions,
-          }),
+          ...formData,
+          questions: selectedQuestions,
         }
       );
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data.success) {
         router.push("/dashboard/quizzes");
         router.refresh();
       } else {
         setError(data.message || "Failed to create quiz");
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      setError(
+        err instanceof Error ? err.message : "Network error. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -156,6 +162,7 @@ export function QuizForm() {
         questions={questions}
         selectedQuestions={selectedQuestions}
         onSelectionChange={setSelectedQuestions}
+        isLoading={questionsLoading}
       />
 
       {error && (
