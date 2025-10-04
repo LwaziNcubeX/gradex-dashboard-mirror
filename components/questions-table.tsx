@@ -134,10 +134,12 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredQuestions.map((question) => (
-                <TableRow key={question.question_id}>
+              filteredQuestions.map((question, index) => (
+                <TableRow key={`question-${question.question_id}-${index}`}>
                   <TableCell className="max-w-md">
-                    <div className="truncate">{question.question_text}</div>
+                    <div className="truncate" title={question.question_text}>
+                      {question.question_text}
+                    </div>
                   </TableCell>
                   <TableCell>
                     <Badge variant="outline">{question.subject}</Badge>

@@ -19,6 +19,9 @@ export interface Question {
 
 import { CONFIG } from "@/lib/config";
 
+// Enable ISR for this page
+export const revalidate = CONFIG.CACHE.REVALIDATE_TIME;
+
 async function getQuestions() {
   try {
     const response = await serverApiClient.get<{
@@ -27,6 +30,7 @@ async function getQuestions() {
     }>("/questions", {
       cache: "force-cache",
       revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+      tags: ["questions"],
     });
     return response.questions || [];
   } catch (error) {
