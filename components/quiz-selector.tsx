@@ -1,51 +1,64 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Badge } from "@/components/ui/badge"
-import { Search } from "lucide-react"
-import type { Quiz } from "@/app/dashboard/quizzes/page"
+import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Badge } from "@/components/ui/badge";
+import { Search } from "lucide-react";
+import type { Quiz } from "@/app/dashboard/quizzes/page";
+import { getQuizId } from "@/app/dashboard/quizzes/page";
 
 interface QuizSelectorProps {
-  quizzes: Quiz[]
-  selectedQuizzes: string[]
-  onSelectionChange: (selected: string[]) => void
+  quizzes: Quiz[];
+  selectedQuizzes: string[];
+  onSelectionChange: (selected: string[]) => void;
 }
 
-export function QuizSelector({ quizzes, selectedQuizzes, onSelectionChange }: QuizSelectorProps) {
-  const [searchTerm, setSearchTerm] = useState("")
+export function QuizSelector({
+  quizzes,
+  selectedQuizzes,
+  onSelectionChange,
+}: QuizSelectorProps) {
+  const [searchTerm, setSearchTerm] = useState("");
 
   const filteredQuizzes = quizzes.filter(
     (quiz) =>
       quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quiz.subject.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      quiz.subject.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   const handleToggle = (quizId: string) => {
     if (selectedQuizzes.includes(quizId)) {
-      onSelectionChange(selectedQuizzes.filter((id) => id !== quizId))
+      onSelectionChange(selectedQuizzes.filter((id) => id !== quizId));
     } else {
-      onSelectionChange([...selectedQuizzes, quizId])
+      onSelectionChange([...selectedQuizzes, quizId]);
     }
-  }
+  };
 
   const handleSelectAll = () => {
     if (selectedQuizzes.length === filteredQuizzes.length) {
-      onSelectionChange([])
+      onSelectionChange([]);
     } else {
-      onSelectionChange(filteredQuizzes.map((q) => q.quiz_id))
+      onSelectionChange(filteredQuizzes.map((q) => getQuizId(q)));
     }
-  }
+  };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex items-center justify-between">
-          <CardTitle>Select Quizzes ({selectedQuizzes.length} selected)</CardTitle>
-          <button type="button" onClick={handleSelectAll} className="text-sm text-primary hover:underline">
-            {selectedQuizzes.length === filteredQuizzes.length ? "Deselect All" : "Select All"}
+          <CardTitle>
+            Select Quizzes ({selectedQuizzes.length} selected)
+          </CardTitle>
+          <button
+            type="button"
+            onClick={handleSelectAll}
+            className="text-sm text-primary hover:underline"
+          >
+            {selectedQuizzes.length === filteredQuizzes.length
+              ? "Deselect All"
+              : "Select All"}
           </button>
         </div>
       </CardHeader>
@@ -62,21 +75,25 @@ export function QuizSelector({ quizzes, selectedQuizzes, onSelectionChange }: Qu
 
         <div className="space-y-2 max-h-[500px] overflow-y-auto">
           {filteredQuizzes.length === 0 ? (
-            <div className="text-center text-muted-foreground py-8">No quizzes found</div>
+            <div className="text-center text-muted-foreground py-8">
+              No quizzes found
+            </div>
           ) : (
             filteredQuizzes.map((quiz) => (
               <div
-                key={quiz.quiz_id}
+                key={getQuizId(quiz)}
                 className="flex items-start gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
               >
                 <Checkbox
-                  checked={selectedQuizzes.includes(quiz.quiz_id)}
-                  onCheckedChange={() => handleToggle(quiz.quiz_id)}
+                  checked={selectedQuizzes.includes(getQuizId(quiz))}
+                  onCheckedChange={() => handleToggle(getQuizId(quiz))}
                   className="mt-1"
                 />
                 <div className="flex-1 space-y-2">
                   <div className="font-medium">{quiz.title}</div>
-                  <div className="text-sm text-muted-foreground">{quiz.description}</div>
+                  <div className="text-sm text-muted-foreground">
+                    {quiz.description}
+                  </div>
                   <div className="flex gap-2">
                     <Badge variant="outline" className="text-xs">
                       {quiz.subject}
@@ -95,5 +112,5 @@ export function QuizSelector({ quizzes, selectedQuizzes, onSelectionChange }: Qu
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

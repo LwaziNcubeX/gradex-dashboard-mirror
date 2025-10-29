@@ -1,8 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { setAuthToken } from "@/lib/auth";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-gradex.rapidshyft.com";
+import { CONFIG } from "@/lib/config";
 
 export async function POST(request: NextRequest) {
   try {
@@ -17,14 +15,20 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    console.log("[API Login] Calling backend:", `${API_BASE_URL}/auth/login`);
-    const response = await fetch(`${API_BASE_URL}/auth/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email, otp }),
-    });
+    console.log(
+      "[API Login] Calling backend:",
+      `${CONFIG.API.BASE_URL}${CONFIG.ENDPOINTS.AUTH.LOGIN}`
+    );
+    const response = await fetch(
+      `${CONFIG.API.BASE_URL}${CONFIG.ENDPOINTS.AUTH.LOGIN}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, otp }),
+      }
+    );
 
     console.log("[API Login] Backend response status:", response.status);
     const data = await response.json();

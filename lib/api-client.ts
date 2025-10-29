@@ -1,15 +1,36 @@
 import { CONFIG } from "./config";
 
-// Client-side function to get auth token from cookies
-function getClientAuthToken(): string | undefined {
+// Client-side function to get auth token via API endpoint
+async function getClientAuthToken(): Promise<string | undefined> {
   if (typeof window === "undefined") return undefined;
 
-  const cookies = document.cookie.split(";");
-  const tokenCookie = cookies.find((cookie) =>
-    cookie.trim().startsWith(`${CONFIG.AUTH.TOKEN_COOKIE_NAME}=`)
-  );
+  try {
+    const response = await fetch("/api/auth/token", {
+      method: "GET",
+      credentials: "include", // This ensures cookies are sent
+    });
 
-  return tokenCookie ? tokenCookie.split("=")[1] : undefined;
+    if (response.ok) {
+      const data = await response.json();
+      if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
+        console.log(
+          "Token retrieved from API:",
+          data.token ? `${data.token.substring(0, 20)}...` : "null"
+        );
+      }
+      return data.token;
+    } else {
+      if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
+        console.log("Failed to get token from API:", response.status);
+      }
+      return undefined;
+    }
+  } catch (error) {
+    if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
+      console.error("Error getting client auth token:", error);
+    }
+    return undefined;
+  }
 }
 
 // Retry logic for failed requests
@@ -50,9 +71,9 @@ export class ApiClient {
   private async getHeaders(): Promise<HeadersInit> {
     let token: string | undefined;
 
-    // Get token from client-side cookies
+    // Get token from client-side API endpoint
     if (typeof window !== "undefined") {
-      token = getClientAuthToken();
+      token = await getClientAuthToken();
       if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
         console.log("Client-side token:", token ? "present" : "missing");
       }
@@ -105,11 +126,9 @@ export class ApiClient {
       );
 
       if (!response.ok) {
-        const error = await response
-          .json()
-          .catch(() => ({
-            message: `HTTP ${response.status}: ${response.statusText}`,
-          }));
+        const error = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
 
         const errorMessage =
           error.message || `Request failed with status ${response.status}`;
@@ -123,6 +142,15 @@ export class ApiClient {
   async post<T>(endpoint: string, data: any): Promise<T> {
     return withRetry(async () => {
       const headers = await this.getHeaders();
+
+      // Debug logging for request
+      if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
+        console.log(`📤 POST Request to: ${this.baseUrl}${endpoint}`);
+        console.log("📤 Headers:", headers);
+        console.log("📤 Request Data:", data);
+        console.log("📤 Request Body (JSON):", JSON.stringify(data, null, 2));
+      }
+
       const response = await this.fetchWithTimeout(
         `${this.baseUrl}${endpoint}`,
         {
@@ -132,19 +160,40 @@ export class ApiClient {
         }
       );
 
+      // Debug logging for response
+      if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
+        console.log(
+          `📥 Response Status: ${response.status} ${response.statusText}`
+        );
+        console.log(
+          "📥 Response Headers:",
+          Object.fromEntries(response.headers.entries())
+        );
+      }
+
       if (!response.ok) {
-        const error = await response
-          .json()
-          .catch(() => ({
-            message: `HTTP ${response.status}: ${response.statusText}`,
-          }));
+        const error = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
+
+        // Debug logging for error
+        if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
+          console.log("❌ Error Response:", error);
+        }
 
         const errorMessage =
           error.message || `Request failed with status ${response.status}`;
         throw new Error(errorMessage);
       }
 
-      return response.json();
+      const responseData = await response.json();
+
+      // Debug logging for success response
+      if (CONFIG.FEATURES.ENABLE_DEBUG_LOGS) {
+        console.log("✅ Success Response:", responseData);
+      }
+
+      return responseData;
     });
   }
 
@@ -161,11 +210,9 @@ export class ApiClient {
       );
 
       if (!response.ok) {
-        const error = await response
-          .json()
-          .catch(() => ({
-            message: `HTTP ${response.status}: ${response.statusText}`,
-          }));
+        const error = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
 
         const errorMessage =
           error.message || `Request failed with status ${response.status}`;
@@ -188,11 +235,9 @@ export class ApiClient {
       );
 
       if (!response.ok) {
-        const error = await response
-          .json()
-          .catch(() => ({
-            message: `HTTP ${response.status}: ${response.statusText}`,
-          }));
+        const error = await response.json().catch(() => ({
+          message: `HTTP ${response.status}: ${response.statusText}`,
+        }));
 
         const errorMessage =
           error.message || `Request failed with status ${response.status}`;

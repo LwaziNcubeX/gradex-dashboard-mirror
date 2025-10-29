@@ -10,6 +10,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QuizSelector } from "@/components/quiz-selector";
 import type { Quiz } from "@/app/dashboard/quizzes/page";
+import { getQuizId } from "@/app/dashboard/quizzes/page";
+import { apiClient } from "@/lib/api-client";
+import { CONFIG } from "@/lib/config";
 
 export function LevelForm() {
   const router = useRouter();
@@ -29,13 +32,10 @@ export function LevelForm() {
 
   const fetchQuizzes = async () => {
     try {
-      const response = await fetch(
-        "https://api-gradex.rapidshyft.com/quizzes",
-        {
-          credentials: "include",
-        }
-      );
-      const data = await response.json();
+      const data = await apiClient.get<{
+        success: boolean;
+        quizzes: Quiz[];
+      }>(CONFIG.ENDPOINTS.QUIZZES.LIST);
       if (data.success) {
         setQuizzes(data.quizzes);
       }
@@ -56,24 +56,15 @@ export function LevelForm() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://api-gradex.rapidshyft.com/level/create",
+      const data = await apiClient.post<{ success: boolean; message?: string }>(
+        CONFIG.ENDPOINTS.LEVELS.CREATE,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            ...formData,
-            quizzes: selectedQuizzes,
-          }),
+          ...formData,
+          quizzes: selectedQuizzes,
         }
       );
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data.success) {
         router.push("/dashboard/levels");
         router.refresh();
       } else {

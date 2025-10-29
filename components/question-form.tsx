@@ -17,6 +17,8 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, X } from "lucide-react";
+import { apiClient } from "@/lib/api-client";
+import { CONFIG } from "@/lib/config";
 
 export function QuestionForm() {
   const router = useRouter();
@@ -61,24 +63,15 @@ export function QuestionForm() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        "https://api-gradex.rapidshyft.com/question/create",
+      const data = await apiClient.post<{ success: boolean; message?: string }>(
+        CONFIG.ENDPOINTS.QUESTIONS.CREATE,
         {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-          body: JSON.stringify({
-            ...formData,
-            subtopics: formData.subtopics.filter((s) => s.trim() !== ""),
-          }),
+          ...formData,
+          subtopics: formData.subtopics.filter((s) => s.trim() !== ""),
         }
       );
 
-      const data = await response.json();
-
-      if (response.ok) {
+      if (data.success) {
         router.push("/dashboard/questions");
         router.refresh();
       } else {

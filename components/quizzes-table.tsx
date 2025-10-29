@@ -14,6 +14,9 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Eye, Trash2, Search } from "lucide-react";
 import type { Quiz } from "@/app/dashboard/quizzes/page";
+import { getQuizId } from "@/app/dashboard/quizzes/page";
+import { apiClient } from "@/lib/api-client";
+import { CONFIG } from "@/lib/config";
 
 interface QuizzesTableProps {
   quizzes: Quiz[];
@@ -31,10 +34,7 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
   const handleDelete = async (quizId: string) => {
     if (confirm("Are you sure you want to delete this quiz?")) {
       try {
-        await fetch(`https://api-gradex.rapidshyft.com/quiz/${quizId}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
+        await apiClient.delete(CONFIG.ENDPOINTS.QUIZZES.DELETE(quizId));
         window.location.reload();
       } catch (error) {
         alert("Failed to delete quiz");
@@ -77,7 +77,7 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
               </TableRow>
             ) : (
               filteredQuizzes.map((quiz) => (
-                <TableRow key={quiz.quiz_id}>
+                <TableRow key={getQuizId(quiz)}>
                   <TableCell className="font-medium">{quiz.title}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{quiz.subject}</Badge>
@@ -94,7 +94,7 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(quiz.quiz_id)}
+                        onClick={() => handleDelete(getQuizId(quiz))}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, Trash2, Search } from "lucide-react";
 import type { Level } from "@/app/dashboard/levels/page";
+import { apiClient } from "@/lib/api-client";
+import { CONFIG } from "@/lib/config";
 
 interface LevelsTableProps {
   levels: Level[];
@@ -28,10 +30,7 @@ export function LevelsTable({ levels }: LevelsTableProps) {
   const handleDelete = async (levelId: string) => {
     if (confirm("Are you sure you want to delete this level?")) {
       try {
-        await fetch(`https://api-gradex.rapidshyft.com/level/${levelId}`, {
-          method: "DELETE",
-          credentials: "include",
-        });
+        await apiClient.delete(CONFIG.ENDPOINTS.LEVELS.DELETE(levelId));
         window.location.reload();
       } catch (error) {
         alert("Failed to delete level");

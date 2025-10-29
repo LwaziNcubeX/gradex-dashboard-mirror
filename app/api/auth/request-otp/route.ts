@@ -1,7 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
-
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-gradex.rapidshyft.com";
+import { CONFIG } from "@/lib/config";
 
 export async function POST(request: NextRequest) {
   try {
@@ -11,13 +9,16 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Email is required" }, { status: 400 });
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/request-otp`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ email }),
-    });
+    const response = await fetch(
+      `${CONFIG.API.BASE_URL}${CONFIG.ENDPOINTS.AUTH.REQUEST_OTP}`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email }),
+      }
+    );
 
     const data = await response.json();
 

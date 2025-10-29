@@ -44,6 +44,48 @@ export const CACHE_CONFIG = {
   REVALIDATE_TIME: 60, // 1 minute for ISR
 } as const;
 
+// API Endpoints Configuration
+export const API_ENDPOINTS = {
+  // Authentication
+  AUTH: {
+    LOGIN: "/auth/login",
+    LOGOUT: "/auth/logout",
+    REQUEST_OTP: "/auth/request-otp",
+    REFRESH_TOKEN: "/auth/refresh",
+  },
+
+  // Questions
+  QUESTIONS: {
+    LIST: "/questions/list",
+    CREATE: "/questions/create",
+    UPDATE: (id: string) => `/questions/${id}`,
+    DELETE: (id: string) => `/questions/${id}`,
+  },
+
+  // Quizzes
+  QUIZZES: {
+    LIST: "/quiz/list",
+    CREATE: "/quiz/create",
+    UPDATE: (id: string) => `/quiz/${id}`,
+    DELETE: (id: string) => `/quiz/${id}`,
+    GET_BY_ID: (id: string) => `/quiz/${id}`,
+  },
+
+  // Levels
+  LEVELS: {
+    LIST: "/levels/list",
+    CREATE: "/levels/create",
+    UPDATE: (id: string) => `/levels/${id}`,
+    DELETE: (id: string) => `/levels/${id}`,
+  },
+
+  // Dashboard/Stats
+  DASHBOARD: {
+    STATS: "/dashboard/stats",
+    RECENT_ACTIVITY: "/dashboard/recent-activity",
+  },
+} as const;
+
 // Validation helpers
 export const validateConfig = () => {
   const requiredEnvVars = ["NEXT_PUBLIC_API_BASE_URL"];
@@ -68,6 +110,7 @@ export const CONFIG = {
   APP: APP_CONFIG,
   FEATURES: FEATURE_FLAGS,
   CACHE: CACHE_CONFIG,
+  ENDPOINTS: API_ENDPOINTS,
 } as const;
 
 export default CONFIG;

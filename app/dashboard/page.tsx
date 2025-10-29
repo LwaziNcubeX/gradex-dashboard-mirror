@@ -7,17 +7,23 @@ async function getDashboardStats() {
   try {
     const [questionsRes, quizzesRes, levelsRes] = await Promise.all([
       serverApiClient.get<{ success: boolean; questions: any[] }>(
-        "/questions",
+        CONFIG.ENDPOINTS.QUESTIONS.LIST,
         { cache: "force-cache", revalidate: CONFIG.CACHE.REVALIDATE_TIME }
       ),
-      serverApiClient.get<{ success: boolean; quizzes: any[] }>("/quizzes", {
-        cache: "force-cache",
-        revalidate: CONFIG.CACHE.REVALIDATE_TIME,
-      }),
-      serverApiClient.get<{ success: boolean; levels: any[] }>("/levels", {
-        cache: "force-cache",
-        revalidate: CONFIG.CACHE.REVALIDATE_TIME,
-      }),
+      serverApiClient.get<{ success: boolean; quizzes: any[] }>(
+        CONFIG.ENDPOINTS.QUIZZES.LIST,
+        {
+          cache: "force-cache",
+          revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+        }
+      ),
+      serverApiClient.get<{ success: boolean; levels: any[] }>(
+        CONFIG.ENDPOINTS.LEVELS.LIST,
+        {
+          cache: "force-cache",
+          revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+        }
+      ),
     ]);
 
     return {

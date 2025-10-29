@@ -1,37 +1,43 @@
-import { Button } from "@/components/ui/button"
-import { Plus } from "lucide-react"
-import Link from "next/link"
-import { QuizzesTable } from "@/components/quizzes-table"
-import { serverApiClient } from "@/lib/server-api-client"
+import { Button } from "@/components/ui/button";
+import { Plus } from "lucide-react";
+import Link from "next/link";
+import { QuizzesTable } from "@/components/quizzes-table";
+import { serverApiClient } from "@/lib/server-api-client";
+import { CONFIG } from "@/lib/config";
 
 export interface Quiz {
-  quiz_id: string
-  title: string
-  description: string
-  subject: string
-  level: string
-  questions: string[]
-  created_at: string
+  quiz_id: string;
+  title: string;
+  description: string;
+  subject: string;
+  level: string;
+  questions: string[];
+  created_at: string;
 }
 
 async function getQuizzes() {
   try {
-    const response = await serverApiClient.get<{ success: boolean; quizzes: Quiz[] }>("/quizzes")
-    return response.quizzes || []
+    const response = await serverApiClient.get<{
+      success: boolean;
+      quizzes: Quiz[];
+    }>(CONFIG.ENDPOINTS.QUIZZES.LIST);
+    return response.quizzes || [];
   } catch (error) {
-    return []
+    return [];
   }
 }
 
 export default async function QuizzesPage() {
-  const quizzes = await getQuizzes()
+  const quizzes = await getQuizzes();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col gap-4 p-4 md:gap-6 md:p-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Quizzes</h2>
-          <p className="text-muted-foreground">Manage all quizzes for your students</p>
+          <p className="text-muted-foreground">
+            Manage all quizzes for your students
+          </p>
         </div>
         <Link href="/dashboard/quizzes/create">
           <Button>
@@ -43,5 +49,5 @@ export default async function QuizzesPage() {
 
       <QuizzesTable quizzes={quizzes} />
     </div>
-  )
+  );
 }

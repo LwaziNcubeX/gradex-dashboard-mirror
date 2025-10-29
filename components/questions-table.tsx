@@ -22,6 +22,8 @@ import {
 import { Eye, Trash2, Search } from "lucide-react";
 import type { Question } from "@/app/dashboard/questions/page";
 import { QuestionViewDialog } from "./question-view-dialog";
+import { apiClient } from "@/lib/api-client";
+import { CONFIG } from "@/lib/config";
 
 interface QuestionsTableProps {
   questions: Question[];
@@ -53,13 +55,7 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
   const handleDelete = async (questionId: string) => {
     if (confirm("Are you sure you want to delete this question?")) {
       try {
-        await fetch(
-          `https://api-gradex.rapidshyft.com/question/${questionId}`,
-          {
-            method: "DELETE",
-            credentials: "include",
-          }
-        );
+        await apiClient.delete(CONFIG.ENDPOINTS.QUESTIONS.DELETE(questionId));
         window.location.reload();
       } catch (error) {
         alert("Failed to delete question");
@@ -135,7 +131,11 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
               </TableRow>
             ) : (
               filteredQuestions.map((question, index) => (
-                <TableRow key={`question-${question.question_id}-${index}`}>
+                <TableRow
+                  key={`question-${
+                    question.id || question._id || question.question_id
+                  }-${index}`}
+                >
                   <TableCell className="max-w-md">
                     <div className="truncate" title={question.question_text}>
                       {question.question_text}
@@ -160,7 +160,14 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(question.question_id)}
+                        onClick={() =>
+                          handleDelete(
+                            question.id ||
+                              question._id ||
+                              question.question_id ||
+                              ""
+                          )
+                        }
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

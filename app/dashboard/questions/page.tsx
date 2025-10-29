@@ -3,9 +3,12 @@ import { Plus } from "lucide-react";
 import Link from "next/link";
 import { QuestionsTable } from "@/components/questions-table";
 import { serverApiClient } from "@/lib/server-api-client";
+import { CONFIG } from "@/lib/config";
 
 export interface Question {
-  question_id: string;
+  id?: string;
+  _id?: string;
+  question_id?: string;
   subject: string;
   topic: string;
   subtopics: string[];
@@ -17,7 +20,10 @@ export interface Question {
   created_at: string;
 }
 
-import { CONFIG } from "@/lib/config";
+// Helper function to get question ID regardless of field name
+export function getQuestionId(question: Question): string {
+  return question.id || question._id || question.question_id || "";
+}
 
 // Enable ISR for this page
 export const revalidate = CONFIG.CACHE.REVALIDATE_TIME;
@@ -27,7 +33,7 @@ async function getQuestions() {
     const response = await serverApiClient.get<{
       success: boolean;
       questions: Question[];
-    }>("/questions", {
+    }>(CONFIG.ENDPOINTS.QUESTIONS.LIST, {
       cache: "force-cache",
       revalidate: CONFIG.CACHE.REVALIDATE_TIME,
       tags: ["questions"],
@@ -43,7 +49,7 @@ export default async function QuestionsPage() {
   const questions = await getQuestions();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 flex flex-col gap-4 p-4 md:gap-6 md:p-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold tracking-tight">Question Bank</h2>

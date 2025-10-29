@@ -47,10 +47,17 @@ export function QuestionSelector({
   });
 
   const handleToggle = (questionId: string) => {
+    console.log("🔍 Question toggle:", { questionId, type: typeof questionId });
+    console.log("🔍 Current selectedQuestions:", selectedQuestions);
+
     if (selectedQuestions.includes(questionId)) {
-      onSelectionChange(selectedQuestions.filter((id) => id !== questionId));
+      const newSelection = selectedQuestions.filter((id) => id !== questionId);
+      console.log("🔍 Removing question, new selection:", newSelection);
+      onSelectionChange(newSelection);
     } else {
-      onSelectionChange([...selectedQuestions, questionId]);
+      const newSelection = [...selectedQuestions, questionId];
+      console.log("🔍 Adding question, new selection:", newSelection);
+      onSelectionChange(newSelection);
     }
   };
 
@@ -58,7 +65,9 @@ export function QuestionSelector({
     if (selectedQuestions.length === filteredQuestions.length) {
       onSelectionChange([]);
     } else {
-      onSelectionChange(filteredQuestions.map((q) => q.question_id));
+      onSelectionChange(
+        filteredQuestions.map((q) => q.id || q._id || q.question_id || "")
+      );
     }
   };
 
@@ -133,12 +142,18 @@ export function QuestionSelector({
           ) : (
             filteredQuestions.map((question) => (
               <div
-                key={question.question_id}
+                key={question.id || question._id || question.question_id}
                 className="flex items-start gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
               >
                 <Checkbox
-                  checked={selectedQuestions.includes(question.question_id)}
-                  onCheckedChange={() => handleToggle(question.question_id)}
+                  checked={selectedQuestions.includes(
+                    question.id || question._id || question.question_id || ""
+                  )}
+                  onCheckedChange={() =>
+                    handleToggle(
+                      question.id || question._id || question.question_id || ""
+                    )
+                  }
                   className="mt-1"
                 />
                 <div className="flex-1 space-y-2">

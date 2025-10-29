@@ -1,5 +1,13 @@
-import { cookies } from "next/headers";
 import { CONFIG } from "./config";
+
+// Dynamically import cookies only on server-side
+const getCookies = async () => {
+  if (typeof window !== "undefined") {
+    throw new Error("Auth functions can only be used on the server side");
+  }
+  const { cookies } = await import("next/headers");
+  return cookies;
+};
 
 export interface User {
   user_id: string;
@@ -9,6 +17,7 @@ export interface User {
 }
 
 export async function setAuthToken(accessToken: string, refreshToken?: string) {
+  const cookies = await getCookies();
   const cookieStore = await cookies();
 
   console.log(
@@ -46,16 +55,19 @@ export async function setAuthToken(accessToken: string, refreshToken?: string) {
 }
 
 export async function getAuthToken(): Promise<string | undefined> {
+  const cookies = await getCookies();
   const cookieStore = await cookies();
   return cookieStore.get(CONFIG.AUTH.TOKEN_COOKIE_NAME)?.value;
 }
 
 export async function getRefreshToken(): Promise<string | undefined> {
+  const cookies = await getCookies();
   const cookieStore = await cookies();
   return cookieStore.get(CONFIG.AUTH.REFRESH_TOKEN_COOKIE_NAME)?.value;
 }
 
 export async function removeAuthToken() {
+  const cookies = await getCookies();
   const cookieStore = await cookies();
   cookieStore.delete(CONFIG.AUTH.TOKEN_COOKIE_NAME);
   cookieStore.delete(CONFIG.AUTH.REFRESH_TOKEN_COOKIE_NAME);
