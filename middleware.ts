@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { CONFIG } from "./lib/config";
+import { serverApiClient, ServerApiClient } from "./lib/server-api-client";
+import { setAuthToken } from "./lib/auth";
 
 export async function middleware(request: NextRequest) {
   // Clone the request headers
@@ -12,8 +14,36 @@ export async function middleware(request: NextRequest) {
 
   const token = request.cookies.get(CONFIG.AUTH.TOKEN_COOKIE_NAME)?.value;
 
+  const refreshToken = request.cookies.get(
+    CONFIG.AUTH.REFRESH_TOKEN_COOKIE_NAME
+  )?.value;
+
   // If no token and trying to access protected routes, redirect to login
   if (!token && !request.nextUrl.pathname.startsWith("/login")) {
+    try {
+      const response = await serverApiClient.post<{
+        success: boolean;
+        access_token: string;
+      }>(`/auth/refresh`, {
+        refresh_token: refreshToken,
+      });
+
+      if (!response.success) {
+        console.error(
+          "[Middleware] Access Token fetch failed, status:",
+          response.access_token
+        );
+
+        // Invalid token, redirect to login
+        const redirectResponse = NextResponse.redirect(
+          new URL("/login", request.url)
+        );
+        //redirectResponse.cookies.delete("gradex_admin_token");
+        //redirectResponse.cookies.delete("gradex_refresh_token");
+        return redirectResponse;
+      }
+      await setAuthToken(response.access_token, refreshToken);
+    } catch (error) {}
     return NextResponse.redirect(new URL("/login", request.url));
   }
 

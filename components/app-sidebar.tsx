@@ -23,13 +23,16 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { getCurrentUser } from "@/lib/auth";
+
+const user = await getCurrentUser();
 
 // GradeX dashboard data
 const data = {
   user: {
-    name: "Admin",
-    email: "admin@gradex.com",
-    avatar: "/avatars/admin.jpg",
+    name: `${user?.name}` || "Admin",
+    email: `${user?.email}` || "admin@gradex.com",
+    avatar: "/admin.png",
   },
   teams: [
     {

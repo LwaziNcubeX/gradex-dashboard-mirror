@@ -34,7 +34,8 @@ export const FEATURE_FLAGS = {
   ENABLE_ANALYTICS: process.env.NEXT_PUBLIC_ENABLE_ANALYTICS === "true",
   ENABLE_ERROR_REPORTING:
     process.env.NEXT_PUBLIC_ENABLE_ERROR_REPORTING === "true",
-  ENABLE_DEBUG_LOGS: process.env.NODE_ENV === "development",
+  ENABLE_DEBUG_LOGS:
+    process.env.NEXT_PUBLIC_ENABLE_DEBUG_LOGS === "development",
 } as const;
 
 // Cache Configuration
@@ -56,7 +57,7 @@ export const API_ENDPOINTS = {
 
   // Questions
   QUESTIONS: {
-    LIST: "/questions/list",
+    LIST: "/questions",
     CREATE: "/questions/create",
     UPDATE: (id: string) => `/questions/${id}`,
     DELETE: (id: string) => `/questions/${id}`,
@@ -73,7 +74,7 @@ export const API_ENDPOINTS = {
 
   // Levels
   LEVELS: {
-    LIST: "/levels/list",
+    LIST: "/levels",
     CREATE: "/levels/create",
     UPDATE: (id: string) => `/levels/${id}`,
     DELETE: (id: string) => `/levels/${id}`,
