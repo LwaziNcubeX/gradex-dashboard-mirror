@@ -1,15 +1,24 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Badge } from "@/components/ui/badge"
-import { CheckCircle2 } from "lucide-react"
-import type { Question } from "@/app/dashboard/questions/page"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { CheckCircle2 } from "lucide-react";
+import type { Question } from "@/app/dashboard/questions/page";
 
 interface QuestionViewDialogProps {
-  question: Question
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  question: Question;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
-export function QuestionViewDialog({ question, open, onOpenChange }: QuestionViewDialogProps) {
+export function QuestionViewDialog({
+  question,
+  open,
+  onOpenChange,
+}: QuestionViewDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-2xl">
@@ -18,7 +27,9 @@ export function QuestionViewDialog({ question, open, onOpenChange }: QuestionVie
         </DialogHeader>
         <div className="space-y-4">
           <div>
-            <div className="text-sm text-muted-foreground mb-1">Subject & Topic</div>
+            <div className="text-sm text-muted-foreground mb-1">
+              Subject & Topic
+            </div>
             <div className="flex gap-2">
               <Badge>{question.subject}</Badge>
               <Badge variant="outline">{question.topic}</Badge>
@@ -49,10 +60,14 @@ export function QuestionViewDialog({ question, open, onOpenChange }: QuestionVie
                 <div
                   key={index}
                   className={`flex items-center gap-2 p-3 rounded-lg border ${
-                    answer === question.correct_answer ? "bg-green-500/10 border-green-500/50" : "bg-muted/50"
+                    answer === question.correct_answer
+                      ? "bg-green-500/10 border-green-500/50"
+                      : "bg-muted/50"
                   }`}
                 >
-                  {answer === question.correct_answer && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+                  {answer === question.correct_answer && (
+                    <CheckCircle2 className="h-4 w-4 text-green-500" />
+                  )}
                   <span>{answer}</span>
                 </div>
               ))}
@@ -62,11 +77,13 @@ export function QuestionViewDialog({ question, open, onOpenChange }: QuestionVie
           {question.hint && (
             <div>
               <div className="text-sm text-muted-foreground mb-1">Hint</div>
-              <div className="text-sm bg-muted/50 p-3 rounded-lg">{question.hint}</div>
+              <div className="text-sm bg-muted/50 p-3 rounded-lg">
+                {question.hint}
+              </div>
             </div>
           )}
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

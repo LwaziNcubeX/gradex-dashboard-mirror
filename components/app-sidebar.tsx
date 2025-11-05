@@ -14,7 +14,6 @@ import {
 
 import { NavMain } from "@/components/nav-main";
 import { NavProjects } from "@/components/nav-projects";
-import { NavUser } from "@/components/nav-user";
 import { TeamSwitcher } from "@/components/team-switcher";
 import {
   Sidebar,
@@ -23,17 +22,10 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { getCurrentUser } from "@/lib/auth";
-
-const user = await getCurrentUser();
+import { NavUser } from "./nav-user";
 
 // GradeX dashboard data
 const data = {
-  user: {
-    name: `${user?.name}` || "Admin",
-    email: `${user?.email}` || "admin@gradex.com",
-    avatar: "/admin.png",
-  },
   teams: [
     {
       name: "GradeX",
@@ -147,10 +139,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
-        <NavProjects projects={data.projects} />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} />
+        <NavUser />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

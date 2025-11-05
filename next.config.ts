@@ -2,13 +2,13 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   // Enable experimental features for better performance
-  experimental: {
-    optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
-  },
+  // experimental: {
+  //   optimizePackageImports: ["lucide-react", "@radix-ui/react-icons"],
+  // },
 
   // Compression and optimization
   compress: true,
-  poweredByHeader: false,
+  poweredByHeader: true,
 
   // Image optimization
   images: {
