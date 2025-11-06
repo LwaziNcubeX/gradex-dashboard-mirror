@@ -1,35 +1,33 @@
 import { ChartAreaInteractive } from "@/components/chart-area-interactive";
 import { SectionCards } from "@/components/section-cards";
-import { serverApiClient } from "@/lib/server-api-client";
-import { CONFIG } from "@/lib/config";
 
 async function getDashboardStats() {
   try {
-    const [questionsRes, quizzesRes, levelsRes] = await Promise.all([
-      serverApiClient.get<{ success: boolean; questions: any[] }>(
-        CONFIG.ENDPOINTS.QUESTIONS.LIST,
-        { cache: "force-cache", revalidate: CONFIG.CACHE.REVALIDATE_TIME }
-      ),
-      serverApiClient.get<{ success: boolean; quizzes: any[] }>(
-        CONFIG.ENDPOINTS.QUIZZES.LIST,
-        {
-          cache: "force-cache",
-          revalidate: CONFIG.CACHE.REVALIDATE_TIME,
-        }
-      ),
-      serverApiClient.get<{ success: boolean; levels: any[] }>(
-        CONFIG.ENDPOINTS.LEVELS.LIST,
-        {
-          cache: "force-cache",
-          revalidate: CONFIG.CACHE.REVALIDATE_TIME,
-        }
-      ),
-    ]);
+    // const [questionsRes, quizzesRes, levelsRes] = await Promise.all([
+    //   serverApiClient.get<{ success: boolean; questions: any[] }>(
+    //     CONFIG.ENDPOINTS.QUESTIONS.LIST,
+    //     { cache: "force-cache", revalidate: CONFIG.CACHE.REVALIDATE_TIME }
+    //   ),
+    //   serverApiClient.get<{ success: boolean; quizzes: any[] }>(
+    //     CONFIG.ENDPOINTS.QUIZZES.LIST,
+    //     {
+    //       cache: "force-cache",
+    //       revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+    //     }
+    //   ),
+    //   serverApiClient.get<{ success: boolean; levels: any[] }>(
+    //     CONFIG.ENDPOINTS.LEVELS.LIST,
+    //     {
+    //       cache: "force-cache",
+    //       revalidate: CONFIG.CACHE.REVALIDATE_TIME,
+    //     }
+    //   ),
+    // ]);
 
     return {
-      totalQuizzes: quizzesRes.quizzes?.length || 0,
-      totalQuestions: questionsRes.questions?.length || 0,
-      totalLevels: levelsRes.levels?.length || 0,
+      totalQuizzes: 10,
+      totalQuestions: 60,
+      totalLevels: 50,
       totalStudents: 0,
     };
   } catch (error) {
