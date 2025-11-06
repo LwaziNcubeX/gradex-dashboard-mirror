@@ -8,12 +8,10 @@ import {
 import { NavUser } from "./nav-user";
 import { SidebarFooter } from "@/ui/sidebar";
 
-// GradeX dashboard data
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function AppSidebar() {
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>{/* <NavUser /> */}</SidebarHeader>
+    <Sidebar collapsible="icon" variant="inset">
+      <SidebarHeader></SidebarHeader>
       <SidebarContent></SidebarContent>
       <SidebarRail />
       <SidebarFooter>

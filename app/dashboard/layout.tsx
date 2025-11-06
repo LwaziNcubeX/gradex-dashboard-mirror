@@ -16,8 +16,9 @@ export default function DashboardLayout({
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
+      open={false}
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

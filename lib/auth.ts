@@ -97,7 +97,6 @@ export async function getCurrentUser(): Promise<User | null> {
     }
 
     const data = await response.json();
-    console.log("[Auth] User profile data:", data);
     return data.data || data.user || data;
   } catch (error) {
     console.error("[Auth] Error fetching user profile:", error);
