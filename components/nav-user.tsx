@@ -32,23 +32,26 @@ interface UserProfile {
   email: string;
 }
 
-export function NavUser() {
+import React from "react";
+
+export const NavUser = () => {
   const { isMobile } = useSidebar();
   const [profile, setProfile] = useState<UserProfile | null>(null);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const resp = await fetch("api/user");
-        const user = await resp.json();
-        console.log(user);
-        setProfile(user);
-      } catch (error) {
-        console.log("error fetching user:", error);
-      }
-    };
-    fetchUser();
-  });
+    if (!profile) {
+      const fetchUser = async () => {
+        try {
+          const resp = await fetch("api/user");
+          const user = await resp.json();
+          setProfile(user);
+        } catch (error) {
+          console.log("error fetching user:", error);
+        }
+      };
+      fetchUser();
+    }
+  }, [profile]);
 
   return (
     <SidebarMenu>
@@ -124,4 +127,4 @@ export function NavUser() {
       </SidebarMenuItem>
     </SidebarMenu>
   );
-}
+};
