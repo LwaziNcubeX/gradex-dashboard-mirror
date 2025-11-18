@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -13,8 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Eye, Trash2, Search } from "lucide-react";
-import type { Quiz } from "@/app/dashboard/quizzes/page";
-import { getQuizId } from "@/app/dashboard/quizzes/page";
+import type { Quiz } from "@/lib/interface";
 import { apiClient } from "@/lib/api-client";
 import { CONFIG } from "@/lib/config";
 
@@ -31,16 +30,17 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
       quiz.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = async (quizId: string) => {
+  const handleDelete = useCallback(async (quizId: string) => {
     if (confirm("Are you sure you want to delete this quiz?")) {
       try {
         await apiClient.delete(CONFIG.ENDPOINTS.QUIZZES.DELETE(quizId));
         window.location.reload();
       } catch (error) {
+        console.error("Failed to delete quiz:", error);
         alert("Failed to delete quiz");
       }
     }
-  };
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -77,7 +77,7 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
               </TableRow>
             ) : (
               filteredQuizzes.map((quiz) => (
-                <TableRow key={getQuizId(quiz)}>
+                <TableRow key={quiz._id}>
                   <TableCell className="font-medium">{quiz.title}</TableCell>
                   <TableCell>
                     <Badge variant="outline">{quiz.subject}</Badge>
@@ -94,7 +94,7 @@ export function QuizzesTable({ quizzes }: QuizzesTableProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(getQuizId(quiz))}
+                        onClick={() => handleDelete(quiz._id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

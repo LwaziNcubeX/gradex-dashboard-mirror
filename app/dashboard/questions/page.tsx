@@ -4,26 +4,7 @@ import Link from "next/link";
 import { QuestionsTable } from "@/components/questions-table";
 import { serverApiClient } from "@/lib/server-api-client";
 import { CONFIG } from "@/lib/config";
-
-export interface Question {
-  id?: string;
-  _id?: string;
-  question_id?: string;
-  subject: string;
-  topic: string;
-  subtopics: string[];
-  question_text: string;
-  answers: string[];
-  correct_answer: string;
-  hint: string;
-  level: "Form 1" | "Form 2" | "Form 3" | "Form 4";
-  created_at: string;
-}
-
-// Helper function to get question ID regardless of field name
-export function getQuestionId(question: Question): string {
-  return question.id || question._id || question.question_id || "";
-}
+import type { Question } from "@/lib/interface";
 
 // Enable ISR for this page
 export const revalidate = CONFIG.CACHE.REVALIDATE_TIME;
@@ -33,11 +14,7 @@ async function getQuestions() {
     const response = await serverApiClient.get<{
       success: boolean;
       questions: Question[];
-    }>(CONFIG.ENDPOINTS.QUESTIONS.LIST, {
-      cache: "force-cache",
-      revalidate: CONFIG.CACHE.REVALIDATE_TIME,
-      tags: ["questions"],
-    });
+    }>(CONFIG.ENDPOINTS.QUESTIONS.LIST);
     return response.questions || [];
   } catch (error) {
     console.error("Failed to fetch questions:", error);

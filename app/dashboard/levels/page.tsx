@@ -4,14 +4,10 @@ import Link from "next/link";
 import { LevelsTable } from "@/components/levels-table";
 import { serverApiClient } from "@/lib/server-api-client";
 import { CONFIG } from "@/lib/config";
+import type { Level } from "@/lib/interface";
 
-export interface Level {
-  level_id: string;
-  name: string;
-  description: string;
-  quizzes: string[];
-  created_at: string;
-}
+// Enable ISR for this page
+export const revalidate = CONFIG.CACHE.REVALIDATE_TIME;
 
 async function getLevels() {
   try {
@@ -21,6 +17,7 @@ async function getLevels() {
     }>(CONFIG.ENDPOINTS.LEVELS.LIST);
     return response.levels || [];
   } catch (error) {
+    console.error("Failed to fetch levels:", error);
     return [];
   }
 }

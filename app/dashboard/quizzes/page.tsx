@@ -4,16 +4,10 @@ import Link from "next/link";
 import { QuizzesTable } from "@/components/quizzes-table";
 import { serverApiClient } from "@/lib/server-api-client";
 import { CONFIG } from "@/lib/config";
+import type { Quiz } from "@/lib/interface";
 
-export interface Quiz {
-  quiz_id: string;
-  title: string;
-  description: string;
-  subject: string;
-  level: string;
-  questions: string[];
-  created_at: string;
-}
+// Enable ISR for this page
+export const revalidate = CONFIG.CACHE.REVALIDATE_TIME;
 
 async function getQuizzes() {
   try {
@@ -23,6 +17,7 @@ async function getQuizzes() {
     }>(CONFIG.ENDPOINTS.QUIZZES.LIST);
     return response.quizzes || [];
   } catch (error) {
+    console.error("Failed to fetch quizzes:", error);
     return [];
   }
 }

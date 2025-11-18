@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,10 +9,19 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QuizSelector } from "@/components/quiz-selector";
-import type { Quiz } from "@/app/dashboard/quizzes/page";
-import { getQuizId } from "@/app/dashboard/quizzes/page";
+import type { Quiz } from "@/lib/interface";
 import { apiClient } from "@/lib/api-client";
 import { CONFIG } from "@/lib/config";
+
+interface FormData {
+  name: string;
+  description: string;
+}
+
+const INITIAL_FORM_DATA: FormData = {
+  name: "",
+  description: "",
+};
 
 export function LevelForm() {
   const router = useRouter();
@@ -20,29 +29,38 @@ export function LevelForm() {
   const [error, setError] = useState("");
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [selectedQuizzes, setSelectedQuizzes] = useState<string[]>([]);
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
 
-  const [formData, setFormData] = useState({
-    name: "",
-    description: "",
-  });
-
+  // Fetch quizzes on mount
   useEffect(() => {
+    const fetchQuizzes = async () => {
+      try {
+        const data = await apiClient.get<{
+          success: boolean;
+          quizzes: Quiz[];
+        }>(CONFIG.ENDPOINTS.QUIZZES.LIST);
+        if (data.success && Array.isArray(data.quizzes)) {
+          setQuizzes(data.quizzes);
+        } else {
+          console.error("Failed to fetch quizzes: API returned invalid data");
+          setQuizzes([]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch quizzes:", err);
+        setError("Failed to load quizzes. Please refresh and try again.");
+        setQuizzes([]);
+      }
+    };
+
     fetchQuizzes();
   }, []);
 
-  const fetchQuizzes = async () => {
-    try {
-      const data = await apiClient.get<{
-        success: boolean;
-        quizzes: Quiz[];
-      }>(CONFIG.ENDPOINTS.QUIZZES.LIST);
-      if (data.success) {
-        setQuizzes(data.quizzes);
-      }
-    } catch (error) {
-      console.error("Failed to fetch quizzes:", error);
-    }
-  };
+  const handleFormChange = useCallback((key: keyof FormData, value: string) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      [key]: value,
+    }));
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,6 +68,16 @@ export function LevelForm() {
 
     if (selectedQuizzes.length === 0) {
       setError("Please select at least one quiz");
+      return;
+    }
+
+    if (!formData.name.trim()) {
+      setError("Please enter a level name");
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      setError("Please enter a level description");
       return;
     }
 
@@ -71,7 +99,10 @@ export function LevelForm() {
         setError(data.message || "Failed to create level");
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      console.error("Error creating level:", err);
+      setError(
+        err instanceof Error ? err.message : "Network error. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -89,9 +120,7 @@ export function LevelForm() {
             <Input
               id="name"
               value={formData.name}
-              onChange={(e) =>
-                setFormData({ ...formData, name: e.target.value })
-              }
+              onChange={(e) => handleFormChange("name", e.target.value)}
               placeholder="e.g., Beginner Geography"
               required
             />
@@ -102,9 +131,7 @@ export function LevelForm() {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={(e) => handleFormChange("description", e.target.value)}
               placeholder="Describe what students will learn in this level..."
               rows={3}
               required

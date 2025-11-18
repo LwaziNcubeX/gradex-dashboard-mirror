@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -13,29 +13,9 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Eye, Trash2, Search, Edit } from "lucide-react";
+import type { Quiz } from "@/lib/interface";
 import { apiClient } from "@/lib/api-client";
 import { CONFIG } from "@/lib/config";
-
-interface Quiz {
-  _id: string;
-  title: string;
-  description: string;
-  subject: string;
-  category: string;
-  tags: string[];
-  duration: number;
-  level: string;
-  questions: string[];
-  level_id: string | null;
-  xp_reward: number;
-  difficulty_score: number;
-  created_at: string;
-  updated_at: string;
-  completion_count: number;
-  average_score: number;
-  is_active: boolean;
-  is_locked: boolean;
-}
 
 interface QuizTableProps {
   quizzes: Quiz[];
@@ -47,28 +27,28 @@ export function QuizTable({ quizzes }: QuizTableProps) {
   const filteredQuizzes = quizzes.filter(
     (quiz) =>
       quiz.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quiz.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      quiz.category.toLowerCase().includes(searchTerm.toLowerCase())
+      quiz.subject.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = async (quizId: string) => {
+  const handleDelete = useCallback(async (quizId: string) => {
     if (confirm("Are you sure you want to delete this quiz?")) {
       try {
         await apiClient.delete(CONFIG.ENDPOINTS.QUIZZES.DELETE(quizId));
         window.location.reload();
       } catch (error) {
+        console.error("Failed to delete quiz:", error);
         alert("Failed to delete quiz");
       }
     }
-  };
+  }, []);
 
-  const handleView = (quiz: Quiz) => {
+  const handleView = useCallback((quiz: Quiz) => {
     console.log("View quiz:", quiz);
-  };
+  }, []);
 
-  const handleEdit = (quiz: Quiz) => {
+  const handleEdit = useCallback((quiz: Quiz) => {
     console.log("Edit quiz:", quiz);
-  };
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -88,14 +68,8 @@ export function QuizTable({ quizzes }: QuizTableProps) {
             <TableRow>
               <TableHead>Title</TableHead>
               <TableHead>Subject</TableHead>
-              <TableHead>Category</TableHead>
               <TableHead>Level</TableHead>
-              <TableHead>Duration</TableHead>
               <TableHead>Questions</TableHead>
-              <TableHead>XP Reward</TableHead>
-              <TableHead>Difficulty</TableHead>
-              <TableHead>Tags</TableHead>
-              <TableHead>Status</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
@@ -103,7 +77,7 @@ export function QuizTable({ quizzes }: QuizTableProps) {
             {filteredQuizzes.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={11}
+                  colSpan={5}
                   className="text-center text-muted-foreground"
                 >
                   No quizzes found
@@ -121,15 +95,7 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                     <Badge variant="outline">{quiz.subject}</Badge>
                   </TableCell>
                   <TableCell>
-                    <Badge variant="secondary">{quiz.category}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant="outline">{quiz.level}</Badge>
-                  </TableCell>
-                  <TableCell>
-                    <span className="font-mono text-sm">
-                      {quiz.duration} min
-                    </span>
+                    <Badge variant="secondary">{quiz.level}</Badge>
                   </TableCell>
                   <TableCell>
                     <span className="font-mono text-sm">
@@ -137,58 +103,6 @@ export function QuizTable({ quizzes }: QuizTableProps) {
                         ? quiz.questions.length
                         : 0}
                     </span>
-                  </TableCell>
-                  <TableCell>
-                    <span className="font-mono text-sm">
-                      {quiz.xp_reward} XP
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center gap-1">
-                      <div className="flex">
-                        {[...Array(5)].map((_, i) => (
-                          <div
-                            key={i}
-                            className={`w-2 h-2 rounded-full ${
-                              i < quiz.difficulty_score
-                                ? "bg-red-400"
-                                : "bg-gray-200"
-                            }`}
-                          />
-                        ))}
-                      </div>
-                      <span className="text-xs text-muted-foreground ml-1">
-                        {quiz.difficulty_score}/5
-                      </span>
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    {Array.isArray(quiz.tags) && quiz.tags.length > 0 ? (
-                      <div className="flex gap-1 flex-wrap max-w-xs">
-                        {quiz.tags.slice(0, 2).map((tag, i) => (
-                          <span
-                            key={i}
-                            className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-800"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                        {quiz.tags.length > 2 && (
-                          <span className="text-xs text-muted-foreground">
-                            +{quiz.tags.length - 2}
-                          </span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-muted-foreground text-sm">
-                        No tags
-                      </span>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <Badge variant={quiz.is_active ? "default" : "secondary"}>
-                      {quiz.is_active ? "Active" : "Inactive"}
-                    </Badge>
                   </TableCell>
                   <TableCell className="text-right">
                     <div className="flex justify-end gap-2">

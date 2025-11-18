@@ -1,7 +1,7 @@
 "use client";
 
 import type React from "react";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,10 +18,35 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { X } from "lucide-react";
 import { QuestionSelector } from "@/components/question-selector";
-import type { Question } from "@/app/dashboard/questions/page";
-import { getQuestionId } from "@/app/dashboard/questions/page";
+import type { Question } from "@/lib/interface";
 import { apiClient } from "@/lib/api-client";
 import { CONFIG } from "@/lib/config";
+
+const LEVELS = ["Form 1", "Form 2", "Form 3", "Form 4"] as const;
+
+interface FormData {
+  title: string;
+  description: string;
+  subject: string;
+  category: string;
+  duration: number;
+  level: string;
+  level_id: string;
+  xp_reward: number;
+  difficulty_score: number;
+}
+
+const INITIAL_FORM_DATA: FormData = {
+  title: "",
+  description: "",
+  subject: "",
+  category: "",
+  duration: 30,
+  level: "",
+  level_id: "",
+  xp_reward: 10,
+  difficulty_score: 1,
+};
 
 export function QuizForm() {
   const router = useRouter();
@@ -32,72 +57,68 @@ export function QuizForm() {
   const [selectedQuestions, setSelectedQuestions] = useState<string[]>([]);
   const [tags, setTags] = useState<string[]>([]);
   const [currentTag, setCurrentTag] = useState("");
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    subject: "",
-    category: "",
-    duration: 30,
-    level: "",
-    level_id: "",
-    xp_reward: 10,
-    difficulty_score: 1,
-  });
-
-  // Hardcoded levels like before
-  const levels = ["Form 1", "Form 2", "Form 3", "Form 4"];
-
+  // Fetch questions on mount
   useEffect(() => {
+    const fetchQuestions = async () => {
+      try {
+        setQuestionsLoading(true);
+        const data = await apiClient.get<{
+          success: boolean;
+          questions: Question[];
+        }>(CONFIG.ENDPOINTS.QUESTIONS.LIST);
+
+        if (data.success && Array.isArray(data.questions)) {
+          setQuestions(data.questions);
+        } else {
+          setError("Failed to load questions from server.");
+          setQuestions([]);
+        }
+      } catch (err) {
+        console.error("Failed to fetch questions:", err);
+        setError(
+          "Failed to load questions. Please check your connection and try again."
+        );
+        setQuestions([]);
+      } finally {
+        setQuestionsLoading(false);
+      }
+    };
+
     fetchQuestions();
   }, []);
 
-  const fetchQuestions = async () => {
-    try {
-      setQuestionsLoading(true);
-      console.log("Fetching questions..."); // Debug log
-      const data = await apiClient.get<{
-        success: boolean;
-        questions: Question[];
-      }>(CONFIG.ENDPOINTS.QUESTIONS.LIST);
-      console.log("Fetched questions response:", data); // Debug log
-      console.log("Questions array:", data.questions); // Debug log
-      console.log("Questions count:", data.questions?.length || 0); // Debug log
-
-      if (data.success) {
-        console.log("🔍 First question structure:", data.questions?.[0]);
-        setQuestions(data.questions || []);
-      } else {
-        console.error("Failed to fetch questions: API returned success: false");
-        setError("Failed to load questions from server.");
-      }
-    } catch (error) {
-      console.error("Failed to fetch questions:", error);
-      setError(
-        "Failed to load questions. Please check your connection and try again."
-      );
-    } finally {
-      setQuestionsLoading(false);
-    }
-  };
-
-  const addTag = () => {
+  const addTag = useCallback(() => {
     if (currentTag.trim() && !tags.includes(currentTag.trim())) {
-      setTags([...tags, currentTag.trim()]);
+      setTags((prevTags) => [...prevTags, currentTag.trim()]);
       setCurrentTag("");
     }
-  };
+  }, [currentTag, tags]);
 
-  const removeTag = (tagToRemove: string) => {
-    setTags(tags.filter((tag) => tag !== tagToRemove));
-  };
+  const removeTag = useCallback((tagToRemove: string) => {
+    setTags((prevTags) => prevTags.filter((tag) => tag !== tagToRemove));
+  }, []);
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      addTag();
-    }
-  };
+  const handleKeyPress = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        addTag();
+      }
+    },
+    [addTag]
+  );
+
+  const handleFormChange = useCallback(
+    (key: keyof FormData, value: string | number) => {
+      setFormData((prevData) => ({
+        ...prevData,
+        [key]: value,
+      }));
+    },
+    []
+  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -152,9 +173,7 @@ export function QuizForm() {
             <Input
               id="title"
               value={formData.title}
-              onChange={(e) =>
-                setFormData({ ...formData, title: e.target.value })
-              }
+              onChange={(e) => handleFormChange("title", e.target.value)}
               placeholder="e.g., Form 1 Geography Quiz"
               required
             />
@@ -165,9 +184,7 @@ export function QuizForm() {
             <Textarea
               id="description"
               value={formData.description}
-              onChange={(e) =>
-                setFormData({ ...formData, description: e.target.value })
-              }
+              onChange={(e) => handleFormChange("description", e.target.value)}
               placeholder="Describe what this quiz covers..."
               rows={3}
               required
@@ -180,9 +197,7 @@ export function QuizForm() {
               <Input
                 id="subject"
                 value={formData.subject}
-                onChange={(e) =>
-                  setFormData({ ...formData, subject: e.target.value })
-                }
+                onChange={(e) => handleFormChange("subject", e.target.value)}
                 placeholder="e.g., Geography"
                 required
               />
@@ -193,9 +208,7 @@ export function QuizForm() {
               <Input
                 id="category"
                 value={formData.category}
-                onChange={(e) =>
-                  setFormData({ ...formData, category: e.target.value })
-                }
+                onChange={(e) => handleFormChange("category", e.target.value)}
                 placeholder="e.g., Science, Math, Languages"
                 required
               />
@@ -208,18 +221,15 @@ export function QuizForm() {
               <Select
                 value={formData.level}
                 onValueChange={(value) => {
-                  setFormData({
-                    ...formData,
-                    level: value,
-                    level_id: value, // Use the same value for level_id
-                  });
+                  handleFormChange("level", value);
+                  handleFormChange("level_id", value);
                 }}
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>
                 <SelectContent>
-                  {levels.map((level) => (
+                  {LEVELS.map((level) => (
                     <SelectItem key={level} value={level}>
                       {level}
                     </SelectItem>
@@ -237,10 +247,7 @@ export function QuizForm() {
                 max="300"
                 value={formData.duration}
                 onChange={(e) =>
-                  setFormData({
-                    ...formData,
-                    duration: parseInt(e.target.value) || 30,
-                  })
+                  handleFormChange("duration", parseInt(e.target.value) || 30)
                 }
                 required
               />
@@ -251,10 +258,7 @@ export function QuizForm() {
               <Select
                 value={formData.difficulty_score.toString()}
                 onValueChange={(value) =>
-                  setFormData({
-                    ...formData,
-                    difficulty_score: parseInt(value),
-                  })
+                  handleFormChange("difficulty_score", parseInt(value))
                 }
               >
                 <SelectTrigger>
@@ -280,10 +284,7 @@ export function QuizForm() {
               max="1000"
               value={formData.xp_reward}
               onChange={(e) =>
-                setFormData({
-                  ...formData,
-                  xp_reward: parseInt(e.target.value) || 10,
-                })
+                handleFormChange("xp_reward", parseInt(e.target.value) || 10)
               }
               placeholder="Experience points awarded for completion"
               required

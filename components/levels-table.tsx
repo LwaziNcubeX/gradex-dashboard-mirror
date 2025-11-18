@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -12,7 +12,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Eye, Trash2, Search } from "lucide-react";
-import type { Level } from "@/app/dashboard/levels/page";
+import type { Level } from "@/lib/interface";
 import { apiClient } from "@/lib/api-client";
 import { CONFIG } from "@/lib/config";
 
@@ -27,16 +27,17 @@ export function LevelsTable({ levels }: LevelsTableProps) {
     level.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleDelete = async (levelId: string) => {
+  const handleDelete = useCallback(async (levelId: string) => {
     if (confirm("Are you sure you want to delete this level?")) {
       try {
         await apiClient.delete(CONFIG.ENDPOINTS.LEVELS.DELETE(levelId));
         window.location.reload();
       } catch (error) {
+        console.error("Failed to delete level:", error);
         alert("Failed to delete level");
       }
     }
-  };
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -72,7 +73,7 @@ export function LevelsTable({ levels }: LevelsTableProps) {
               </TableRow>
             ) : (
               filteredLevels.map((level) => (
-                <TableRow key={level.level_id}>
+                <TableRow key={level._id}>
                   <TableCell className="font-medium">{level.name}</TableCell>
                   <TableCell className="max-w-md">
                     <div className="truncate">{level.description}</div>
@@ -86,7 +87,7 @@ export function LevelsTable({ levels }: LevelsTableProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => handleDelete(level.level_id)}
+                        onClick={() => handleDelete(level._id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

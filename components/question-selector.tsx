@@ -13,7 +13,7 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
-import type { Question } from "@/app/dashboard/questions/page";
+import type { Question } from "@/lib/interface";
 
 interface QuestionSelectorProps {
   questions: Question[];
@@ -47,17 +47,10 @@ export function QuestionSelector({
   });
 
   const handleToggle = (questionId: string) => {
-    console.log("🔍 Question toggle:", { questionId, type: typeof questionId });
-    console.log("🔍 Current selectedQuestions:", selectedQuestions);
-
     if (selectedQuestions.includes(questionId)) {
-      const newSelection = selectedQuestions.filter((id) => id !== questionId);
-      console.log("🔍 Removing question, new selection:", newSelection);
-      onSelectionChange(newSelection);
+      onSelectionChange(selectedQuestions.filter((id) => id !== questionId));
     } else {
-      const newSelection = [...selectedQuestions, questionId];
-      console.log("🔍 Adding question, new selection:", newSelection);
-      onSelectionChange(newSelection);
+      onSelectionChange([...selectedQuestions, questionId]);
     }
   };
 
@@ -65,9 +58,7 @@ export function QuestionSelector({
     if (selectedQuestions.length === filteredQuestions.length) {
       onSelectionChange([]);
     } else {
-      onSelectionChange(
-        filteredQuestions.map((q) => q.id || q._id || q.question_id || "")
-      );
+      onSelectionChange(filteredQuestions.map((q) => q._id));
     }
   };
 
@@ -142,18 +133,12 @@ export function QuestionSelector({
           ) : (
             filteredQuestions.map((question) => (
               <div
-                key={question.id || question._id || question.question_id}
+                key={question._id}
                 className="flex items-start gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
               >
                 <Checkbox
-                  checked={selectedQuestions.includes(
-                    question.id || question._id || question.question_id || ""
-                  )}
-                  onCheckedChange={() =>
-                    handleToggle(
-                      question.id || question._id || question.question_id || ""
-                    )
-                  }
+                  checked={selectedQuestions.includes(question._id)}
+                  onCheckedChange={() => handleToggle(question._id)}
                   className="mt-1"
                 />
                 <div className="flex-1 space-y-2">

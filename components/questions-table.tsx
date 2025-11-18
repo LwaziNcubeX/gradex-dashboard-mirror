@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import {
   Table,
   TableBody,
@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Eye, Trash2, Search } from "lucide-react";
-import type { Question } from "@/app/dashboard/questions/page";
+import type { Question } from "@/lib/interface";
 import { QuestionViewDialog } from "./question-view-dialog";
 import { apiClient } from "@/lib/api-client";
 import { CONFIG } from "@/lib/config";
@@ -28,6 +28,8 @@ import { CONFIG } from "@/lib/config";
 interface QuestionsTableProps {
   questions: Question[];
 }
+
+const LEVELS = ["Form 1", "Form 2", "Form 3", "Form 4"];
 
 export function QuestionsTable({ questions }: QuestionsTableProps) {
   const [searchTerm, setSearchTerm] = useState("");
@@ -39,7 +41,6 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
   const [viewDialogOpen, setViewDialogOpen] = useState(false);
 
   const subjects = Array.from(new Set(questions.map((q) => q.subject)));
-  const levels = ["Form 1", "Form 2", "Form 3", "Form 4"];
 
   const filteredQuestions = questions.filter((question) => {
     const matchesSearch =
@@ -52,21 +53,22 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
     return matchesSearch && matchesSubject && matchesLevel;
   });
 
-  const handleDelete = async (questionId: string) => {
+  const handleDelete = useCallback(async (questionId: string) => {
     if (confirm("Are you sure you want to delete this question?")) {
       try {
         await apiClient.delete(CONFIG.ENDPOINTS.QUESTIONS.DELETE(questionId));
         window.location.reload();
       } catch (error) {
+        console.error("Failed to delete question:", error);
         alert("Failed to delete question");
       }
     }
-  };
+  }, []);
 
-  const handleView = (question: Question) => {
+  const handleView = useCallback((question: Question) => {
     setSelectedQuestion(question);
     setViewDialogOpen(true);
-  };
+  }, []);
 
   return (
     <div className="space-y-4">
@@ -99,7 +101,7 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Levels</SelectItem>
-            {levels.map((level) => (
+            {LEVELS.map((level) => (
               <SelectItem key={level} value={level}>
                 {level}
               </SelectItem>
@@ -130,12 +132,8 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
                 </TableCell>
               </TableRow>
             ) : (
-              filteredQuestions.map((question, index) => (
-                <TableRow
-                  key={`question-${
-                    question.id || question._id || question.question_id
-                  }-${index}`}
-                >
+              filteredQuestions.map((question) => (
+                <TableRow key={question._id}>
                   <TableCell className="max-w-md">
                     <div className="truncate" title={question.question_text}>
                       {question.question_text}
@@ -160,14 +158,7 @@ export function QuestionsTable({ questions }: QuestionsTableProps) {
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() =>
-                          handleDelete(
-                            question.id ||
-                              question._id ||
-                              question.question_id ||
-                              ""
-                          )
-                        }
+                        onClick={() => handleDelete(question._id)}
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>

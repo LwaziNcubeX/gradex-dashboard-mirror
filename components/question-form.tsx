@@ -1,8 +1,7 @@
 "use client";
 
 import type React from "react";
-
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,46 +19,114 @@ import { Plus, X } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
 import { CONFIG } from "@/lib/config";
 
+type FormLevel = "Form 1" | "Form 2" | "Form 3" | "Form 4";
+
+interface FormData {
+  subject: string;
+  topic: string;
+  subtopics: string[];
+  question_text: string;
+  answers: string[];
+  correct_answer: string;
+  hint: string;
+  level: FormLevel;
+}
+
+const INITIAL_FORM_DATA: FormData = {
+  subject: "",
+  topic: "",
+  subtopics: [""],
+  question_text: "",
+  answers: ["", "", "", ""],
+  correct_answer: "",
+  hint: "",
+  level: "Form 1",
+};
+
+const LEVELS: FormLevel[] = ["Form 1", "Form 2", "Form 3", "Form 4"];
+
 export function QuestionForm() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [formData, setFormData] = useState<FormData>(INITIAL_FORM_DATA);
 
-  const [formData, setFormData] = useState({
-    subject: "",
-    topic: "",
-    subtopics: [""],
-    question_text: "",
-    answers: ["", "", "", ""],
-    correct_answer: "",
-    hint: "",
-    level: "Form 1" as "Form 1" | "Form 2" | "Form 3" | "Form 4",
-  });
+  const handleSubtopicChange = useCallback((index: number, value: string) => {
+    setFormData((prevData) => {
+      const newSubtopics = [...prevData.subtopics];
+      newSubtopics[index] = value;
+      return { ...prevData, subtopics: newSubtopics };
+    });
+  }, []);
 
-  const handleSubtopicChange = (index: number, value: string) => {
-    const newSubtopics = [...formData.subtopics];
-    newSubtopics[index] = value;
-    setFormData({ ...formData, subtopics: newSubtopics });
-  };
+  const addSubtopic = useCallback(() => {
+    setFormData((prevData) => ({
+      ...prevData,
+      subtopics: [...prevData.subtopics, ""],
+    }));
+  }, []);
 
-  const addSubtopic = () => {
-    setFormData({ ...formData, subtopics: [...formData.subtopics, ""] });
-  };
+  const removeSubtopic = useCallback((index: number) => {
+    setFormData((prevData) => ({
+      ...prevData,
+      subtopics: prevData.subtopics.filter((_, i) => i !== index),
+    }));
+  }, []);
 
-  const removeSubtopic = (index: number) => {
-    const newSubtopics = formData.subtopics.filter((_, i) => i !== index);
-    setFormData({ ...formData, subtopics: newSubtopics });
-  };
+  const handleAnswerChange = useCallback((index: number, value: string) => {
+    setFormData((prevData) => {
+      const newAnswers = [...prevData.answers];
+      newAnswers[index] = value;
+      return { ...prevData, answers: newAnswers };
+    });
+  }, []);
 
-  const handleAnswerChange = (index: number, value: string) => {
-    const newAnswers = [...formData.answers];
-    newAnswers[index] = value;
-    setFormData({ ...formData, answers: newAnswers });
+  const handleFormChange = useCallback(
+    (key: keyof Omit<FormData, "subtopics" | "answers">, value: string) => {
+      setFormData((prevData) => ({
+        ...prevData,
+        [key]: value,
+      }));
+    },
+    []
+  );
+
+  const validateForm = (): boolean => {
+    if (!formData.subject.trim()) {
+      setError("Please enter a subject");
+      return false;
+    }
+    if (!formData.topic.trim()) {
+      setError("Please enter a topic");
+      return false;
+    }
+    if (!formData.question_text.trim()) {
+      setError("Please enter the question text");
+      return false;
+    }
+    if (formData.answers.some((a) => !a.trim())) {
+      setError("Please fill in all answers");
+      return false;
+    }
+    if (!formData.correct_answer) {
+      setError("Please select the correct answer");
+      return false;
+    }
+    if (!formData.hint.trim()) {
+      setError("Please enter a hint");
+      return false;
+    }
+    return true;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (!validateForm()) {
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -78,7 +145,10 @@ export function QuestionForm() {
         setError(data.message || "Failed to create question");
       }
     } catch (err) {
-      setError("Network error. Please try again.");
+      console.error("Error creating question:", err);
+      setError(
+        err instanceof Error ? err.message : "Network error. Please try again."
+      );
     } finally {
       setLoading(false);
     }
@@ -97,9 +167,7 @@ export function QuestionForm() {
               <Input
                 id="subject"
                 value={formData.subject}
-                onChange={(e) =>
-                  setFormData({ ...formData, subject: e.target.value })
-                }
+                onChange={(e) => handleFormChange("subject", e.target.value)}
                 placeholder="e.g., Geography"
                 required
               />
@@ -109,18 +177,19 @@ export function QuestionForm() {
               <Label htmlFor="level">Level *</Label>
               <Select
                 value={formData.level}
-                onValueChange={(value: any) =>
-                  setFormData({ ...formData, level: value })
+                onValueChange={(value: FormLevel) =>
+                  handleFormChange("level", value)
                 }
               >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="Form 1">Form 1</SelectItem>
-                  <SelectItem value="Form 2">Form 2</SelectItem>
-                  <SelectItem value="Form 3">Form 3</SelectItem>
-                  <SelectItem value="Form 4">Form 4</SelectItem>
+                  {LEVELS.map((level) => (
+                    <SelectItem key={level} value={level}>
+                      {level}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
@@ -131,9 +200,7 @@ export function QuestionForm() {
             <Input
               id="topic"
               value={formData.topic}
-              onChange={(e) =>
-                setFormData({ ...formData, topic: e.target.value })
-              }
+              onChange={(e) => handleFormChange("topic", e.target.value)}
               placeholder="e.g., Climate"
               required
             />
@@ -178,7 +245,7 @@ export function QuestionForm() {
               id="question_text"
               value={formData.question_text}
               onChange={(e) =>
-                setFormData({ ...formData, question_text: e.target.value })
+                handleFormChange("question_text", e.target.value)
               }
               placeholder="Enter your question here..."
               rows={3}
@@ -204,7 +271,7 @@ export function QuestionForm() {
             <Select
               value={formData.correct_answer}
               onValueChange={(value) =>
-                setFormData({ ...formData, correct_answer: value })
+                handleFormChange("correct_answer", value)
               }
             >
               <SelectTrigger>
@@ -227,9 +294,7 @@ export function QuestionForm() {
             <Textarea
               id="hint"
               value={formData.hint}
-              onChange={(e) =>
-                setFormData({ ...formData, hint: e.target.value })
-              }
+              onChange={(e) => handleFormChange("hint", e.target.value)}
               placeholder="Provide a helpful hint..."
               rows={2}
               required

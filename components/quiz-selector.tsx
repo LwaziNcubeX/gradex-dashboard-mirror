@@ -6,8 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { Search } from "lucide-react";
-import type { Quiz } from "@/app/dashboard/quizzes/page";
-import { getQuizId } from "@/app/dashboard/quizzes/page";
+import type { Quiz } from "@/lib/interface";
 
 interface QuizSelectorProps {
   quizzes: Quiz[];
@@ -40,7 +39,7 @@ export function QuizSelector({
     if (selectedQuizzes.length === filteredQuizzes.length) {
       onSelectionChange([]);
     } else {
-      onSelectionChange(filteredQuizzes.map((q) => getQuizId(q)));
+      onSelectionChange(filteredQuizzes.map((q) => q._id));
     }
   };
 
@@ -81,12 +80,12 @@ export function QuizSelector({
           ) : (
             filteredQuizzes.map((quiz) => (
               <div
-                key={getQuizId(quiz)}
+                key={quiz._id}
                 className="flex items-start gap-3 p-4 rounded-lg border hover:bg-muted/50 transition-colors"
               >
                 <Checkbox
-                  checked={selectedQuizzes.includes(getQuizId(quiz))}
-                  onCheckedChange={() => handleToggle(getQuizId(quiz))}
+                  checked={selectedQuizzes.includes(quiz._id)}
+                  onCheckedChange={() => handleToggle(quiz._id)}
                   className="mt-1"
                 />
                 <div className="flex-1 space-y-2">
