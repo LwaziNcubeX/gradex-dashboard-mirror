@@ -73,6 +73,7 @@ export async function apiRequest<T>(
   options: FetchOptions = {}
 ): Promise<T> {
   const { params, ...fetchOptions } = options;
+  const debug = process.env.NEXT_PUBLIC_API_DEBUG === "true";
 
   // Build URL
   const url = `${API_BASE_URL}${endpoint}${buildQueryString(params)}`;
@@ -91,76 +92,113 @@ export async function apiRequest<T>(
     headers.set("Content-Type", "application/json");
   }
 
-  // Make the request
-  let response = await fetch(url, {
-    ...fetchOptions,
-    headers,
-  });
+  // Log request if debug enabled
+  if (debug) {
+    console.log(`[API] ${fetchOptions.method || "GET"} ${url}`, {
+      hasToken: !!token,
+      body: fetchOptions.body
+        ? JSON.parse(fetchOptions.body as string)
+        : undefined,
+    });
+  }
 
-  // Handle 401 - try to refresh token and retry
-  if (response.status === 401) {
-    const refreshToken = getRefreshToken();
+  try {
+    // Make the request
+    let response = await fetch(url, {
+      ...fetchOptions,
+      headers,
+    });
 
-    if (refreshToken) {
-      try {
-        // Attempt to refresh the token
-        const newTokens = await refreshAccessToken(refreshToken);
-        setTokens(newTokens.access_token, newTokens.refresh_token);
+    // Handle 401 - try to refresh token and retry
+    if (response.status === 401) {
+      const refreshToken = getRefreshToken();
 
-        // Retry the original request with new token
-        const retryHeaders = new Headers(fetchOptions.headers);
-        retryHeaders.set("Authorization", `Bearer ${newTokens.access_token}`);
+      if (refreshToken) {
+        if (debug) console.log("[API] Attempting token refresh...");
 
-        response = await fetch(url, {
-          ...fetchOptions,
-          headers: retryHeaders,
-        });
-      } catch (error) {
-        // Refresh failed, clear tokens and throw error
+        try {
+          // Attempt to refresh the token
+          const newTokens = await refreshAccessToken(refreshToken);
+          setTokens(newTokens.access_token, newTokens.refresh_token);
+
+          if (debug) console.log("[API] Token refreshed successfully");
+
+          // Retry the original request with new token
+          const retryHeaders = new Headers(fetchOptions.headers);
+          retryHeaders.set("Authorization", `Bearer ${newTokens.access_token}`);
+
+          response = await fetch(url, {
+            ...fetchOptions,
+            headers: retryHeaders,
+          });
+        } catch (error) {
+          // Refresh failed, clear tokens and throw error
+          clearTokens();
+          if (debug) console.error("[API] Token refresh failed", error);
+          throw new Error("Session expired. Please login again.");
+        }
+      } else {
+        // No refresh token, redirect to login
         clearTokens();
-        throw new Error("Session expired. Please login again.");
+        if (debug) console.error("[API] No refresh token available");
+        if (typeof window !== "undefined") {
+          window.location.href = "/auth/login";
+        }
+        throw new Error("Not authenticated");
       }
-    } else {
-      // No refresh token, redirect to login
-      clearTokens();
-      if (typeof window !== "undefined") {
-        window.location.href = "/auth/login";
-      }
-      throw new Error("Not authenticated");
     }
-  }
 
-  // Handle response
-  let data: unknown;
-  const contentType = response.headers.get("content-type");
+    // Handle response
+    let data: unknown;
+    const contentType = response.headers.get("content-type");
 
-  if (contentType?.includes("application/json")) {
-    data = await response.json();
-  } else {
-    data = await response.text();
-  }
+    if (contentType?.includes("application/json")) {
+      data = await response.json();
+    } else {
+      data = await response.text();
+    }
 
-  // Check if response is ok
-  if (!response.ok) {
-    const error = new Error(
-      typeof data === "object" && data !== null && "message" in data
-        ? ((data as Record<string, unknown>).message as string)
-        : `API Error: ${response.status}`
-    ) as ApiError;
-    error.status = response.status;
-    error.response = data;
+    // Log response if debug enabled
+    if (debug) {
+      console.log(`[API] ${response.status} ${endpoint}`, data);
+    }
+
+    // Check if response is ok
+    if (!response.ok) {
+      const errorMessage =
+        typeof data === "object" && data !== null && "message" in data
+          ? ((data as Record<string, unknown>).message as string)
+          : `API Error: ${response.status}`;
+
+      if (debug) {
+        console.error(`[API] Error: ${errorMessage}`, data);
+      }
+
+      const error = new Error(errorMessage) as ApiError;
+      error.status = response.status;
+      error.response = data;
+      throw error;
+    }
+
+    // Extract data from response wrapper
+    if (typeof data === "object" && data !== null && "data" in data) {
+      return (data as Record<string, unknown>).data as T;
+    }
+
+    return data as T;
+  } catch (error) {
+    // Log network errors
+    if (debug) {
+      console.error("[API] Network error:", error);
+    }
     throw error;
   }
-
-  return data as T;
 }
 
 /**
  * Refresh access token using refresh token
  */
-async function refreshAccessToken(
-  refreshToken: string
-): Promise<{
+async function refreshAccessToken(refreshToken: string): Promise<{
   access_token: string;
   refresh_token: string;
   token_type: "bearer";

@@ -31,12 +31,22 @@ export async function login(
   otp: string
 ): Promise<LoginResponse["data"]> {
   const payload: LoginRequest = { email, otp };
-  const response = await apiPost<LoginResponse>("/auth/login", payload);
+  const response = await apiPost<{
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
+    user: any;
+  }>("/auth/login", payload);
 
   // Store tokens
-  setTokens(response.data.access_token, response.data.refresh_token);
+  setTokens(response.access_token, response.refresh_token);
 
-  return response.data;
+  return {
+    access_token: response.access_token,
+    refresh_token: response.refresh_token,
+    token_type: response.token_type as "bearer",
+    user: response.user,
+  };
 }
 
 /**
@@ -44,23 +54,24 @@ export async function login(
  */
 export async function refreshToken(refreshToken: string): Promise<string> {
   const payload: RefreshTokenRequest = { refresh_token: refreshToken };
-  const response = await apiPost<RefreshTokenResponse>(
-    "/auth/refresh",
-    payload
-  );
+  const response = await apiPost<{
+    access_token: string;
+    refresh_token: string;
+    token_type: string;
+  }>("/auth/refresh", payload);
 
   // Store new tokens
-  setTokens(response.data.access_token, response.data.refresh_token);
+  setTokens(response.access_token, response.refresh_token);
 
-  return response.data.access_token;
+  return response.access_token;
 }
 
 /**
  * Get current user profile
  */
 export async function getProfile(): Promise<ProfileResponse["data"]> {
-  const response = await apiGet<ProfileResponse>("/auth/profile");
-  return response.data;
+  const response = await apiGet<any>("/auth/profile");
+  return response;
 }
 
 /**

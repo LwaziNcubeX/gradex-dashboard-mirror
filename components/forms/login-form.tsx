@@ -62,7 +62,7 @@ export function LoginForm() {
 
     try {
       await login(email, otp);
-      router.push("/admin");
+      router.push("/dashboard");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Login failed";
       setLocalError(message);
