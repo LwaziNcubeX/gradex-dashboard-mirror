@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -18,12 +18,41 @@ type LoginStep = "email" | "otp";
 
 export function LoginForm() {
   const router = useRouter();
-  const { requestOtp, login, isLoading, error, clearError } = useAuth();
+  const {
+    requestOtp,
+    login,
+    isLoading,
+    error,
+    clearError,
+    isAuthenticated,
+    user,
+  } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
   const [step, setStep] = useState<LoginStep>("email");
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [localError, setLocalError] = useState<string | null>(null);
+
+  // Redirect to dashboard if user is already authenticated
+  useEffect(() => {
+    if (isAuthenticated && user) {
+      setIsRedirecting(true);
+      router.push("/dashboard");
+    }
+  }, [isAuthenticated, user, router]);
+
+  // If already authenticated, show loading spinner and redirect
+  if (isAuthenticated || isRedirecting) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-slate-900 to-slate-800">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-blue-500" />
+          <p className="text-slate-300">Redirecting to dashboard...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleRequestOtp = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -66,7 +95,7 @@ export function LoginForm() {
   const displayError = error || localError;
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 p-4">
+    <div className="flex items-center justify-center min-h-screen bg-linear-to-br from-slate-900 to-slate-800 p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2">
           <CardTitle className="text-2xl">GradeX Admin</CardTitle>
@@ -80,7 +109,7 @@ export function LoginForm() {
         <CardContent>
           {displayError && (
             <div className="mb-6 flex items-center gap-3 rounded-lg bg-red-50 p-3 text-sm text-red-800">
-              <AlertCircle className="h-4 w-4 flex-shrink-0" />
+              <AlertCircle className="h-4 w-4 shrink-0" />
               <span>{displayError}</span>
             </div>
           )}

@@ -6,6 +6,7 @@
  */
 
 import React, { createContext, useCallback, useEffect, useState } from "react";
+import useSWR, { mutate } from "swr";
 import { authService } from "@/services/auth";
 import { clearTokens, getRefreshToken, getAccessToken } from "@/lib/api";
 import type { User } from "@/types/auth";
@@ -28,31 +29,37 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 );
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isMounted, setIsMounted] = useState(false);
 
-  // Initialize auth state on mount
+  // Mark as mounted on client to avoid hydration mismatch
   useEffect(() => {
-    const initializeAuth = async () => {
-      const token = getAccessToken();
-
-      if (token) {
-        try {
-          const profile = await authService.getProfile();
-          setUser(profile);
-        } catch (err) {
-          console.error("Failed to fetch profile:", err);
-          clearTokens();
-          setUser(null);
-        }
-      }
-
-      setIsLoading(false);
-    };
-
-    initializeAuth();
+    setIsMounted(true);
   }, []);
+
+  // Use SWR to fetch and cache profile. Only fetch if mounted (client-side) and token exists.
+  const shouldFetch = isMounted && !!getAccessToken();
+
+  const {
+    data: profile,
+    error: swrError,
+    isLoading: profileLoading,
+  } = useSWR(
+    shouldFetch ? "auth/profile" : null,
+    async () => await authService.getProfile(),
+    {
+      revalidateOnFocus: false,
+      dedupingInterval: 1000 * 60 * 5, // dedupe identical requests for 5 minutes
+    }
+  );
+
+  // Combine SWR loading state with local operation loading (login/logout)
+  const combinedLoading = isLoading || !!profileLoading;
+  if (swrError && !error) {
+    // surface SWR errors into local error state
+    setError(swrError instanceof Error ? swrError.message : String(swrError));
+  }
 
   const handleRequestOtp = useCallback(async (email: string) => {
     setIsLoading(true);
@@ -76,7 +83,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     try {
       const data = await authService.login(email, otp);
-      setUser(data.user);
+      // Update SWR cache so consumers see the user immediately
+      try {
+        mutate("auth/profile", data.user, false);
+      } catch (e) {
+        // ignore mutate errors
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : "Login failed";
       setError(message);
@@ -100,7 +112,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setError(message);
     } finally {
       clearTokens();
-      setUser(null);
+      // Clear SWR cache for profile so consumers update
+      try {
+        mutate("auth/profile", null, false);
+      } catch (e) {
+        // ignore
+      }
       setIsLoading(false);
     }
   }, []);
@@ -110,10 +127,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value: AuthContextType = {
-    user,
-    isLoading,
+    user: (profile as User) || null,
+    isLoading: combinedLoading,
     error,
-    isAuthenticated: user !== null,
+    isAuthenticated: !!profile,
     requestOtp: handleRequestOtp,
     login: handleLogin,
     logout: handleLogout,
