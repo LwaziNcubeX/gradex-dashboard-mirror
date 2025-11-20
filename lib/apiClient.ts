@@ -2,6 +2,8 @@
  * Base API client with token management and request/response interceptors
  */
 
+import Cookies from "js-cookie";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "https://api-gradex.rapidshyft.com";
 
@@ -23,37 +25,52 @@ class ApiClient {
   }
 
   /**
-   * Get access token from localStorage
+   * Get access token from cookies
    */
   private getAccessToken(): string | null {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem("accessToken");
+    return Cookies.get("accessToken") || null;
   }
 
   /**
-   * Get refresh token from localStorage
+   * Get refresh token from cookies
    */
   private getRefreshToken(): string | null {
     if (typeof window === "undefined") return null;
-    return localStorage.getItem("refreshToken");
+    return Cookies.get("refreshToken") || null;
   }
 
   /**
-   * Store tokens in localStorage
+   * Store tokens in cookies with secure settings
    */
   private storeTokens(accessToken: string, refreshToken: string): void {
     if (typeof window === "undefined") return;
-    localStorage.setItem("accessToken", accessToken);
-    localStorage.setItem("refreshToken", refreshToken);
+
+    const cookieOptions = {
+      expires: 7, // 7 days
+      path: "/",
+      secure: process.env.NODE_ENV === "production", // HTTPS only in production
+      sameSite: "strict" as const,
+    };
+
+    Cookies.set("accessToken", accessToken, {
+      ...cookieOptions,
+      expires: 1, // Access token expires in 1 day
+    });
+
+    Cookies.set("refreshToken", refreshToken, {
+      ...cookieOptions,
+      expires: 7, // Refresh token expires in 7 days
+    });
   }
 
   /**
-   * Clear tokens from localStorage
+   * Clear tokens from cookies
    */
   private clearTokens(): void {
     if (typeof window === "undefined") return;
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
+    Cookies.remove("accessToken", { path: "/" });
+    Cookies.remove("refreshToken", { path: "/" });
     localStorage.removeItem("user");
   }
 

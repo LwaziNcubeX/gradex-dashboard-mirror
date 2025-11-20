@@ -2,6 +2,8 @@
  * Base API Client with token management and request/response interceptors
  */
 
+import Cookies from "js-cookie";
+
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
 const TOKEN_KEY = "gradex_access_token";
@@ -17,37 +19,52 @@ export interface ApiError extends Error {
 }
 
 /**
- * Get stored access token
+ * Get stored access token from cookies
  */
 export function getAccessToken(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(TOKEN_KEY);
+  return Cookies.get(TOKEN_KEY) || null;
 }
 
 /**
- * Get stored refresh token
+ * Get stored refresh token from cookies
  */
 export function getRefreshToken(): string | null {
   if (typeof window === "undefined") return null;
-  return localStorage.getItem(REFRESH_TOKEN_KEY);
+  return Cookies.get(REFRESH_TOKEN_KEY) || null;
 }
 
 /**
- * Store tokens in localStorage
+ * Store tokens in cookies with secure settings
  */
 export function setTokens(accessToken: string, refreshToken: string): void {
   if (typeof window === "undefined") return;
-  localStorage.setItem(TOKEN_KEY, accessToken);
-  localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken);
+
+  const cookieOptions = {
+    expires: 7, // 7 days
+    path: "/",
+    secure: process.env.NODE_ENV === "production", // HTTPS only in production
+    sameSite: "strict" as const,
+  };
+
+  Cookies.set(TOKEN_KEY, accessToken, {
+    ...cookieOptions,
+    expires: 1, // Access token expires in 1 day
+  });
+
+  Cookies.set(REFRESH_TOKEN_KEY, refreshToken, {
+    ...cookieOptions,
+    expires: 7, // Refresh token expires in 7 days
+  });
 }
 
 /**
- * Clear tokens from localStorage
+ * Clear tokens from cookies
  */
 export function clearTokens(): void {
   if (typeof window === "undefined") return;
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(REFRESH_TOKEN_KEY);
+  Cookies.remove(TOKEN_KEY, { path: "/" });
+  Cookies.remove(REFRESH_TOKEN_KEY, { path: "/" });
 }
 
 /**

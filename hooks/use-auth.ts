@@ -1,10 +1,5 @@
 "use client";
 
-/**
- * useAuth Hook
- * Easy access to authentication context in components
- */
-
 import { useContext } from "react";
 import { AuthContext, type AuthContextType } from "@/contexts/AuthContext";
 
