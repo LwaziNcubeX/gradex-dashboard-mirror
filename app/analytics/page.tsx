@@ -1,10 +1,13 @@
-import { AppSidebar } from '@/components/app-sidebar'
-import { SiteHeader } from '@/components/site-header'
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import {
-  SidebarInset,
-  SidebarProvider,
-} from '@/components/ui/sidebar'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function AnalyticsPage() {
   return (
@@ -15,8 +18,9 @@ export default function AnalyticsPage() {
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
+      defaultOpen={false}
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar variant="sidebar" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
@@ -24,7 +28,9 @@ export default function AnalyticsPage() {
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Analytics</h1>
-                <p className="text-muted-foreground mt-2">Track and analyze your key metrics</p>
+                <p className="text-muted-foreground mt-2">
+                  Track and analyze your key metrics
+                </p>
               </div>
 
               <div className="grid gap-4 md:grid-cols-4">
@@ -35,7 +41,9 @@ export default function AnalyticsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold">28,400</div>
-                    <p className="text-xs text-muted-foreground mt-1">+12% from last month</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      +12% from last month
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -46,7 +54,9 @@ export default function AnalyticsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold">8,234</div>
-                    <p className="text-xs text-muted-foreground mt-1">+5% from last month</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      +5% from last month
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -57,7 +67,9 @@ export default function AnalyticsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold">4.2%</div>
-                    <p className="text-xs text-muted-foreground mt-1">-0.5% from last month</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      -0.5% from last month
+                    </p>
                   </CardContent>
                 </Card>
 
@@ -68,7 +80,9 @@ export default function AnalyticsPage() {
                   </CardHeader>
                   <CardContent>
                     <div className="text-3xl font-bold">28.1%</div>
-                    <p className="text-xs text-muted-foreground mt-1">+2.1% from last month</p>
+                    <p className="text-xs text-muted-foreground mt-1">
+                      +2.1% from last month
+                    </p>
                   </CardContent>
                 </Card>
               </div>
@@ -76,7 +90,9 @@ export default function AnalyticsPage() {
               <Card>
                 <CardHeader>
                   <CardTitle>Analytics Summary</CardTitle>
-                  <CardDescription>Overview of your analytics data</CardDescription>
+                  <CardDescription>
+                    Overview of your analytics data
+                  </CardDescription>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
@@ -85,16 +101,22 @@ export default function AnalyticsPage() {
                       <span className="text-muted-foreground">1.2s avg</span>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
-                      <span className="font-medium">Average Session Duration</span>
+                      <span className="font-medium">
+                        Average Session Duration
+                      </span>
                       <span className="text-muted-foreground">3m 45s</span>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <span className="font-medium">Peak Traffic Hour</span>
-                      <span className="text-muted-foreground">2:00 PM - 3:00 PM</span>
+                      <span className="text-muted-foreground">
+                        2:00 PM - 3:00 PM
+                      </span>
                     </div>
                     <div className="flex items-center justify-between p-3 border rounded-lg">
                       <span className="font-medium">Top Device</span>
-                      <span className="text-muted-foreground">Desktop (68%)</span>
+                      <span className="text-muted-foreground">
+                        Desktop (68%)
+                      </span>
                     </div>
                   </div>
                 </CardContent>
@@ -104,5 +126,5 @@ export default function AnalyticsPage() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

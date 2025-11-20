@@ -1,10 +1,13 @@
-import { AppSidebar } from '@/components/app-sidebar'
-import { SiteHeader } from '@/components/site-header'
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import {
-  SidebarInset,
-  SidebarProvider,
-} from '@/components/ui/sidebar'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export default function TeamPage() {
   return (
@@ -15,8 +18,9 @@ export default function TeamPage() {
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
+      defaultOpen={false}
     >
-      <AppSidebar variant="inset" />
+      <AppSidebar variant="sidebar" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
@@ -24,7 +28,9 @@ export default function TeamPage() {
             <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Team</h1>
-                <p className="text-muted-foreground mt-2">Manage your team members and their roles</p>
+                <p className="text-muted-foreground mt-2">
+                  Manage your team members and their roles
+                </p>
               </div>
 
               <div className="grid gap-4 md:grid-cols-3">
@@ -67,21 +73,44 @@ export default function TeamPage() {
                 <CardContent>
                   <div className="space-y-4">
                     {[
-                      { name: "Alice Johnson", role: "Product Manager", status: "Active" },
-                      { name: "Bob Smith", role: "Software Engineer", status: "Active" },
-                      { name: "Carol Davis", role: "Designer", status: "Active" },
-                      { name: "David Wilson", role: "QA Engineer", status: "Inactive" },
+                      {
+                        name: "Alice Johnson",
+                        role: "Product Manager",
+                        status: "Active",
+                      },
+                      {
+                        name: "Bob Smith",
+                        role: "Software Engineer",
+                        status: "Active",
+                      },
+                      {
+                        name: "Carol Davis",
+                        role: "Designer",
+                        status: "Active",
+                      },
+                      {
+                        name: "David Wilson",
+                        role: "QA Engineer",
+                        status: "Inactive",
+                      },
                     ].map((member) => (
-                      <div key={member.name} className="flex items-center justify-between p-3 border rounded-lg">
+                      <div
+                        key={member.name}
+                        className="flex items-center justify-between p-3 border rounded-lg"
+                      >
                         <div>
                           <p className="font-medium">{member.name}</p>
-                          <p className="text-sm text-muted-foreground">{member.role}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {member.role}
+                          </p>
                         </div>
-                        <span className={`px-2 py-1 text-xs font-medium rounded-full ${
-                          member.status === "Active" 
-                            ? "bg-green-100 text-green-800" 
-                            : "bg-gray-100 text-gray-800"
-                        }`}>
+                        <span
+                          className={`px-2 py-1 text-xs font-medium rounded-full ${
+                            member.status === "Active"
+                              ? "bg-green-100 text-green-800"
+                              : "bg-gray-100 text-gray-800"
+                          }`}
+                        >
                           {member.status}
                         </span>
                       </div>
@@ -94,5 +123,5 @@ export default function TeamPage() {
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

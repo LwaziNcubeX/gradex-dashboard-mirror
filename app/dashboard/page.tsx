@@ -16,8 +16,9 @@ export default function Page() {
           "--header-height": "calc(var(--spacing) * 12)",
         } as React.CSSProperties
       }
+      defaultOpen={false}
     >
-      <AppSidebar />
+      <AppSidebar variant="sidebar" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">
