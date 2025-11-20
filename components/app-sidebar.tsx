@@ -33,12 +33,18 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
+import {
+  Layers3Icon,
+  FileQuestionIcon,
+  ListCheckIcon,
+  CreditCardIcon,
+} from "lucide-react";
 
 const data = {
   user: {
-    name: "shadcn",
-    email: "m@example.com",
-    avatar: "/avatars/shadcn.jpg",
+    name: "Admin",
+    email: "m@rapidshyft.com",
+    avatar: "/profile.jpg",
   },
   navMain: [
     {
@@ -47,106 +53,42 @@ const data = {
       icon: IconDashboard,
     },
     {
-      title: "Lifecycle",
-      url: "/lifecycle",
-      icon: IconListDetails,
-    },
-    {
       title: "Analytics",
       url: "/analytics",
       icon: IconChartBar,
+    },
+
+    {
+      title: "Levels",
+      url: "/levels",
+      icon: Layers3Icon,
+    },
+    {
+      title: "Quizzes",
+      url: "/quizzes",
+      icon: FileQuestionIcon,
+    },
+    {
+      title: "Questions",
+      url: "/questions",
+      icon: ListCheckIcon,
+    },
+
+    {
+      title: "Students",
+      url: "/students",
+      icon: IconUsers,
     },
     {
       title: "Reports",
       url: "/reports",
       icon: IconReport,
     },
+
     {
-      title: "Team",
-      url: "/team",
-      icon: IconUsers,
-    },
-  ],
-  navClouds: [
-    {
-      title: "Capture",
-      icon: IconCamera,
-      isActive: true,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Proposal",
-      icon: IconFileDescription,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-    {
-      title: "Prompts",
-      icon: IconFileAi,
-      url: "#",
-      items: [
-        {
-          title: "Active Proposals",
-          url: "#",
-        },
-        {
-          title: "Archived",
-          url: "#",
-        },
-      ],
-    },
-  ],
-  navSecondary: [
-    {
-      title: "Settings",
-      url: "#",
-      icon: IconSettings,
-    },
-    {
-      title: "Get Help",
-      url: "#",
-      icon: IconHelp,
-    },
-    {
-      title: "Search",
-      url: "#",
-      icon: IconSearch,
-    },
-  ],
-  documents: [
-    {
-      name: "Data Library",
-      url: "#",
-      icon: IconDatabase,
-    },
-    {
-      name: "Reports",
-      url: "#",
-      icon: IconReport,
-    },
-    {
-      name: "Word Assistant",
-      url: "#",
-      icon: IconFileWord,
+      title: "Billing",
+      url: "/billing",
+      icon: CreditCardIcon,
     },
   ],
 };
@@ -181,8 +123,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavDocuments items={data.documents} />
+        <NavMain items={data.navMain as any /* TODO: Fix Icon type issue */} />
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={updatedData.user} />
