@@ -3,6 +3,7 @@ import { oswald } from "@/components/fonts";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import React from "react";
+import { QuestionsContent } from "@/components/questions/questions-content";
 
 const Questions = () => {
   return (
@@ -25,12 +26,15 @@ const Questions = () => {
                 <h1
                   className={`text-3xl font-bold tracking-tight ${oswald.className}`}
                 >
-                  Questions
+                  Questions Management
                 </h1>
                 <p className="text-muted-foreground mt-2">
-                  Track project and product lifecycle stages
+                  Create, manage, and organize your question bank
                 </p>
               </div>
+
+              {/* Questions Management Content */}
+              <QuestionsContent />
             </div>
           </div>
         </div>
