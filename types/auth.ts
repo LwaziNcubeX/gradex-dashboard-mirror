@@ -5,8 +5,7 @@
 export interface User {
   user_id: string;
   email: string;
-  first_name: string;
-  last_name: string;
+  name: string;
   role: "student" | "teacher" | "admin";
   is_verified: boolean;
   created_at: string;
