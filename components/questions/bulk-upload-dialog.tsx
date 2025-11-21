@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 import { useQuestions } from "@/hooks/use-questions";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +11,13 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Loader2, Upload, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Loader2,
+  Upload,
+  AlertCircle,
+  CheckCircle,
+  FileUp,
+} from "lucide-react";
 
 interface BulkUploadDialogProps {
   open: boolean;
@@ -64,7 +71,6 @@ export function BulkUploadDialog({
       });
       setFile(null);
 
-      // Close dialog after 2 seconds
       setTimeout(() => {
         onOpenChange(false);
         setSuccess(null);
@@ -82,24 +88,31 @@ export function BulkUploadDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Bulk Upload Questions</DialogTitle>
-          <DialogDescription>
-            Upload multiple questions from a CSV file
-          </DialogDescription>
+          <div className="flex items-center gap-3">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-accent">
+              <FileUp className="h-5 w-5 text-accent-foreground" />
+            </div>
+            <div>
+              <DialogTitle>Bulk Upload Questions</DialogTitle>
+              <DialogDescription className="mt-1">
+                Upload multiple questions from a CSV file
+              </DialogDescription>
+            </div>
+          </div>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {error && (
-            <div className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-800">
-              <AlertCircle className="h-4 w-4 shrink-0" />
-              <span>{error}</span>
+            <div className="flex items-start gap-3 rounded-lg border border-destructive/20 bg-destructive/5 p-4">
+              <AlertCircle className="h-5 w-5 shrink-0 text-destructive mt-0.5" />
+              <span className="text-sm text-destructive">{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="flex items-center gap-2 rounded-lg bg-green-50 p-3 text-sm text-green-800">
-              <CheckCircle className="h-4 w-4 shrink-0" />
-              <span>
+            <div className="flex items-start gap-3 rounded-lg border border-green-500/20 bg-green-50 p-4 dark:bg-green-950/30">
+              <CheckCircle className="h-5 w-5 shrink-0 text-green-600 dark:text-green-400 mt-0.5" />
+              <span className="text-sm text-green-600 dark:text-green-400">
                 Successfully imported {success.imported} questions
                 {success.failed > 0 && ` (${success.failed} failed)`}
               </span>
@@ -107,44 +120,58 @@ export function BulkUploadDialog({
           )}
 
           {/* CSV Format Info */}
-          <div className="rounded-lg bg-blue-50 p-3 text-sm text-blue-800">
-            <p className="font-medium mb-2">CSV Format:</p>
-            <code className="block text-xs font-mono break-all">
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-4">
+            <p className="font-medium text-sm text-foreground mb-2">
+              CSV Format:
+            </p>
+            <code className="block text-xs font-mono text-muted-foreground break-all bg-background/50 p-2 rounded border border-border">
               question_text,answers,correct_answer,subject,topic,level,explanation
             </code>
-            <p className="mt-2 text-xs">
-              Separate multiple answers with pipe character: "Option 1|Option
-              2|Option 3"
+            <p className="mt-3 text-xs text-muted-foreground">
+              <span className="font-medium">Note:</span> Separate multiple
+              answers with pipe character: "Option 1|Option 2|Option 3"
             </p>
           </div>
 
           {/* File Input */}
-          <div className="space-y-2">
+          <div className="space-y-3">
             <label htmlFor="file" className="block text-sm font-medium">
               Select CSV File
             </label>
-            <input
-              id="file"
-              type="file"
-              accept=".csv"
-              onChange={handleFileChange}
-              disabled={isSubmitting}
-              className="block w-full text-sm text-slate-500
-                file:mr-4 file:py-2 file:px-4
-                file:rounded file:border-0
-                file:text-sm file:font-semibold
-                file:bg-blue-50 file:text-blue-700
-                hover:file:bg-blue-100"
-            />
+            <div className="relative">
+              <input
+                id="file"
+                type="file"
+                accept=".csv"
+                onChange={handleFileChange}
+                disabled={isSubmitting}
+                className="sr-only"
+              />
+              <label
+                htmlFor="file"
+                className="flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed border-border px-4 py-8 text-center cursor-pointer hover:border-primary hover:bg-primary/5 transition-colors"
+              >
+                <Upload className="h-8 w-8 text-muted-foreground" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    Click to upload CSV file
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    or drag and drop
+                  </p>
+                </div>
+              </label>
+            </div>
             {file && (
-              <p className="text-sm text-slate-600">
-                Selected: <span className="font-medium">{file.name}</span>
+              <p className="text-sm text-muted-foreground">
+                Selected:{" "}
+                <span className="font-medium text-foreground">{file.name}</span>
               </p>
             )}
           </div>
 
           {/* Actions */}
-          <div className="flex justify-end gap-3 pt-4">
+          <div className="flex justify-end gap-3 pt-4 border-t border-border">
             <Button
               type="button"
               variant="outline"
@@ -156,7 +183,7 @@ export function BulkUploadDialog({
             <Button
               type="submit"
               disabled={isSubmitting || !file}
-              className="gap-2"
+              className="gap-2 bg-accent hover:bg-accent/90"
             >
               {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSubmitting ? "Uploading..." : "Upload"}

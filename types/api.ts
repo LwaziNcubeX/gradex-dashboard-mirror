@@ -27,3 +27,29 @@ export interface ApiResponse<T> {
   message?: string;
   data: T;
 }
+
+/**
+ * Level-Based Quiz Types
+ */
+export interface LevelQuiz {
+  _id: string;
+  title: string;
+  description?: string;
+  subject: string;
+  category?: string;
+  level: string;
+  xp_reward: number;
+  question_count?: number;
+}
+
+export interface LevelQuizzesListResponse {
+  quizzes: LevelQuiz[];
+  total: number;
+  page: number;
+  limit: number;
+  total_pages: number;
+}
+
+export interface LevelQuizzesGroupedByLevel {
+  [level: string]: LevelQuiz[];
+}

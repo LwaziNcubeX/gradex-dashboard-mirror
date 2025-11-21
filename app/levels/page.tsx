@@ -1,6 +1,7 @@
 import { AppSidebar } from "@/components/app-sidebar";
 import { SiteHeader } from "@/components/site-header";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import { LevelsContent } from "@/components/levels/levels-content";
 import React from "react";
 
 const Levels = () => {
@@ -23,9 +24,10 @@ const Levels = () => {
               <div>
                 <h1 className="text-3xl font-bold tracking-tight">Levels</h1>
                 <p className="text-muted-foreground mt-2">
-                  Track project and product lifecycle stages
+                  Explore quizzes organized by O-Level Forms
                 </p>
               </div>
+              <LevelsContent />
             </div>
           </div>
         </div>
