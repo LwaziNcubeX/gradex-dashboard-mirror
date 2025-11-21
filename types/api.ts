@@ -193,3 +193,92 @@ export interface BulkUploadQuestionsResponse {
     errors?: Array<{ row: number; error: string }>;
   };
 }
+
+/**
+ * Quiz Management Types (API v1.0)
+ */
+export type QuizStatus = "draft" | "active" | "archived";
+
+export interface Quiz {
+  _id: string;
+  title: string;
+  description: string;
+  subject: string;
+  category?: string;
+  tags?: string[];
+  duration: number; // seconds
+  level: FormLevel;
+  questions: string[]; // array of question IDs
+  level_id?: string;
+  xp_reward: number;
+  difficulty_score: number; // 0.1-5.0
+  completion_count?: number;
+  average_score?: number;
+  status: QuizStatus;
+  is_active: boolean;
+  created_at: string; // ISO datetime
+  updated_at: string; // ISO datetime
+}
+
+export interface QuizDetail extends Quiz {
+  question_count?: number;
+  user_attempts?: number;
+  user_best_score?: number;
+}
+
+export interface QuizCreateInput {
+  title: string;
+  description: string;
+  subject: string;
+  category?: string;
+  tags?: string[];
+  duration: number;
+  level: FormLevel;
+  questions?: string[];
+  level_id?: string;
+  xp_reward: number;
+  difficulty_score: number;
+  status?: QuizStatus;
+  is_active?: boolean;
+}
+
+export interface QuizzesListResponse {
+  success: boolean;
+  message?: string;
+  data: Quiz[];
+}
+
+export interface AdminQuizzesListResponse {
+  success: boolean;
+  message?: string;
+  data: Quiz[];
+  meta: {
+    page: number;
+    page_size: number;
+    total_items: number;
+    total_pages: number;
+  };
+}
+
+export interface AdminQuizzesQueryParams {
+  page?: number;
+  per_page?: number;
+  subject?: string;
+  level?: FormLevel;
+  category?: string;
+  status?: QuizStatus;
+  search?: string;
+  sort_by?: "created_at" | "difficulty_score" | "title";
+  sort_order?: "asc" | "desc";
+  tags?: string[];
+}
+
+export interface BulkUploadQuizzesResponse {
+  success: boolean;
+  message: string;
+  data: {
+    imported_count: number;
+    failed_count: number;
+    errors?: Array<{ row: number; error: string }>;
+  };
+}
