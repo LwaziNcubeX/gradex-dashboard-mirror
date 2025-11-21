@@ -312,6 +312,21 @@ export function apiPut<T>(
 }
 
 /**
+ * PATCH request
+ */
+export function apiPatch<T>(
+  endpoint: string,
+  body?: unknown,
+  options?: Omit<FetchOptions, "method">
+): Promise<T> {
+  return apiRequest<T>(endpoint, {
+    ...options,
+    method: "PATCH",
+    body: body ? JSON.stringify(body) : undefined,
+  });
+}
+
+/**
  * DELETE request
  */
 export function apiDelete<T>(

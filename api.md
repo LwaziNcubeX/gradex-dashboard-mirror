@@ -721,91 +721,155 @@ Get a single question by ID.
 
 ---
 
-## Level-Based Quiz Endpoints
+## Levels Admin Management API
 
-### GET /level-quiz/list
+This section documents endpoints the admin dashboard will use to manage levels (create, list, update, status changes, reorder, bulk import, restore). All endpoints return the project-standard JSON shape: {"success": bool, "message": str, "data": ...} unless otherwise noted.
 
-List all level-based quizzes with pagination.
+Base path: /levels (root)
 
-**Authentication**: Not required
+Roles & Permissions
 
-**Query Parameters**:
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| page | integer | 1 | Page number |
-| limit | integer | 10 | Items per page (1-100) |
+- student: read-only access to `GET /levels`, `GET /levels/{id}`, and `POST /levels/{id}/unlock`.
+- teacher: can create and update levels, view admin list (`GET /admin/levels`), and change level status.
+- admin: full access (create/update/delete/restore/reorder/bulk import).
 
-**Success Response** (200):
+Common fields (Level resource)
 
-```json
-{
-  "success": true,
-  "data": {
-    "quizzes": [
-      {
-        "_id": "QZ123ABC45",
-        "title": "Level 1: Basic Algebra",
-        "description": "Learn algebraic fundamentals",
-        "xp_reward": 100,
-        "question_count": 15
-      }
-    ],
-    "total": 45,
-    "page": 1,
-    "limit": 10,
-    "total_pages": 5
+- id: str (MongoDB ObjectId string)
+- level_number: int
+- title: str
+- description: str
+- form_level: "Form 1" | "Form 2" | "Form 3" | "Form 4"
+- subject: str
+- xp_required: int
+- completion_percentage_required: int
+- total_xp_reward: int
+- quiz_ids: [str]
+- is_starter_level: bool
+- prerequisites: [str] (level ids)
+- difficulty_rating: int (1-5)
+- tags: [str]
+- bonus_coins: int
+- status: "draft" | "active" | "archived"
+- created_at, updated_at: ISO datetime strings
+- is_active: bool
+
+Endpoints
+
+1. Create level
+
+- POST /levels
+- Roles: teacher, admin
+- Body: LevelCreateSchema (see field list above)
+- Success: 201 Created
+  Example request:
+  {
+  "level_number": 1,
+  "title": "Algebra Basics",
+  "description": "Intro to algebraic expressions",
+  "form_level": "Form 1",
+  "subject": "Mathematics",
+  "total_xp_reward": 200
   }
+
+Example response (201):
+{
+"success": true,
+"message": "Level created successfully",
+"data": {
+"\_id": "64b8f...",
+"level_number": 1,
+"title": "Algebra Basics",
+"created_at": "2025-11-21T10:00:00.000000",
+"updated_at": "2025-11-21T10:00:00.000000",
+...
 }
-```
+}
 
----
+2. List levels (user-facing)
 
-### GET /level-quiz/by-level/{level}
+- GET /levels
+- Roles: authenticated users (student/teacher/admin)
+- Query params: subject (optional)
+- Returns all active levels with user progress for the requesting user.
 
-Get quizzes filtered by difficulty level.
+3. Get level detail
 
-**Authentication**: Not required
+- GET /levels/{level_id}
+- Roles: authenticated users
+- Returns level detail including quizzes and user-specific progress if user is provided.
 
-**Path Parameters**:
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| level | string | "Form 1", "Form 2", "Form 3", or "Form 4" |
+4. Unlock level (user)
 
-**Query Parameters**:
-| Parameter | Type | Default | Description |
-|-----------|------|---------|-------------|
-| page | integer | 1 | Page number |
-| limit | integer | 10 | Items per page |
-| subject | string | null | Filter by subject |
-| category | string | null | Filter by category |
+- POST /levels/{level_id}/unlock
+- Roles: authenticated users
+- Checks prerequisites and XP requirements, then creates/updates user progress.
 
-**Example Request**:
+5. Admin paginated list
+
+- GET /admin/levels
+- Roles: teacher, admin (teachers can view but cannot include archived)
+- Query params:
+  - page (int, default 1)
+  - per_page (int, default 20, max 100)
+  - subject, form_level, status, search
+  - sort_by: level_number | title | created_at | difficulty_rating
+  - sort_order: asc | desc
+  - include_archived: bool (admin only)
+- Response: {"success": true, "data": [levels], "meta": {pagination}}
+
+Example request:
+GET /admin/levels?page=1&per_page=20&sort_by=created_at&sort_order=desc
+
+Example response:
+{
+"success": true,
+"data": [ ...levels... ],
+"meta": { "page":1, "page_size":20, "total_items": 200, "total_pages":10 }
+}
+
+6. Change level status
+
+- PATCH /levels/{level_id}/status
+- Roles: teacher, admin
+- Body: {"status": "draft"|"active"|"archived"}
+- Use to publish/unpublish/archive levels used by the mobile app.
+
+7. Restore level (soft delete revert)
+
+- POST /levels/{level_id}/restore
+- Roles: admin only
+- Restores `is_active` to true and returns updated level object.
+
+9. Bulk import levels
+
+- POST /levels/bulk
+- Roles: admin only
+- Body: {"levels": [LevelCreateSchema, ...]}
+- Response: per-item result array with success/failure and messages.
+
+UI Tips for the Admin Dashboard
+
+- When listing levels, show `status`, `is_active`, `created_at`, and `updated_at` columns.
+- Provide filters for `form_level`, `subject`, and `status`.
+- For reorder, provide a drag-and-drop UI that calls `PATCH /levels/{id}/reorder` with the target position; confirm with the user before committing.
+- Use `quiz_count` (count of quiz_ids) client-side to show how many quizzes are attached (the API returns `quiz_ids`, compute count on the client or request detail endpoint).
+
+Validation & Errors
+
+- Invalid input returns 400 with a message; unauthorized access returns 403.
+- For pagination: `per_page` is capped at 100; invalid values return 400.
+
+Testing endpoints (quick smoke)
+
+- Start dev server: `./run` or `uvicorn main:app --reload --host 0.0.0.0 --port 8000`
+- Use curl / httpie or Postman with an Authorization header (Bearer access_token).
+
+Examples (curl):
 
 ```bash
-GET /level-quiz/by-level/Form%201?subject=Mathematics&limit=20
-```
-
-**Success Response** (200):
-
-```json
-{
-  "success": true,
-  "data": {
-    "quizzes": [
-      {
-        "_id": "QZ123ABC45",
-        "title": "Form 1 Mathematics",
-        "subject": "Mathematics",
-        "category": "Algebra",
-        "level": "Form 1",
-        "xp_reward": 100
-      }
-    ],
-    "total": 12,
-    "page": 1,
-    "limit": 10
-  }
-}
+curl -X GET "http://localhost:8000/admin/levels?page=1&per_page=10" \
+  -H "Authorization: Bearer $ACCESS_TOKEN"
 ```
 
 ---

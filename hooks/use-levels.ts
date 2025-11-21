@@ -2,30 +2,36 @@
 
 import useSWR, { mutate } from "swr";
 import {
-  getAllLevelQuizzes,
-  getQuizzesByLevel,
-  getAllFormsSummary,
+  getAllLevels,
+  getLevelDetail,
+  getAdminLevels,
   AVAILABLE_LEVELS,
 } from "@/services/levels";
-import { LevelQuiz, LevelQuizzesListResponse } from "@/types/api";
+import {
+  Level,
+  LevelDetail,
+  AdminLevelsListResponse,
+  AdminLevelsQueryParams,
+} from "@/types/api";
 
 export interface UseLevelsOptions {
   skipFetch?: boolean;
-  page?: number;
-  limit?: number;
+}
+
+export interface UseAdminLevelsOptions extends AdminLevelsQueryParams {
+  skipFetch?: boolean;
 }
 
 /**
- * Hook to fetch all level-based quizzes
+ * Hook to fetch all active levels for the user
  */
-export function useAllLevelQuizzes(options: UseLevelsOptions = {}) {
-  const { skipFetch = false, page = 1, limit = 10 } = options;
-
-  const cacheKey = skipFetch ? null : `levels:all:${page}:${limit}`;
+export function useAllLevels(subject?: string, options: UseLevelsOptions = {}) {
+  const { skipFetch = false } = options;
+  const cacheKey = skipFetch ? null : `levels:all:${subject || "all"}`;
 
   const { data, error, isLoading } = useSWR(
     cacheKey,
-    async () => await getAllLevelQuizzes(page, limit),
+    async () => await getAllLevels(subject),
     {
       revalidateOnFocus: false,
       dedupingInterval: 1000 * 60 * 5, // 5 minutes
@@ -35,32 +41,26 @@ export function useAllLevelQuizzes(options: UseLevelsOptions = {}) {
   const refetch = () => mutate(cacheKey);
 
   return {
-    quizzes: data?.quizzes || [],
-    total: data?.total || 0,
-    page: data?.page || 1,
-    limit: data?.limit || 10,
-    totalPages: data?.total_pages || 1,
+    levels: data || [],
     isLoading,
-    error,
+    error: error as Error | undefined,
     refetch,
   };
 }
 
 /**
- * Hook to fetch quizzes filtered by level/form
+ * Hook to fetch a single level with details and user progress
  */
-export function useQuizzesByLevel(
-  level: string | null,
+export function useLevelDetail(
+  levelId: string | null,
   options: UseLevelsOptions = {}
 ) {
-  const { skipFetch = false, page = 1, limit = 10 } = options;
-
-  const cacheKey =
-    skipFetch || !level ? null : `levels:${level}:${page}:${limit}`;
+  const { skipFetch = false } = options;
+  const cacheKey = skipFetch || !levelId ? null : `level:detail:${levelId}`;
 
   const { data, error, isLoading } = useSWR(
     cacheKey,
-    async () => level && (await getQuizzesByLevel(level, page, limit)),
+    async () => levelId && (await getLevelDetail(levelId)),
     {
       revalidateOnFocus: false,
       dedupingInterval: 1000 * 60 * 5, // 5 minutes
@@ -70,27 +70,52 @@ export function useQuizzesByLevel(
   const refetch = () => mutate(cacheKey);
 
   return {
-    quizzes: (data as LevelQuizzesListResponse | undefined)?.quizzes || [],
-    total: (data as LevelQuizzesListResponse | undefined)?.total || 0,
-    page: (data as LevelQuizzesListResponse | undefined)?.page || 1,
-    limit: (data as LevelQuizzesListResponse | undefined)?.limit || 10,
-    totalPages:
-      (data as LevelQuizzesListResponse | undefined)?.total_pages || 1,
+    level: data || null,
     isLoading,
-    error,
+    error: error as Error | undefined,
     refetch,
   };
 }
 
 /**
- * Hook to fetch summary of all forms
+ * Hook to fetch paginated admin levels list with filters and sorting
  */
-export function useAllFormsSummary(skipFetch = false) {
-  const cacheKey = skipFetch ? null : "levels:summary";
+export function useAdminLevels(options: UseAdminLevelsOptions = {}) {
+  const {
+    skipFetch = false,
+    page = 1,
+    per_page = 20,
+    subject,
+    form_level,
+    status,
+    search,
+    sort_by,
+    sort_order,
+    include_archived,
+  } = options;
+
+  const cacheKey = skipFetch
+    ? null
+    : `admin:levels:${page}:${per_page}:${subject || ""}:${form_level || ""}:${
+        status || ""
+      }:${search || ""}:${sort_by || ""}:${sort_order || ""}:${
+        include_archived || ""
+      }`;
 
   const { data, error, isLoading } = useSWR(
     cacheKey,
-    async () => await getAllFormsSummary(),
+    async () =>
+      await getAdminLevels({
+        page,
+        per_page,
+        subject,
+        form_level,
+        status,
+        search,
+        sort_by,
+        sort_order,
+        include_archived,
+      }),
     {
       revalidateOnFocus: false,
       dedupingInterval: 1000 * 60 * 5, // 5 minutes
@@ -100,15 +125,19 @@ export function useAllFormsSummary(skipFetch = false) {
   const refetch = () => mutate(cacheKey);
 
   return {
-    summaries: data || [],
+    levels: data?.data || [],
+    total: data?.meta.total_items || 0,
+    page: data?.meta.page || 1,
+    pageSize: data?.meta.page_size || 20,
+    totalPages: data?.meta.total_pages || 1,
     isLoading,
-    error,
+    error: error as Error | undefined,
     refetch,
   };
 }
 
 /**
- * Hook to get available levels
+ * Hook to get available form levels
  */
 export function useAvailableLevels() {
   return AVAILABLE_LEVELS;

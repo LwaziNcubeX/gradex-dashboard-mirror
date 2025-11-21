@@ -1,91 +1,147 @@
 /**
  * Levels API Service
- * Handles all level-based quiz related API calls
+ * Handles all level management API calls using the latest API v1.0
  */
 
-import { apiGet } from "@/lib/api";
-import { LevelQuiz, LevelQuizzesListResponse } from "@/types/api";
+import { apiGet, apiPost, apiPatch } from "@/lib/api";
+import {
+  Level,
+  LevelDetail,
+  LevelCreateInput,
+  AdminLevelsListResponse,
+  AdminLevelsQueryParams,
+  FormLevel,
+  LevelStatus,
+} from "@/types/api";
 
 /**
- * Get all level-based quizzes with pagination
- * GET /level-quiz/list
+ * Form levels available in the system
  */
-export async function getAllLevelQuizzes(
-  page: number = 1,
-  limit: number = 10
-): Promise<LevelQuizzesListResponse> {
-  const response = await apiGet<LevelQuizzesListResponse>("/level-quiz/list", {
-    params: {
-      page,
-      limit,
-    },
+export const AVAILABLE_LEVELS: FormLevel[] = [
+  "Form 1",
+  "Form 2",
+  "Form 3",
+  "Form 4",
+];
+
+/**
+ * Get all active levels (user-facing)
+ * GET /levels
+ * Returns all active levels with optional filtering by subject
+ */
+export async function getAllLevels(subject?: string): Promise<Level[]> {
+  const params: Record<string, string> = {};
+  if (subject) params.subject = subject;
+
+  const response = await apiGet<Level[]>("/levels", {
+    params,
   });
   return response;
 }
 
 /**
- * Get quizzes filtered by difficulty level/form
- * GET /level-quiz/by-level/{level}
+ * Get level detail by ID
+ * GET /levels/{level_id}
+ * Includes user-specific progress if authenticated
  */
-export async function getQuizzesByLevel(
-  level: string,
-  page: number = 1,
-  limit: number = 10,
-  filters?: {
-    subject?: string;
-    category?: string;
-  }
-): Promise<LevelQuizzesListResponse> {
-  const params: Record<string, any> = {
-    page,
-    limit,
-  };
-
-  if (filters?.subject) params.subject = filters.subject;
-  if (filters?.category) params.category = filters.category;
-
-  const response = await apiGet<LevelQuizzesListResponse>(
-    `/level-quiz/by-level/${encodeURIComponent(level)}`,
-    {
-      params,
-    }
-  );
+export async function getLevelDetail(levelId: string): Promise<LevelDetail> {
+  const response = await apiGet<LevelDetail>(`/levels/${levelId}`);
   return response;
 }
 
 /**
- * Get all available forms/levels
- * This is a convenience function that fetches from all levels
+ * Unlock a level for the current user
+ * POST /levels/{level_id}/unlock
+ * Checks prerequisites and XP requirements before unlocking
  */
-export const AVAILABLE_LEVELS = ["Form 1", "Form 2", "Form 3", "Form 4"];
+export async function unlockLevel(levelId: string): Promise<Level> {
+  const response = await apiPost<Level>(`/levels/${levelId}/unlock`, {});
+  return response;
+}
 
 /**
- * Get summary of quizzes for all forms
+ * Get admin paginated list of levels with filters and sorting
+ * GET /admin/levels
+ * Requires teacher or admin role
  */
-export async function getAllFormsSummary(): Promise<
-  { level: string; quizCount: number; totalXp: number }[]
-> {
-  const summaries = await Promise.all(
-    AVAILABLE_LEVELS.map(async (level) => {
-      try {
-        const data = await getQuizzesByLevel(level, 1, 100);
-        const totalXp = data.quizzes.reduce(
-          (sum, quiz) => sum + (quiz.xp_reward || 0),
-          0
-        );
-        return {
-          level,
-          quizCount: data.total,
-          totalXp,
-        };
-      } catch {
-        return {
-          level,
-          quizCount: 0,
-          totalXp: 0,
-        };
-      }
-    })
-  );
-  return summaries;
+export async function getAdminLevels(
+  queryParams?: AdminLevelsQueryParams
+): Promise<AdminLevelsListResponse> {
+  const params: Record<string, any> = {
+    page: queryParams?.page || 1,
+    per_page: queryParams?.per_page || 20,
+  };
+
+  if (queryParams?.subject) params.subject = queryParams.subject;
+  if (queryParams?.form_level) params.form_level = queryParams.form_level;
+  if (queryParams?.status) params.status = queryParams.status;
+  if (queryParams?.search) params.search = queryParams.search;
+  if (queryParams?.sort_by) params.sort_by = queryParams.sort_by;
+  if (queryParams?.sort_order) params.sort_order = queryParams.sort_order;
+  if (queryParams?.include_archived !== undefined) {
+    params.include_archived = queryParams.include_archived;
+  }
+
+  const response = await apiGet<AdminLevelsListResponse>("/admin/levels", {
+    params,
+  });
+  return response;
+}
+
+/**
+ * Create a new level (admin or teacher only)
+ * POST /levels
+ */
+export async function createLevel(data: LevelCreateInput): Promise<Level> {
+  const response = await apiPost<Level>("/levels", data);
+  return response;
+}
+
+/**
+ * Update an existing level (admin or teacher only)
+ * PATCH /levels/{level_id}
+ */
+export async function updateLevel(
+  levelId: string,
+  data: Partial<LevelCreateInput>
+): Promise<Level> {
+  const response = await apiPatch<Level>(`/levels/${levelId}`, data);
+  return response;
+}
+
+/**
+ * Change level status (publish/draft/archive)
+ * PATCH /levels/{level_id}/status
+ * Requires teacher or admin role
+ */
+export async function changeLevelStatus(
+  levelId: string,
+  status: LevelStatus
+): Promise<Level> {
+  const response = await apiPatch<Level>(`/levels/${levelId}/status`, {
+    status,
+  });
+  return response;
+}
+
+/**
+ * Restore a level (revert soft delete)
+ * POST /levels/{level_id}/restore
+ * Admin only
+ */
+export async function restoreLevel(levelId: string): Promise<Level> {
+  const response = await apiPost<Level>(`/levels/${levelId}/restore`, {});
+  return response;
+}
+
+/**
+ * Bulk import levels
+ * POST /levels/bulk
+ * Admin only
+ */
+export async function bulkImportLevels(
+  levels: LevelCreateInput[]
+): Promise<{ success: boolean; data: any[] }> {
+  const response = await apiPost<any[]>("/levels/bulk", { levels });
+  return response as any;
 }
