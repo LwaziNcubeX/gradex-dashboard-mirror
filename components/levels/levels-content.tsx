@@ -1,298 +1,360 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { useAllLevels, useAvailableLevels } from "@/hooks/use-levels";
+import { useState, useMemo } from "react";
+import { useLevels } from "@/hooks/use-levels";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   AlertCircle,
   Loader2,
+  Plus,
+  MoreHorizontal,
+  Edit,
+  Trash2,
+  Search,
   BookOpen,
-  Trophy,
-  ArrowRight,
-  Zap,
-  Star,
-  Lock,
 } from "lucide-react";
-import { Level } from "@/types/api";
+import { CreateLevelDialog } from "./create-level";
+import { EditLevelDialog } from "./edit-level";
+import { DeleteLevelDialog } from "./delete-level";
+import type { Level } from "@/hooks/use-levels";
 
 export function LevelsContent() {
-  const [selectedSubject, setSelectedSubject] = useState<string>("");
-  const availableFormLevels = useAvailableLevels();
-  const { levels, isLoading, error } = useAllLevels();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedSubject, setSelectedSubject] = useState("all");
+  const [selectedStatus, setSelectedStatus] = useState("all");
+  const [createDialogOpen, setCreateDialogOpen] = useState(false);
+  const [editingLevel, setEditingLevel] = useState<Level | null>(null);
+  const [deletingLevel, setDeletingLevel] = useState<Level | null>(null);
 
-  // Get unique subjects from levels
-  const subjects = useMemo(() => {
-    const uniqueSubjects = Array.from(new Set(levels.map((l) => l.subject)));
-    return uniqueSubjects.sort();
-  }, [levels]);
+  const { levels, isLoading, error } = useLevels();
 
-  // Set default selected subject
-  const activeSubject = selectedSubject || subjects[0] || "";
-
-  // Filter levels by selected subject
-  const subjectLevels = levels.filter(
-    (level) => level.subject === activeSubject
+  const subjects = useMemo(
+    () => Array.from(new Set(levels.map((l) => l.subject))).sort(),
+    [levels]
   );
 
-  // Get subject statistics for cards
-  const getSubjectStats = (subject: string) => {
-    const subjectData = levels.filter((level) => level.subject === subject);
+  const filteredLevels = useMemo(() => {
+    return levels.filter((level) => {
+      const matchesSearch =
+        level.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        level.subject.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSubject =
+        selectedSubject === "all" || level.subject === selectedSubject;
+      const matchesStatus =
+        selectedStatus === "all" || level.status === selectedStatus;
+      return matchesSearch && matchesSubject && matchesStatus;
+    });
+  }, [levels, searchQuery, selectedSubject, selectedStatus]);
+
+  const stats = useMemo(() => {
     return {
-      levelCount: subjectData.filter((l) => l.status === "active").length,
-      totalXp: subjectData.reduce(
-        (sum, level) => sum + level.total_xp_reward,
-        0
-      ),
-      formLevels: Array.from(new Set(subjectData.map((l) => l.form_level))),
+      total: levels.length,
+      active: levels.filter((l) => l.status === "active").length,
+      draft: levels.filter((l) => l.status === "draft").length,
+      inactive: levels.filter((l) => l.status === "inactive").length,
     };
+  }, [levels]);
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-green-100 text-green-800 hover:bg-green-100";
+      case "draft":
+        return "bg-yellow-100 text-yellow-800 hover:bg-yellow-100";
+      case "inactive":
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100";
+      default:
+        return "bg-gray-100 text-gray-800 hover:bg-gray-100";
+    }
   };
 
   return (
     <div className="space-y-6">
-      {/* Subjects Overview */}
-      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {subjects.map((subject) => {
-          const stats = getSubjectStats(subject);
-          return (
-            <Card
-              key={subject}
-              className={`cursor-pointer transition-all hover:shadow-lg ${
-                activeSubject === subject
-                  ? "border-primary shadow-lg"
-                  : "hover:border-primary"
-              }`}
-              onClick={() => setSelectedSubject(subject)}
-            >
-              <CardHeader className="pb-3">
-                <CardTitle className="text-base truncate">{subject}</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">Levels</span>
-                  <span className="text-lg font-bold">
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      stats.levelCount
-                    )}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm text-muted-foreground">
-                    Total XP
-                  </span>
-                  <span className="text-lg font-bold text-amber-600">
-                    {isLoading ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      stats.totalXp
-                    )}
-                  </span>
-                </div>
-                <div className="flex gap-1 flex-wrap">
-                  {stats.formLevels.slice(0, 2).map((form) => (
-                    <span
-                      key={form}
-                      className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded"
-                    >
-                      {form}
-                    </span>
-                  ))}
-                  {stats.formLevels.length > 2 && (
-                    <span className="text-xs bg-slate-100 text-slate-700 px-2 py-1 rounded">
-                      +{stats.formLevels.length - 2}
-                    </span>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
+      {/* Stats Cards */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
+        {[
+          { label: "Total Levels", value: stats.total, color: "bg-blue-50" },
+          { label: "Active", value: stats.active, color: "bg-green-50" },
+          { label: "Draft", value: stats.draft, color: "bg-yellow-50" },
+          { label: "Inactive", value: stats.inactive, color: "bg-gray-50" },
+        ].map((stat) => (
+          <Card key={stat.label} className={`${stat.color} border-0`}>
+            <CardContent className="pt-6">
+              <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
+              <p className="text-3xl font-bold">{stat.value}</p>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Levels for Selected Subject */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BookOpen className="h-5 w-5" />
-            {activeSubject} Levels
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {error && (
-            <div className="flex gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-              <AlertCircle className="h-5 w-5 shrink-0" />
-              <div>
-                <p className="font-semibold">Failed to load levels</p>
-                <p className="text-xs">{error?.message || "Unknown error"}</p>
+      {/* Header with Actions */}
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold tracking-tight">Manage Levels</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            Create, edit, and manage educational levels
+          </p>
+        </div>
+        <Button
+          onClick={() => setCreateDialogOpen(true)}
+          className="gap-2 bg-primary hover:bg-primary/90"
+        >
+          <Plus className="h-4 w-4" />
+          Create Level
+        </Button>
+      </div>
+
+      {/* Filters */}
+      <Card className="border">
+        <CardContent className="pt-6">
+          <div className="flex flex-col gap-3 md:flex-row md:items-end md:gap-4">
+            <div className="flex-1">
+              <label className="text-sm font-medium mb-2 block">Search</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search by title or subject..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-background"
+                />
               </div>
             </div>
-          )}
 
-          {isLoading && !subjectLevels.length && (
-            <div className="flex items-center justify-center py-8">
-              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            <div className="min-w-[200px]">
+              <label className="text-sm font-medium mb-2 block">Subject</label>
+              <Select
+                value={selectedSubject}
+                onValueChange={setSelectedSubject}
+              >
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="All subjects" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All subjects</SelectItem>
+                  {subjects.map((subject) => (
+                    <SelectItem key={subject} value={subject}>
+                      {subject}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
-          )}
 
-          {!isLoading && subjectLevels.length === 0 && (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <BookOpen className="mb-3 h-12 w-12 text-muted-foreground/50" />
-              <p className="text-muted-foreground">
-                No levels available for {activeSubject}
-              </p>
+            <div className="min-w-[200px]">
+              <label className="text-sm font-medium mb-2 block">Status</label>
+              <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+                <SelectTrigger className="bg-background">
+                  <SelectValue placeholder="All statuses" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All statuses</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                  <SelectItem value="inactive">Inactive</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          )}
 
-          {subjectLevels.length > 0 && (
-            <div className="space-y-4">
-              {subjectLevels
-                .sort((a: Level, b: Level) => a.level_number - b.level_number)
-                .map((level: Level) => (
-                  <Card
-                    key={level._id}
-                    className="transition-all hover:shadow-md hover:border-primary cursor-pointer"
-                  >
-                    <CardHeader className="pb-3">
-                      <div className="flex items-start justify-between gap-2">
-                        <div className="flex items-center gap-3">
-                          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                            <span className="text-lg font-bold text-primary">
-                              {level.level_number}
-                            </span>
-                          </div>
-                          <div>
-                            <CardTitle className="text-base">
-                              {level.title}
-                            </CardTitle>
-                            <p className="text-xs text-muted-foreground">
-                              {level.form_level}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {level.is_starter_level && (
-                            <div className="flex items-center gap-1 rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-700">
-                              <Star className="h-3 w-3" />
-                              Starter
-                            </div>
-                          )}
-                          {level.status === "active" ? (
-                            <div className="flex items-center gap-1 rounded-full bg-green-100 px-2 py-1 text-xs font-semibold text-green-700">
-                              <span className="h-2 w-2 rounded-full bg-green-600" />
-                              Active
-                            </div>
-                          ) : (
-                            <div className="flex items-center gap-1 rounded-full bg-gray-100 px-2 py-1 text-xs font-semibold text-gray-700">
-                              {level.status}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </CardHeader>
-                    <CardContent className="space-y-4">
-                      {level.description && (
-                        <p className="text-sm text-muted-foreground">
-                          {level.description}
-                        </p>
-                      )}
-
-                      {/* Difficulty and XP */}
-                      <div className="flex flex-wrap gap-2">
-                        <span className="rounded-full bg-yellow-100 px-2.5 py-1 text-xs font-medium text-yellow-700">
-                          Difficulty: {level.difficulty_rating}/5
-                        </span>
-                        <span className="flex items-center gap-1 rounded-full bg-amber-100 px-2.5 py-1 text-xs font-medium text-amber-700">
-                          <Trophy className="h-3 w-3" />
-                          {level.total_xp_reward} XP
-                        </span>
-                        {level.bonus_coins > 0 && (
-                          <span className="rounded-full bg-purple-100 px-2.5 py-1 text-xs font-medium text-purple-700">
-                            💎 {level.bonus_coins} coins
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Requirements */}
-                      <div className="grid gap-3 grid-cols-2 text-sm">
-                        <div className="rounded-lg bg-muted p-3">
-                          <p className="text-xs text-muted-foreground">
-                            XP Required
-                          </p>
-                          <p className="flex items-center gap-1 font-semibold">
-                            <Zap className="h-4 w-4" />
-                            {level.xp_required}
-                          </p>
-                        </div>
-                        <div className="rounded-lg bg-muted p-3">
-                          <p className="text-xs text-muted-foreground">
-                            Completion
-                          </p>
-                          <p className="font-semibold">
-                            {level.completion_percentage_required}%
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Quizzes */}
-                      <div className="rounded-lg bg-muted p-3">
-                        <p className="text-xs text-muted-foreground">Quizzes</p>
-                        <p className="font-semibold">
-                          {level.quiz_ids.length} quiz(zes)
-                        </p>
-                      </div>
-
-                      {/* Prerequisites */}
-                      {level.prerequisites.length > 0 && (
-                        <div className="rounded-lg border border-orange-200 bg-orange-50 p-3">
-                          <p className="text-xs font-semibold text-orange-700 mb-1">
-                            Prerequisites
-                          </p>
-                          <p className="text-xs text-orange-600">
-                            {level.prerequisites.length} level(s) required
-                          </p>
-                        </div>
-                      )}
-
-                      {/* Tags */}
-                      {level.tags.length > 0 && (
-                        <div className="flex flex-wrap gap-2">
-                          {level.tags.map((tag: string) => (
-                            <span
-                              key={tag}
-                              className="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-700"
-                            >
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-
-                      <Button
-                        className="w-full gap-2"
-                        disabled={!level.is_active}
-                      >
-                        {level.prerequisites.length > 0 ? (
-                          <>
-                            <Lock className="h-4 w-4" />
-                            Locked
-                          </>
-                        ) : (
-                          <>
-                            Start Level
-                            <ArrowRight className="h-4 w-4" />
-                          </>
-                        )}
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
-            </div>
-          )}
+            {(searchQuery ||
+              selectedSubject !== "all" ||
+              selectedStatus !== "all") && (
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setSearchQuery("");
+                  setSelectedSubject("all");
+                  setSelectedStatus("all");
+                }}
+                className="bg-background"
+              >
+                Clear filters
+              </Button>
+            )}
+          </div>
         </CardContent>
       </Card>
+
+      {/* Error Message */}
+      {error && (
+        <div className="flex gap-3 rounded-lg border border-destructive/50 bg-destructive/5 p-4 text-sm text-destructive">
+          <AlertCircle className="h-5 w-5 shrink-0 mt-0.5" />
+          <div>
+            <p className="font-semibold">Failed to load levels</p>
+            <p className="text-xs opacity-90">{error.message}</p>
+          </div>
+        </div>
+      )}
+
+      {/* Loading State */}
+      {isLoading && !levels.length && (
+        <div className="flex items-center justify-center py-12">
+          <div className="text-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground mx-auto mb-3" />
+            <p className="text-sm text-muted-foreground">Loading levels...</p>
+          </div>
+        </div>
+      )}
+
+      {/* Empty State */}
+      {!isLoading && filteredLevels.length === 0 && (
+        <Card className="border-dashed">
+          <CardContent className="flex flex-col items-center justify-center py-12">
+            <BookOpen className="h-12 w-12 text-muted-foreground/30 mb-4" />
+            <p className="text-muted-foreground mb-4">
+              {levels.length === 0
+                ? "No levels yet. Create your first level to get started."
+                : "No levels match your filters."}
+            </p>
+            {levels.length === 0 && (
+              <Button
+                onClick={() => setCreateDialogOpen(true)}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Create Level
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Levels Table */}
+      {filteredLevels.length > 0 && (
+        <Card>
+          <CardContent className="p-0">
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead className="border-b bg-muted/50">
+                  <tr>
+                    <th className="text-left px-6 py-3 font-semibold">Level</th>
+                    <th className="text-left px-6 py-3 font-semibold">
+                      Subject
+                    </th>
+                    <th className="text-left px-6 py-3 font-semibold">Form</th>
+                    <th className="text-left px-6 py-3 font-semibold">
+                      Status
+                    </th>
+                    <th className="text-left px-6 py-3 font-semibold">
+                      Difficulty
+                    </th>
+                    <th className="text-left px-6 py-3 font-semibold">
+                      XP Reward
+                    </th>
+                    <th className="text-right px-6 py-3 font-semibold">
+                      Actions
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredLevels.map((level) => (
+                    <tr
+                      key={level._id}
+                      className="border-b hover:bg-muted/50 transition-colors"
+                    >
+                      <td className="px-6 py-4">
+                        <div>
+                          <p className="font-medium">{level.title}</p>
+                          <p className="text-xs text-muted-foreground">
+                            Level {level.level_number}
+                          </p>
+                        </div>
+                      </td>
+                      <td className="px-6 py-4">{level.subject}</td>
+                      <td className="px-6 py-4">{level.form_level}</td>
+                      <td className="px-6 py-4">
+                        <Badge
+                          variant="outline"
+                          className={getStatusColor(level.status)}
+                        >
+                          {level.status}
+                        </Badge>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm">
+                          {level.difficulty_rating}/5
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="font-semibold">
+                          {level.total_xp_reward}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 w-8 p-0"
+                            >
+                              <MoreHorizontal className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent align="end">
+                            <DropdownMenuItem
+                              onClick={() => setEditingLevel(level)}
+                              className="gap-2 cursor-pointer"
+                            >
+                              <Edit className="h-4 w-4" />
+                              Edit
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => setDeletingLevel(level)}
+                              className="gap-2 cursor-pointer text-destructive"
+                            >
+                              <Trash2 className="h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Dialogs */}
+      <CreateLevelDialog
+        open={createDialogOpen}
+        onOpenChange={setCreateDialogOpen}
+      />
+
+      {editingLevel && (
+        <EditLevelDialog
+          open={!!editingLevel}
+          onOpenChange={(open) => !open && setEditingLevel(null)}
+          level={editingLevel}
+        />
+      )}
+
+      {deletingLevel && (
+        <DeleteLevelDialog
+          open={!!deletingLevel}
+          onOpenChange={(open) => !open && setDeletingLevel(null)}
+          level={deletingLevel}
+        />
+      )}
     </div>
   );
 }
