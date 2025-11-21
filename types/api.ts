@@ -113,3 +113,83 @@ export interface AdminLevelsQueryParams {
   sort_order?: "asc" | "desc";
   include_archived?: boolean;
 }
+
+/**
+ * Question Management Types (API v1.0)
+ */
+export type QuestionStatus = "draft" | "active" | "archived";
+
+export interface Question {
+  _id: string;
+  question_text: string;
+  answers: string[];
+  correct_answer: string;
+  subject: string;
+  topic?: string;
+  level?: FormLevel;
+  explanation?: string;
+  hint?: string;
+  tags?: string[];
+  points?: number;
+  time_limit_seconds?: number;
+  difficulty_score?: number;
+  status: QuestionStatus;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface QuestionCreateInput {
+  question_text: string;
+  answers: string[];
+  correct_answer: string;
+  subject: string;
+  topic?: string;
+  level?: FormLevel;
+  explanation?: string;
+  hint?: string;
+  tags?: string[];
+  points?: number;
+  time_limit_seconds?: number;
+  status?: QuestionStatus;
+}
+
+export interface QuestionsListResponse {
+  success: boolean;
+  message?: string;
+  data: Question[];
+}
+
+export interface AdminQuestionsListResponse {
+  success: boolean;
+  message?: string;
+  data: Question[];
+  meta: {
+    page: number;
+    page_size: number;
+    total_items: number;
+    total_pages: number;
+  };
+}
+
+export interface AdminQuestionsQueryParams {
+  page?: number;
+  per_page?: number;
+  subject?: string;
+  level?: FormLevel;
+  topic?: string;
+  status?: QuestionStatus;
+  search?: string;
+  sort_by?: "created_at" | "difficulty_score" | "points";
+  sort_order?: "asc" | "desc";
+  tags?: string[];
+}
+
+export interface BulkUploadQuestionsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    imported_count: number;
+    failed_count: number;
+    errors?: Array<{ row: number; error: string }>;
+  };
+}

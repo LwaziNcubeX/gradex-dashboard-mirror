@@ -1,154 +1,124 @@
 /**
  * Questions API Service
- * Handles all question-related API calls
+ * Handles all question-related API calls using the latest API v1.0
  */
 
 import { apiPost, apiGet, apiPut, apiDelete } from "@/lib/api";
-
-export interface QuestionCreateRequest {
-  question_text: string;
-  answers: string[];
-  correct_answer: string;
-  subject: string;
-  topic?: string;
-  level?: string;
-  explanation?: string;
-  hint?: string;
-  tags?: string[];
-  points?: number;
-  time_limit_seconds?: number;
-}
-
-export interface Question extends QuestionCreateRequest {
-  _id: string;
-  difficulty_score?: number;
-  created_at?: string;
-}
-
-export interface QuestionListResponse {
-  success: boolean;
-  data: Question[];
-  count?: number;
-  total?: number;
-}
-
-export interface QuestionResponse {
-  success: boolean;
-  data: Question;
-}
-
-export interface BulkUploadResponse {
-  success: boolean;
-  message: string;
-  data: {
-    imported_count: number;
-    failed_count: number;
-  };
-}
+import {
+  Question,
+  QuestionCreateInput,
+  QuestionsListResponse,
+  AdminQuestionsListResponse,
+  AdminQuestionsQueryParams,
+  QuestionStatus,
+  BulkUploadQuestionsResponse,
+} from "@/types/api";
 
 /**
- * Create a new question
+ * Get all active questions (user-facing)
+ * GET /questions
  */
-export async function createQuestion(
-  payload: QuestionCreateRequest
-): Promise<{ question_id: string }> {
-  const response = await apiPost<{ question_id: string }>(
-    "/questions/create",
-    payload
-  );
+export async function getAllQuestions(subject?: string): Promise<Question[]> {
+  const params: Record<string, string> = {};
+  if (subject) params.subject = subject;
+
+  const response = await apiGet<Question[]>("/questions", {
+    params,
+  });
   return response;
 }
 
 /**
- * Get all questions with pagination and filtering
- */
-export async function listQuestions(
-  page: number = 1,
-  pageSize: number = 20,
-  filters?: {
-    subject?: string;
-    topic?: string;
-    level?: string;
-    tags?: string[];
-  }
-): Promise<{
-  items: Question[];
-  total: number;
-  page: number;
-  page_size: number;
-  total_pages: number;
-}> {
-  const params: Record<string, any> = {
-    page,
-    page_size: pageSize,
-  };
-
-  if (filters?.subject) params.subject = filters.subject;
-  if (filters?.topic) params.topic = filters.topic;
-  if (filters?.level) params.level = filters.level;
-  if (filters?.tags?.length) {
-    params.tags = filters.tags.join(",");
-  }
-
-  try {
-    // The apiGet already extracts the `data` field, so we get the array directly
-    const items = await apiGet<Question[]>("/questions", { params });
-
-    // For now, assume all items are returned (simple list)
-    // TODO: Update when backend pagination is implemented
-    const total = Array.isArray(items) ? items.length : 0;
-
-    return {
-      items: Array.isArray(items) ? items : [],
-      total,
-      page,
-      page_size: pageSize,
-      total_pages: Math.ceil(total / pageSize),
-    };
-  } catch (err) {
-    console.error("Failed to list questions:", err);
-    return {
-      items: [],
-      total: 0,
-      page,
-      page_size: pageSize,
-      total_pages: 0,
-    };
-  }
-}
-
-/**
  * Get a single question by ID
+ * GET /questions/{question_id}
  */
-export async function getQuestion(questionId: string): Promise<Question> {
+export async function getQuestionDetail(questionId: string): Promise<Question> {
   const response = await apiGet<Question>(`/questions/${questionId}`);
   return response;
 }
 
 /**
- * Update a question
+ * Get admin paginated list of questions with filters and sorting
+ * GET /admin/questions
+ * Requires teacher or admin role
+ */
+export async function getAdminQuestions(
+  queryParams?: AdminQuestionsQueryParams
+): Promise<AdminQuestionsListResponse> {
+  const params: Record<string, any> = {
+    page: queryParams?.page || 1,
+    per_page: queryParams?.per_page || 20,
+  };
+
+  if (queryParams?.subject) params.subject = queryParams.subject;
+  if (queryParams?.level) params.level = queryParams.level;
+  if (queryParams?.topic) params.topic = queryParams.topic;
+  if (queryParams?.status) params.status = queryParams.status;
+  if (queryParams?.search) params.search = queryParams.search;
+  if (queryParams?.sort_by) params.sort_by = queryParams.sort_by;
+  if (queryParams?.sort_order) params.sort_order = queryParams.sort_order;
+  if (queryParams?.tags?.length) params.tags = queryParams.tags.join(",");
+
+  const response = await apiGet<AdminQuestionsListResponse>(
+    "/admin/questions",
+    { params }
+  );
+  return response;
+}
+
+/**
+ * Create a new question (admin or teacher only)
+ * POST /questions/create
+ */
+export async function createQuestion(
+  data: QuestionCreateInput
+): Promise<Question> {
+  const response = await apiPost<Question>("/questions/create", data);
+  return response;
+}
+
+/**
+ * Update an existing question (admin or teacher only)
+ * PUT /questions/{question_id}
  */
 export async function updateQuestion(
   questionId: string,
-  payload: Partial<QuestionCreateRequest>
+  data: Partial<QuestionCreateInput>
 ): Promise<Question> {
-  const response = await apiPut<Question>(`/questions/${questionId}`, payload);
+  const response = await apiPut<Question>(`/questions/${questionId}`, data);
   return response;
 }
 
 /**
  * Delete a question
+ * DELETE /questions/{question_id}
  */
 export async function deleteQuestion(questionId: string): Promise<void> {
   await apiDelete<void>(`/questions/${questionId}`);
 }
 
 /**
- * Bulk upload questions via CSV file
+ * Change question status
+ * PATCH /questions/{question_id}/status
+ */
+export async function changeQuestionStatus(
+  questionId: string,
+  status: QuestionStatus
+): Promise<Question> {
+  const response = await apiPut<Question>(`/questions/${questionId}/status`, {
+    status,
+  });
+  return response;
+}
+
+/**
+ * Bulk upload questions via CSV
+ * POST /questions/bulk-upload
+ * Admin or teacher only
  */
 export async function bulkUploadQuestions(
   file: File
-): Promise<BulkUploadResponse["data"]> {
+): Promise<BulkUploadQuestionsResponse["data"]> {
   const formData = new FormData();
   formData.append("file", file);
 
@@ -172,15 +142,6 @@ export async function bulkUploadQuestions(
     throw new Error("Failed to upload questions");
   }
 
-  const data = (await response.json()) as BulkUploadResponse;
+  const data = (await response.json()) as BulkUploadQuestionsResponse;
   return data.data;
 }
-
-export const questionsService = {
-  createQuestion,
-  listQuestions,
-  getQuestion,
-  updateQuestion,
-  deleteQuestion,
-  bulkUploadQuestions,
-};
