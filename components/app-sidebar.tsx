@@ -100,18 +100,16 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="data-[slot=sidebar-menu-button]:p-1.5!"
+              className="size-8 bg-primary text-primary-foreground hover:bg-primary/90"
             >
-              <a href="/dashboard">
+              <a href="/dashboard" className="flex items-center justify-center">
                 <Image
                   src="/logo.png"
                   alt="GradeX logo"
-                  width={32}
-                  height={32}
-                  className="h-auto w-auto object-cover"
+                  fill
+                  className="object-contain relative p-1.5"
                   priority
                 />
-                <span className="text-base font-semibold">GradeX</span>
               </a>
             </SidebarMenuButton>
           </SidebarMenuItem>
