@@ -3,6 +3,11 @@
  */
 
 import Cookies from "js-cookie";
+import {
+  getErrorCacheStatus,
+  cacheError,
+  clearErrorCache,
+} from "./error-cache";
 
 const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000";
@@ -91,6 +96,18 @@ export async function apiRequest<T>(
 ): Promise<T> {
   const { params, ...fetchOptions } = options;
   const debug = process.env.NEXT_PUBLIC_API_DEBUG === "true";
+
+  // Check error cache first - prevent spam requests
+  const cacheStatus = getErrorCacheStatus(endpoint);
+  if (cacheStatus && !cacheStatus.shouldRetry) {
+    if (debug) {
+      console.warn(
+        `[API] Skipping request to ${endpoint} - error cached (wait ${cacheStatus.waitTime}ms)`,
+        cacheStatus.error
+      );
+    }
+    throw cacheStatus.error;
+  }
 
   // Build URL
   const url = `${API_BASE_URL}${endpoint}${buildQueryString(params)}`;
@@ -212,8 +229,15 @@ export async function apiRequest<T>(
       const error = new Error(errorMessage) as ApiError;
       error.status = response.status;
       error.response = data;
+
+      // Cache the error to prevent spam
+      cacheError(endpoint, error);
+
       throw error;
     }
+
+    // Success - clear any cached errors for this endpoint
+    clearErrorCache(endpoint);
 
     // Extract data from response wrapper
     if (typeof data === "object" && data !== null && "data" in data) {
@@ -222,6 +246,11 @@ export async function apiRequest<T>(
 
     return data as T;
   } catch (error) {
+    // Cache network and other errors
+    if (error instanceof Error) {
+      cacheError(endpoint, error);
+    }
+
     // Log network errors
     if (debug) {
       console.error("[API] Network error:", error);
