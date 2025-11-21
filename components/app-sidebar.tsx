@@ -2,26 +2,14 @@
 
 import * as React from "react";
 import {
-  IconCamera,
   IconChartBar,
   IconDashboard,
-  IconDatabase,
-  IconFileAi,
-  IconFileDescription,
-  IconFileWord,
-  IconFolder,
-  IconHelp,
-  IconInnerShadowTop,
-  IconListDetails,
   IconReport,
-  IconSearch,
-  IconSettings,
   IconUsers,
 } from "@tabler/icons-react";
+import Image from "next/image";
 
-import { NavDocuments } from "@/components/nav-documents";
 import { NavMain } from "@/components/nav-main";
-import { NavSecondary } from "@/components/nav-secondary";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
@@ -115,7 +103,14 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <a href="/dashboard">
-                <IconInnerShadowTop className="size-5!" />
+                <Image
+                  src="/logo.png"
+                  alt="GradeX logo"
+                  width={32}
+                  height={32}
+                  className="h-auto w-auto object-cover"
+                  priority
+                />
                 <span className="text-base font-semibold">GradeX</span>
               </a>
             </SidebarMenuButton>
