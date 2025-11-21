@@ -27,14 +27,23 @@ interface UseQuizzesOptions {
  * Uses useState + useCallback for reliable state management
  */
 export function useQuizzes(options: UseQuizzesOptions = {}) {
+  const {
+    page: providedPage,
+    pageSize: providedPageSize,
+    subject,
+    category,
+    status,
+    onError,
+  } = options;
+
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
   const [total, setTotal] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
-  const pageSize = options.pageSize || 20;
-  const page = options.page || 1;
+  const pageSize = providedPageSize ?? 20;
+  const page = providedPage ?? 1;
 
   // Fetch quizzes on mount and when options change
   useEffect(() => {
@@ -46,9 +55,9 @@ export function useQuizzes(options: UseQuizzesOptions = {}) {
         const params: AdminQuizzesQueryParams = {
           page,
           per_page: pageSize,
-          subject: options.subject,
-          category: options.category,
-          status: options.status as any,
+          subject,
+          category,
+          status: status as any,
         };
 
         const response = await quizzesService.getAdminQuizzes(params);
@@ -59,21 +68,14 @@ export function useQuizzes(options: UseQuizzesOptions = {}) {
         const error =
           err instanceof Error ? err : new Error("Failed to fetch quizzes");
         setError(error);
-        if (options.onError) options.onError(error);
+        if (onError) onError(error);
       } finally {
         setIsLoading(false);
       }
     };
 
     fetchQuizzes();
-  }, [
-    page,
-    pageSize,
-    options.subject,
-    options.category,
-    options.status,
-    options,
-  ]);
+  }, [page, pageSize, subject, category, status, onError]);
 
   // Create quiz
   const createQuiz = useCallback(async (data: QuizCreateInput) => {
@@ -147,7 +149,7 @@ export function useQuizzes(options: UseQuizzesOptions = {}) {
         const params: AdminQuizzesQueryParams = {
           page,
           per_page: pageSize,
-          subject: options.subject,
+          subject,
         };
         const response = await quizzesService.getAdminQuizzes(params);
         setQuizzes(response.data || []);
@@ -161,7 +163,7 @@ export function useQuizzes(options: UseQuizzesOptions = {}) {
         throw error;
       }
     },
-    [page, pageSize, options.subject]
+    [page, pageSize, subject]
   );
 
   return {
