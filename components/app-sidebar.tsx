@@ -1,13 +1,17 @@
 "use client";
 
 import * as React from "react";
-import {
-  IconChartBar,
-  IconDashboard,
-  IconReport,
-  IconUsers,
-} from "@tabler/icons-react";
 import Image from "next/image";
+import {
+  HomeIcon,
+  ChartBarIcon,
+  Squares2X2Icon,
+  QuestionMarkCircleIcon,
+  ClipboardDocumentListIcon,
+  UsersIcon,
+  DocumentChartBarIcon,
+  CreditCardIcon,
+} from "@heroicons/react/24/solid";
 
 import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
@@ -21,12 +25,7 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
-import {
-  Layers3Icon,
-  FileQuestionIcon,
-  ListCheckIcon,
-  CreditCardIcon,
-} from "lucide-react";
+// icons replaced with Heroicons above
 
 const data = {
   user: {
@@ -38,39 +37,39 @@ const data = {
     {
       title: "Dashboard",
       url: "/dashboard",
-      icon: IconDashboard,
+      icon: HomeIcon,
     },
     {
       title: "Analytics",
       url: "/analytics",
-      icon: IconChartBar,
+      icon: ChartBarIcon,
     },
 
     {
       title: "Levels",
       url: "/levels",
-      icon: Layers3Icon,
+      icon: Squares2X2Icon,
     },
     {
       title: "Quizzes",
       url: "/quizzes",
-      icon: FileQuestionIcon,
+      icon: QuestionMarkCircleIcon,
     },
     {
       title: "Questions",
       url: "/questions",
-      icon: ListCheckIcon,
+      icon: ClipboardDocumentListIcon,
     },
 
     {
       title: "Students",
       url: "/students",
-      icon: IconUsers,
+      icon: UsersIcon,
     },
     {
       title: "Reports",
       url: "/reports",
-      icon: IconReport,
+      icon: DocumentChartBarIcon,
     },
 
     {
