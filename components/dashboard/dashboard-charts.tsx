@@ -1,11 +1,37 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Area, AreaChart, CartesianGrid, XAxis, YAxis, ResponsiveContainer, Bar, BarChart } from "recharts"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import * as React from "react";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  XAxis,
+  YAxis,
+  ResponsiveContainer,
+  Bar,
+  BarChart,
+} from "recharts";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  type ChartConfig,
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const engagementData = [
   { date: "Mon", students: 420, quizzes: 320 },
@@ -15,7 +41,7 @@ const engagementData = [
   { date: "Fri", students: 580, quizzes: 520 },
   { date: "Sat", students: 320, quizzes: 240 },
   { date: "Sun", students: 280, quizzes: 200 },
-]
+];
 
 const subjectData = [
   { subject: "Math", completed: 2840, avgScore: 78 },
@@ -23,7 +49,7 @@ const subjectData = [
   { subject: "English", completed: 1890, avgScore: 81 },
   { subject: "History", completed: 1540, avgScore: 75 },
   { subject: "Geography", completed: 1280, avgScore: 69 },
-]
+];
 
 const chartConfig = {
   students: {
@@ -38,17 +64,21 @@ const chartConfig = {
     label: "Completed",
     color: "hsl(var(--primary))",
   },
-} satisfies ChartConfig
+} satisfies ChartConfig;
 
 export function DashboardCharts() {
-  const [timeRange, setTimeRange] = React.useState("7d")
+  const [timeRange, setTimeRange] = React.useState("7d");
 
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <div>
-          <CardTitle className="text-base font-semibold">Learning Activity</CardTitle>
-          <CardDescription>Student engagement and quiz completions</CardDescription>
+          <CardTitle className="text-base font-semibold">
+            Learning Activity
+          </CardTitle>
+          <CardDescription>
+            Student engagement and quiz completions
+          </CardDescription>
         </div>
         <Select value={timeRange} onValueChange={setTimeRange}>
           <SelectTrigger className="w-32" aria-label="Select time range">
@@ -69,22 +99,68 @@ export function DashboardCharts() {
           </TabsList>
 
           <TabsContent value="engagement" className="space-y-4">
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
+            <ChartContainer config={chartConfig} className="h-70 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={engagementData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+                <AreaChart
+                  data={engagementData}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
                   <defs>
-                    <linearGradient id="fillStudents" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--chart-1))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--chart-1))" stopOpacity={0} />
+                    <linearGradient
+                      id="fillStudents"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="hsl(var(--chart-1))"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="hsl(var(--chart-1))"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
-                    <linearGradient id="fillQuizzes" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--chart-2))" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="hsl(var(--chart-2))" stopOpacity={0} />
+                    <linearGradient
+                      id="fillQuizzes"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="hsl(var(--chart-2))"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="hsl(var(--chart-2))"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="date" tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12 }} />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12 }} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="date"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tick={{ fontSize: 12 }}
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Area
                     type="monotone"
@@ -106,14 +182,36 @@ export function DashboardCharts() {
           </TabsContent>
 
           <TabsContent value="subjects" className="space-y-4">
-            <ChartContainer config={chartConfig} className="h-[280px] w-full">
+            <ChartContainer config={chartConfig} className="h-70 w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={subjectData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="subject" tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12 }} />
-                  <YAxis tickLine={false} axisLine={false} tickMargin={8} tick={{ fontSize: 12 }} />
+                <BarChart
+                  data={subjectData}
+                  margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="subject"
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tick={{ fontSize: 12 }}
+                  />
+                  <YAxis
+                    tickLine={false}
+                    axisLine={false}
+                    tickMargin={8}
+                    tick={{ fontSize: 12 }}
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="completed" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+                  <Bar
+                    dataKey="completed"
+                    fill="hsl(var(--primary))"
+                    radius={[4, 4, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </ChartContainer>
@@ -121,5 +219,5 @@ export function DashboardCharts() {
         </Tabs>
       </CardContent>
     </Card>
-  )
+  );
 }
