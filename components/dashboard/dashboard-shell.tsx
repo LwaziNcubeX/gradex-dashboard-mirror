@@ -1,20 +1,25 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { AppSidebar } from "@/components/app-sidebar"
-import { SiteHeader } from "@/components/site-header"
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar"
-import type { ReactNode } from "react"
+import { AppSidebar } from "@/components/app-sidebar";
+import { SiteHeader } from "@/components/site-header";
+import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
+import type { ReactNode } from "react";
 
 interface DashboardShellProps {
-  children: ReactNode
-  title?: string
-  description?: string
-  actions?: ReactNode
+  children: ReactNode;
+  title?: string;
+  description?: string;
+  actions?: ReactNode;
 }
 
-export function DashboardShell({ children, title, description, actions }: DashboardShellProps) {
+export function DashboardShell({
+  children,
+  title,
+  description,
+  actions,
+}: DashboardShellProps) {
   return (
     <SidebarProvider
       style={
@@ -27,7 +32,6 @@ export function DashboardShell({ children, title, description, actions }: Dashbo
     >
       <AppSidebar variant="sidebar" />
       <SidebarInset>
-        <SiteHeader />
         <div className="flex flex-1 flex-col">
           <div className="@container/main flex flex-1 flex-col gap-2">
             <div className="flex flex-col gap-6 py-6 px-4 lg:px-6">
@@ -35,11 +39,19 @@ export function DashboardShell({ children, title, description, actions }: Dashbo
                 <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                   {title && (
                     <div>
-                      <h1 className="text-2xl font-semibold tracking-tight">{title}</h1>
-                      {description && <p className="text-muted-foreground mt-1">{description}</p>}
+                      <h1 className="text-2xl font-semibold tracking-tight">
+                        {title}
+                      </h1>
+                      {description && (
+                        <p className="text-muted-foreground mt-1">
+                          {description}
+                        </p>
+                      )}
                     </div>
                   )}
-                  {actions && <div className="flex items-center gap-2">{actions}</div>}
+                  {actions && (
+                    <div className="flex items-center gap-2">{actions}</div>
+                  )}
                 </div>
               )}
               {children}
@@ -48,5 +60,5 @@ export function DashboardShell({ children, title, description, actions }: Dashbo
         </div>
       </SidebarInset>
     </SidebarProvider>
-  )
+  );
 }

@@ -32,6 +32,8 @@ import {
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
+import Logo from "../public/image.svg";
+import Image from "next/image";
 
 const mainNavItems = [
   {
@@ -109,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }) => (
     <SidebarGroup className="overflow-hidden ">
       {label && (
-        <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+        <SidebarGroupLabel className="text-md font-medium text-muted-foreground uppercase tracking-wider">
           {label}
         </SidebarGroupLabel>
       )}
@@ -130,9 +132,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 >
                   <Link href={item.url}>
                     <item.icon
-                      className={cn("h-4 w-4", isActive && "text-primary")}
+                      className={cn("h-8 w-8", isActive && "text-primary")}
                     />
-                    <span>{item.title}</span>
+                    {/* <span>{item.title}</span> */}
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
@@ -149,13 +151,18 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {...props}
       className="overflow-hidden w-fit h-full"
     >
-      <SidebarHeader className="border-b">
+      <SidebarHeader className="h-14 bg-secondary">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="hover:bg-transparent">
               <Link href="/dashboard" className="flex items-center gap-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-                  <GraduationCap className="h-5 w-5" />
+                <div className="flex items-center justify-center">
+                  <Image
+                    src={"image.svg"}
+                    alt="logo"
+                    fill
+                    className="rounded-md"
+                  />
                 </div>
               </Link>
             </SidebarMenuButton>
@@ -163,7 +170,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="overflow-hidden">
+      <SidebarContent className="overflow-hidden bg-secondary">
         <NavGroup items={mainNavItems} />
         <SidebarSeparator />
         <NavGroup items={contentNavItems} label="Content" />
@@ -173,7 +180,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavGroup items={systemNavItems} label="System" />
       </SidebarContent>
 
-      <SidebarFooter className="border-t">
+      <SidebarFooter className="border-t bg-secondary">
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
