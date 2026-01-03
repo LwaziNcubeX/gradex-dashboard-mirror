@@ -1,34 +1,55 @@
-"use client"
+"use client";
 
-import type React from "react"
+import type React from "react";
 
-import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
-import { useAuth } from "@/hooks/use-auth"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { AlertCircle, Loader2, Mail, KeyRound, ArrowLeft, GraduationCap } from "lucide-react"
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/hooks/use-auth";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import {
+  AlertCircle,
+  Loader2,
+  Mail,
+  KeyRound,
+  ArrowLeft,
+  GraduationCap,
+} from "lucide-react";
 
-type LoginStep = "email" | "otp"
+type LoginStep = "email" | "otp";
 
 export function LoginForm() {
-  const router = useRouter()
-  const { requestOtp, login, isLoading, error, clearError, isAuthenticated, user } = useAuth()
-  const [isRedirecting, setIsRedirecting] = useState(false)
+  const router = useRouter();
+  const {
+    requestOtp,
+    login,
+    isLoading,
+    error,
+    clearError,
+    isAuthenticated,
+    user,
+  } = useAuth();
+  const [isRedirecting, setIsRedirecting] = useState(false);
 
-  const [step, setStep] = useState<LoginStep>("email")
-  const [email, setEmail] = useState("")
-  const [otp, setOtp] = useState("")
-  const [localError, setLocalError] = useState<string | null>(null)
+  const [step, setStep] = useState<LoginStep>("email");
+  const [email, setEmail] = useState("");
+  const [otp, setOtp] = useState("");
+  const [localError, setLocalError] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && user) {
-      setIsRedirecting(true)
-      router.push("/dashboard")
+      setIsRedirecting(true);
+      router.push("/dashboard");
     }
-  }, [isAuthenticated, user, router])
+  }, [isAuthenticated, user, router]);
 
   if (isAuthenticated || isRedirecting) {
     return (
@@ -38,48 +59,48 @@ export function LoginForm() {
           <p className="text-muted-foreground">Redirecting to dashboard...</p>
         </div>
       </div>
-    )
+    );
   }
 
   const handleRequestOtp = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLocalError(null)
-    clearError()
+    e.preventDefault();
+    setLocalError(null);
+    clearError();
 
     if (!email.trim()) {
-      setLocalError("Please enter your email")
-      return
+      setLocalError("Please enter your email");
+      return;
     }
 
     try {
-      await requestOtp(email)
-      setStep("otp")
+      await requestOtp(email);
+      setStep("otp");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Failed to send OTP"
-      setLocalError(message)
+      const message = err instanceof Error ? err.message : "Failed to send OTP";
+      setLocalError(message);
     }
-  }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setLocalError(null)
-    clearError()
+    e.preventDefault();
+    setLocalError(null);
+    clearError();
 
     if (!otp.trim() || otp.length !== 6) {
-      setLocalError("Please enter a valid 6-digit OTP")
-      return
+      setLocalError("Please enter a valid 6-digit OTP");
+      return;
     }
 
     try {
-      await login(email, otp)
-      router.push("/dashboard")
+      await login(email, otp);
+      router.push("/dashboard");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Login failed"
-      setLocalError(message)
+      const message = err instanceof Error ? err.message : "Login failed";
+      setLocalError(message);
     }
-  }
+  };
 
-  const displayError = error || localError
+  const displayError = error || localError;
 
   return (
     <div className="flex min-h-screen">
@@ -99,11 +120,13 @@ export function LoginForm() {
 
           <div className="space-y-6">
             <blockquote className="space-y-2">
-              <p className="text-lg font-medium leading-relaxed">
-                "GradeX has transformed how we manage our educational content. The admin dashboard makes quiz management
-                effortless."
+              <p className="text-lg font-medium leading-relaxed text-black">
+                "GradeX has transformed how we manage our educational content.
+                The admin dashboard makes quiz management effortless."
               </p>
-              <footer className="text-sm text-primary-foreground/70">- Education Administrator</footer>
+              <footer className="text-sm text-primary-foreground/70">
+                - Education Administrator
+              </footer>
             </blockquote>
           </div>
 
@@ -111,15 +134,21 @@ export function LoginForm() {
             <div className="flex items-center gap-4 text-sm">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary-foreground/60" />
-                <span className="text-primary-foreground/80">Quiz Management</span>
+                <span className="text-primary-foreground/80">
+                  Quiz Management
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary-foreground/60" />
-                <span className="text-primary-foreground/80">Student Analytics</span>
+                <span className="text-primary-foreground/80">
+                  Student Analytics
+                </span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 rounded-full bg-primary-foreground/60" />
-                <span className="text-primary-foreground/80">Progress Tracking</span>
+                <span className="text-primary-foreground/80">
+                  Progress Tracking
+                </span>
               </div>
             </div>
           </div>
@@ -146,7 +175,9 @@ export function LoginForm() {
                 {step === "email" ? "Welcome back" : "Enter verification code"}
               </CardTitle>
               <CardDescription className="text-muted-foreground">
-                {step === "email" ? "Sign in to access your admin dashboard" : `We sent a 6-digit code to ${email}`}
+                {step === "email"
+                  ? "Sign in to access your admin dashboard"
+                  : `We sent a 6-digit code to ${email}`}
               </CardDescription>
             </CardHeader>
 
@@ -177,11 +208,19 @@ export function LoginForm() {
                         className="pl-10 h-11"
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">We'll send you a secure login code</p>
+                    <p className="text-xs text-muted-foreground">
+                      We'll send you a secure login code
+                    </p>
                   </div>
 
-                  <Button type="submit" className="w-full h-11 font-medium" disabled={isLoading}>
-                    {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                  <Button
+                    type="submit"
+                    className="w-full h-11 font-medium"
+                    disabled={isLoading}
+                  >
+                    {isLoading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
                     {isLoading ? "Sending code..." : "Continue with Email"}
                   </Button>
                 </form>
@@ -198,7 +237,9 @@ export function LoginForm() {
                         type="text"
                         placeholder="000000"
                         value={otp}
-                        onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                        onChange={(e) =>
+                          setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))
+                        }
                         disabled={isLoading}
                         maxLength={6}
                         inputMode="numeric"
@@ -206,12 +247,20 @@ export function LoginForm() {
                         className="pl-10 h-11 text-center text-lg tracking-[0.5em] font-mono"
                       />
                     </div>
-                    <p className="text-xs text-muted-foreground">Code expires in 5 minutes</p>
+                    <p className="text-xs text-muted-foreground">
+                      Code expires in 5 minutes
+                    </p>
                   </div>
 
                   <div className="space-y-3">
-                    <Button type="submit" className="w-full h-11 font-medium" disabled={isLoading}>
-                      {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                    <Button
+                      type="submit"
+                      className="w-full h-11 font-medium"
+                      disabled={isLoading}
+                    >
+                      {isLoading && (
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      )}
                       {isLoading ? "Verifying..." : "Sign In"}
                     </Button>
 
@@ -220,10 +269,10 @@ export function LoginForm() {
                       variant="ghost"
                       className="w-full h-11"
                       onClick={() => {
-                        setStep("email")
-                        setOtp("")
-                        setLocalError(null)
-                        clearError()
+                        setStep("email");
+                        setOtp("");
+                        setLocalError(null);
+                        clearError();
                       }}
                       disabled={isLoading}
                     >
@@ -236,7 +285,8 @@ export function LoginForm() {
 
               <div className="mt-8 text-center">
                 <p className="text-xs text-muted-foreground">
-                  By signing in, you agree to our Terms of Service and Privacy Policy
+                  By signing in, you agree to our Terms of Service and Privacy
+                  Policy
                 </p>
               </div>
             </CardContent>
@@ -244,5 +294,5 @@ export function LoginForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }

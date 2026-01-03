@@ -107,7 +107,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     items: typeof mainNavItems;
     label?: string;
   }) => (
-    <SidebarGroup>
+    <SidebarGroup className="overflow-hidden ">
       {label && (
         <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           {label}
@@ -144,8 +144,12 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   );
 
   return (
-    <Sidebar collapsible="icon" {...props} className="overflow-hidden">
-      <SidebarHeader className="h-14 border-b">
+    <Sidebar
+      collapsible="icon"
+      {...props}
+      className="overflow-hidden w-fit h-full"
+    >
+      <SidebarHeader className="border-b">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="hover:bg-transparent">
@@ -153,19 +157,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
                   <GraduationCap className="h-5 w-5" />
                 </div>
-                <div className="flex flex-col">
-                  <span className="font-semibold text-sm">GradeX</span>
-                  <span className="text-xs text-muted-foreground">
-                    Admin Portal
-                  </span>
-                </div>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent>
+      <SidebarContent className="overflow-hidden">
         <NavGroup items={mainNavItems} />
         <SidebarSeparator />
         <NavGroup items={contentNavItems} label="Content" />
