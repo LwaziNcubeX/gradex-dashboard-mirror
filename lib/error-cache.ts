@@ -1,8 +1,3 @@
-/**
- * Error Cache and Retry Management
- * Prevents API spam by caching errors and implementing exponential backoff
- */
-
 interface CachedError {
   error: Error;
   timestamp: number;

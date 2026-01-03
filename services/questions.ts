@@ -1,8 +1,3 @@
-/**
- * Questions API Service
- * Handles all question-related API calls using the latest API v1.0
- */
-
 import { apiPost, apiGet, apiPut, apiDelete } from "@/lib/api";
 import {
   Question,

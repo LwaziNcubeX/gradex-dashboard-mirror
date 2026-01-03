@@ -1,8 +1,3 @@
-/**
- * Levels API Service
- * Handles all level management API calls using the latest API v1.0
- */
-
 import { apiGet, apiPost, apiPatch } from "@/lib/api";
 import {
   Level,

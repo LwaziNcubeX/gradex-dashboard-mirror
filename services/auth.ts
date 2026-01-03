@@ -1,8 +1,3 @@
-/**
- * Authentication API service
- * Handles login, OTP verification, token management, and logout
- */
-
 import { apiPost, apiGet, clearTokens, setTokens } from "@/lib/api";
 import type {
   RequestOtpRequest,
@@ -36,7 +31,7 @@ export async function login(
     refresh_token: string;
     token_type: string;
     user: any;
-  }>("/auth/login", payload);
+  }>("/auth", payload);
 
   // Store tokens
   setTokens(response.access_token, response.refresh_token);

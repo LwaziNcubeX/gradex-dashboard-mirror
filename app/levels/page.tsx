@@ -1,39 +1,10 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import { LevelsContent } from "@/components/levels/levels-content";
-import React from "react";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell"
+import { LevelsContent } from "@/components/levels/levels-content"
 
-const Levels = () => {
+export default function LevelsPage() {
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-      defaultOpen={false}
-    >
-      <AppSidebar variant="sidebar" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Levels</h1>
-                <p className="text-muted-foreground mt-2">
-                  Explore quizzes organized by O-Level Forms
-                </p>
-              </div>
-              <LevelsContent />
-            </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
-  );
-};
-
-export default Levels;
+    <DashboardShell title="Levels" description="Create and manage educational levels by O-Level Forms">
+      <LevelsContent />
+    </DashboardShell>
+  )
+}

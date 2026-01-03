@@ -1,124 +1,182 @@
 "use client";
 
-import * as React from "react";
-import Image from "next/image";
+import type * as React from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
-  HomeIcon,
-  ChartBarIcon,
-  Squares2X2Icon,
-  QuestionMarkCircleIcon,
-  ClipboardDocumentListIcon,
-  UsersIcon,
-  DocumentChartBarIcon,
-  CreditCardIcon,
-} from "@heroicons/react/24/solid";
+  LayoutDashboard,
+  BarChart3,
+  Layers,
+  FileQuestion,
+  HelpCircle,
+  Users,
+  FileText,
+  CreditCard,
+  Settings,
+  GraduationCap,
+} from "lucide-react";
 
-import { NavMain } from "@/components/nav-main";
 import { NavUser } from "@/components/nav-user";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarSeparator,
 } from "@/components/ui/sidebar";
 import { useAuth } from "@/hooks/use-auth";
-// icons replaced with Heroicons above
+import { cn } from "@/lib/utils";
 
-const data = {
-  user: {
-    name: "Admin",
-    email: "m@rapidshyft.com",
-    avatar: "/profile.jpg",
+const mainNavItems = [
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: LayoutDashboard,
   },
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/dashboard",
-      icon: HomeIcon,
-    },
-    {
-      title: "Analytics",
-      url: "/analytics",
-      icon: ChartBarIcon,
-    },
+  {
+    title: "Analytics",
+    url: "/analytics",
+    icon: BarChart3,
+  },
+];
 
-    {
-      title: "Levels",
-      url: "/levels",
-      icon: Squares2X2Icon,
-    },
-    {
-      title: "Quizzes",
-      url: "/quizzes",
-      icon: QuestionMarkCircleIcon,
-    },
-    {
-      title: "Questions",
-      url: "/questions",
-      icon: ClipboardDocumentListIcon,
-    },
+const contentNavItems = [
+  {
+    title: "Levels",
+    url: "/levels",
+    icon: Layers,
+  },
+  {
+    title: "Quizzes",
+    url: "/quizzes",
+    icon: FileQuestion,
+  },
+  {
+    title: "Questions",
+    url: "/questions",
+    icon: HelpCircle,
+  },
+];
 
-    {
-      title: "Students",
-      url: "/students",
-      icon: UsersIcon,
-    },
-    {
-      title: "Reports",
-      url: "/reports",
-      icon: DocumentChartBarIcon,
-    },
+const managementNavItems = [
+  {
+    title: "Students",
+    url: "/students",
+    icon: Users,
+  },
+  {
+    title: "Reports",
+    url: "/reports",
+    icon: FileText,
+  },
+];
 
-    {
-      title: "Billing",
-      url: "/billing",
-      icon: CreditCardIcon,
-    },
-  ],
-};
+const systemNavItems = [
+  {
+    title: "Billing",
+    url: "/billing",
+    icon: CreditCard,
+  },
+  {
+    title: "Settings",
+    url: "/settings",
+    icon: Settings,
+  },
+];
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { logout, user } = useAuth();
+  const pathname = usePathname();
+  const { user } = useAuth();
 
-  const updatedData = {
-    ...data,
-    user: {
-      ...data.user,
-      name: user?.name ?? data.user.name,
-      email: user?.email ?? data.user.email,
-    },
+  const userData = {
+    name: user?.name || "Admin User",
+    email: user?.email || "admin@gradex.com",
+    avatar: "/profile.png",
   };
 
+  const NavGroup = ({
+    items,
+    label,
+  }: {
+    items: typeof mainNavItems;
+    label?: string;
+  }) => (
+    <SidebarGroup>
+      {label && (
+        <SidebarGroupLabel className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
+          {label}
+        </SidebarGroupLabel>
+      )}
+      <SidebarGroupContent>
+        <SidebarMenu>
+          {items.map((item) => {
+            const isActive = pathname === item.url;
+            return (
+              <SidebarMenuItem key={item.title}>
+                <SidebarMenuButton
+                  asChild
+                  isActive={isActive}
+                  tooltip={item.title}
+                  className={cn(
+                    "transition-colors",
+                    isActive && "bg-primary/10 text-primary font-medium"
+                  )}
+                >
+                  <Link href={item.url}>
+                    <item.icon
+                      className={cn("h-4 w-4", isActive && "text-primary")}
+                    />
+                    <span>{item.title}</span>
+                  </Link>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
+            );
+          })}
+        </SidebarMenu>
+      </SidebarGroupContent>
+    </SidebarGroup>
+  );
+
   return (
-    <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+    <Sidebar collapsible="icon" {...props} className="overflow-hidden">
+      <SidebarHeader className="h-14 border-b">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton
-              asChild
-              className="size-8 bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <a href="/dashboard" className="flex items-center justify-center">
-                <Image
-                  src="/logo.png"
-                  alt="GradeX logo"
-                  fill
-                  className="object-contain relative p-1.5"
-                  priority
-                />
-              </a>
+            <SidebarMenuButton asChild className="hover:bg-transparent">
+              <Link href="/dashboard" className="flex items-center gap-3">
+                <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+                  <GraduationCap className="h-5 w-5" />
+                </div>
+                <div className="flex flex-col">
+                  <span className="font-semibold text-sm">GradeX</span>
+                  <span className="text-xs text-muted-foreground">
+                    Admin Portal
+                  </span>
+                </div>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
-        <NavMain items={data.navMain as any /* TODO: Fix Icon type issue */} />
+        <NavGroup items={mainNavItems} />
+        <SidebarSeparator />
+        <NavGroup items={contentNavItems} label="Content" />
+        <SidebarSeparator />
+        <NavGroup items={managementNavItems} label="Management" />
+        <SidebarSeparator />
+        <NavGroup items={systemNavItems} label="System" />
       </SidebarContent>
-      <SidebarFooter>
-        <NavUser user={updatedData.user} />
+
+      <SidebarFooter className="border-t">
+        <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
   );

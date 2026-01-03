@@ -1,7 +1,3 @@
-/**
- * Base API Client with token management and request/response interceptors
- */
-
 import Cookies from "js-cookie";
 import {
   getErrorCacheStatus,

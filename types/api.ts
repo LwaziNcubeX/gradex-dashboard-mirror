@@ -1,7 +1,3 @@
-/**
- * API Response types
- */
-
 export interface ApiSuccessResponse<T> {
   success: boolean;
   message?: string;

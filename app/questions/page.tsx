@@ -1,46 +1,10 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { oswald } from "@/components/fonts";
-import { SiteHeader } from "@/components/site-header";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import React from "react";
-import { QuestionsContent } from "@/components/questions/questions-content";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell"
+import { QuestionsContent } from "@/components/questions/questions-content"
 
-const Questions = () => {
+export default function QuestionsPage() {
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
-      }
-      defaultOpen={false}
-    >
-      <AppSidebar variant="sidebar" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
-              <div>
-                <h1
-                  className={`text-3xl font-bold tracking-tight ${oswald.className}`}
-                >
-                  Questions Management
-                </h1>
-                <p className="text-muted-foreground mt-2">
-                  Create, manage, and organize your question bank
-                </p>
-              </div>
-
-              {/* Questions Management Content */}
-              <QuestionsContent />
-            </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
-  );
-};
-
-export default Questions;
+    <DashboardShell title="Questions" description="Create, manage, and organize your question bank">
+      <QuestionsContent />
+    </DashboardShell>
+  )
+}

@@ -68,7 +68,7 @@ The API uses email-based OTP (One-Time Password) authentication:
 
 ### Obtaining Tokens
 
-```bash
+\`\`\`bash
 # Step 1: Register
 POST /auth/register
 {
@@ -105,15 +105,15 @@ Response:
     "current_level": 1
   }
 }
-```
+\`\`\`
 
 ### Using Tokens
 
 **In Request Headers**:
 
-```http
+\`\`\`http
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-```
+\`\`\`
 
 ### Token Details
 
@@ -126,7 +126,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
 
 ### Refreshing Tokens
 
-```bash
+\`\`\`bash
 POST /auth/refresh
 {
   "refresh_token": "eyJhbGc..."
@@ -141,11 +141,11 @@ Response:
     "token_type": "bearer"
   }
 }
-```
+\`\`\`
 
 ### Logout
 
-```bash
+\`\`\`bash
 POST /auth/logout
 {
   "refresh_token": "eyJhbGc..."
@@ -156,7 +156,7 @@ Response:
   "success": true,
   "message": "Logged out successfully"
 }
-```
+\`\`\`
 
 ---
 
@@ -166,7 +166,7 @@ All API responses follow a consistent structure:
 
 ### Success Response
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Operation completed successfully",
@@ -174,21 +174,21 @@ All API responses follow a consistent structure:
     // Response data goes here
   }
 }
-```
+\`\`\`
 
 ### Error Response
 
-```json
+\`\`\`json
 {
   "success": false,
   "message": "Error description",
   "data": null
 }
-```
+\`\`\`
 
 ### Paginated Response
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Data retrieved successfully",
@@ -200,16 +200,16 @@ All API responses follow a consistent structure:
     "total_pages": 5
   }
 }
-```
+\`\`\`
 
 ### List Response
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": [...]
 }
-```
+\`\`\`
 
 ---
 
@@ -230,16 +230,16 @@ All API responses follow a consistent structure:
 
 ### Error Response Example
 
-```json
+\`\`\`json
 {
   "success": false,
   "message": "User with this email already exists"
 }
-```
+\`\`\`
 
 ### Validation Error Response
 
-```json
+\`\`\`json
 {
   "detail": [
     {
@@ -249,7 +249,7 @@ All API responses follow a consistent structure:
     }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -261,13 +261,13 @@ Register a new user account.
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "email": "student@example.com",
   "first_name": "John",
   "last_name": "Doe"
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -278,7 +278,7 @@ Register a new user account.
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "User registered successfully. Please check your email for OTP.",
@@ -286,7 +286,7 @@ Register a new user account.
     "user_id": "USR123ABC45"
   }
 }
-```
+\`\`\`
 
 **Error Responses**:
 
@@ -301,11 +301,11 @@ Request a 6-digit OTP code for login.
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "email": "student@example.com"
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -314,13 +314,13 @@ Request a 6-digit OTP code for login.
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "OTP sent successfully to your email",
   "data": {}
 }
-```
+\`\`\`
 
 **Note**: OTP expires in 5 minutes. A new request will invalidate the previous OTP.
 
@@ -332,12 +332,12 @@ Login with email and OTP code.
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "email": "student@example.com",
   "otp": "123456"
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -347,7 +347,7 @@ Login with email and OTP code.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -365,7 +365,7 @@ Login with email and OTP code.
     }
   }
 }
-```
+\`\`\`
 
 **Error Responses**:
 
@@ -380,15 +380,15 @@ Refresh the access token using a valid refresh token.
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
-```
+\`\`\`
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -397,7 +397,7 @@ Refresh the access token using a valid refresh token.
     "token_type": "bearer"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -409,7 +409,7 @@ Get the current logged-in user's profile.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -429,7 +429,7 @@ Get the current logged-in user's profile.
     "longest_streak": 21
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -441,20 +441,20 @@ Logout the current user.
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 }
-```
+\`\`\`
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Logged out successfully"
 }
-```
+\`\`\`
 
 ---
 
@@ -468,7 +468,7 @@ Create a new quiz (admin or teacher only).
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "title": "Form 1 Mathematics - Algebra Basics",
   "description": "Introduction to algebraic expressions and equations",
@@ -483,7 +483,7 @@ Create a new quiz (admin or teacher only).
   "difficulty_score": 1.5,
   "is_active": true
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -503,7 +503,7 @@ Create a new quiz (admin or teacher only).
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Quiz created successfully",
@@ -513,7 +513,7 @@ Create a new quiz (admin or teacher only).
     "created_at": "2025-01-18T14:30:00Z"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -533,14 +533,14 @@ List all quizzes with pagination and filtering.
 
 **Example Request**:
 
-```bash
+\`\`\`bash
 GET /quiz/list?page=1&page_size=20&subject=Mathematics&level=Form%201
 Authorization: Bearer {access_token}
-```
+\`\`\`
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Quizzes retrieved successfully",
@@ -568,7 +568,7 @@ Authorization: Bearer {access_token}
     "total_pages": 5
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -590,7 +590,7 @@ Get quizzes optimized for a specific game mode.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": [
@@ -604,7 +604,7 @@ Get quizzes optimized for a specific game mode.
     }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -618,7 +618,7 @@ Create a new question (admin or teacher only).
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "question_text": "What is the value of 2x + 3 when x = 5?",
   "answers": ["10", "13", "15", "18"],
@@ -632,7 +632,7 @@ Create a new question (admin or teacher only).
   "points": 10,
   "time_limit_seconds": 60
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -651,7 +651,7 @@ Create a new question (admin or teacher only).
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Question created successfully",
@@ -659,7 +659,7 @@ Create a new question (admin or teacher only).
     "question_id": "Q123ABC45"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -673,14 +673,14 @@ Upload multiple questions via CSV file.
 
 **CSV Format**:
 
-```csv
+\`\`\`csv
 question_text,answers,correct_answer,subject,topic,level,explanation
 "What is 2+2?","2|3|4|5","4","Mathematics","Arithmetic","Form 1","Basic addition"
-```
+\`\`\`
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Questions imported successfully",
@@ -689,7 +689,7 @@ question_text,answers,correct_answer,subject,topic,level,explanation
     "failed_count": 0
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -701,7 +701,7 @@ Get a single question by ID.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -717,7 +717,7 @@ Get a single question by ID.
     "tags": ["algebra", "equations"]
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -867,10 +867,10 @@ Testing endpoints (quick smoke)
 
 Examples (curl):
 
-```bash
+\`\`\`bash
 curl -X GET "http://localhost:8000/admin/levels?page=1&per_page=10" \
   -H "Authorization: Bearer $ACCESS_TOKEN"
-```
+\`\`\`
 
 ---
 
@@ -884,12 +884,12 @@ Start an Arcade mode game session (practice without time pressure).
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "subject_filter": "Mathematics",
   "limit": 10
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -899,7 +899,7 @@ Start an Arcade mode game session (practice without time pressure).
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Arcade mode started successfully",
@@ -914,7 +914,7 @@ Start an Arcade mode game session (practice without time pressure).
     "status": "active"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -926,11 +926,11 @@ Start a Speed Run mode game session (beat the clock).
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "time_limit_minutes": 10
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -939,7 +939,7 @@ Start a Speed Run mode game session (beat the clock).
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Speed run mode started successfully",
@@ -951,7 +951,7 @@ Start a Speed Run mode game session (beat the clock).
     "status": "active"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -963,11 +963,11 @@ Start a Wild Card mode game session (random subjects mix).
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "limit": 12
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -976,7 +976,7 @@ Start a Wild Card mode game session (random subjects mix).
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Wild card mode started successfully",
@@ -987,7 +987,7 @@ Start a Wild Card mode game session (random subjects mix).
     "status": "active"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1004,7 +1004,7 @@ Get details of an active game session.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1019,7 +1019,7 @@ Get details of an active game session.
     "status": "active"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1036,7 +1036,7 @@ Submit a quiz result within a game session.
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "quiz_id": "QZ123ABC45",
   "total_score": 85,
@@ -1044,7 +1044,7 @@ Submit a quiz result within a game session.
   "xp_earned": 50,
   "time_taken_seconds": 420
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -1057,7 +1057,7 @@ Submit a quiz result within a game session.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Quiz submitted successfully",
@@ -1070,7 +1070,7 @@ Submit a quiz result within a game session.
     "total_quizzes": 3
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1087,7 +1087,7 @@ Complete a game session manually.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Session completed successfully",
@@ -1102,7 +1102,7 @@ Complete a game session manually.
     "completed_at": "2025-01-18T14:45:00Z"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1124,7 +1124,7 @@ Get leaderboard for a specific game mode.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1150,7 +1150,7 @@ Get leaderboard for a specific game mode.
     ]
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1162,7 +1162,7 @@ Get current user's game mode statistics.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1189,7 +1189,7 @@ Get current user's game mode statistics.
     }
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1203,7 +1203,7 @@ Get comprehensive user progress and statistics.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1244,7 +1244,7 @@ Get comprehensive user progress and statistics.
     }
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1256,7 +1256,7 @@ Get user's question performance analytics.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1285,7 +1285,7 @@ Get user's question performance analytics.
     "overall_mastery": 0.82
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1297,7 +1297,7 @@ Get global question difficulty analytics.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1317,7 +1317,7 @@ Get global question difficulty analytics.
     }
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1329,7 +1329,7 @@ Manually update user's streak (usually done automatically).
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Streak updated",
@@ -1338,7 +1338,7 @@ Manually update user's streak (usually done automatically).
     "longest_streak": 21
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1350,7 +1350,7 @@ Get personalized learning recommendations.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1371,7 +1371,7 @@ Get personalized learning recommendations.
     ]
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1385,7 +1385,7 @@ Get all available achievements in the system.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": [
@@ -1407,7 +1407,7 @@ Get all available achievements in the system.
     }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -1419,7 +1419,7 @@ Get current user's achievements with progress.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1448,7 +1448,7 @@ Get current user's achievements with progress.
     ]
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1465,7 +1465,7 @@ Get achievements for a specific user.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1475,7 +1475,7 @@ Get achievements for a specific user.
     "unlocked_achievements": [...]
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1487,7 +1487,7 @@ Manually trigger achievement check for current user.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "Achievement check completed",
@@ -1501,7 +1501,7 @@ Manually trigger achievement check for current user.
     ]
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1520,7 +1520,7 @@ Get shop items and user's current rewards.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1546,7 +1546,7 @@ Get shop items and user's current rewards.
     ]
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1558,7 +1558,7 @@ Get all downloadable packs.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": [
@@ -1573,7 +1573,7 @@ Get all downloadable packs.
     }
   ]
 }
-```
+\`\`\`
 
 ---
 
@@ -1587,14 +1587,14 @@ Create a new user account.
 
 **Request Body**:
 
-```json
+\`\`\`json
 {
   "user_id": "USR123ABC45",
   "first_name": "John",
   "last_name": "Doe",
   "email": "john@example.com"
 }
-```
+\`\`\`
 
 **Parameters**:
 | Field | Type | Required | Constraints |
@@ -1606,7 +1606,7 @@ Create a new user account.
 
 **Success Response** (201):
 
-```json
+\`\`\`json
 {
   "success": true,
   "message": "User created successfully",
@@ -1615,7 +1615,7 @@ Create a new user account.
     "email": "john@example.com"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1632,7 +1632,7 @@ Get user details by ID.
 
 **Success Response** (200):
 
-```json
+\`\`\`json
 {
   "success": true,
   "data": {
@@ -1646,7 +1646,7 @@ Get user details by ID.
     "created_at": "2025-01-10T10:30:00Z"
   }
 }
-```
+\`\`\`
 
 ---
 
@@ -1654,7 +1654,7 @@ Get user details by ID.
 
 ### User Model
 
-```json
+\`\`\`json
 {
   "user_id": "USR123ABC45",
   "email": "student@example.com",
@@ -1695,11 +1695,11 @@ Get user details by ID.
     "notifications_enabled": true
   }
 }
-```
+\`\`\`
 
 ### Quiz Model
 
-```json
+\`\`\`json
 {
   "_id": "QZ123ABC45",
   "title": "Form 1 Mathematics - Algebra Basics",
@@ -1719,11 +1719,11 @@ Get user details by ID.
   "created_at": "2025-01-01T10:00:00Z",
   "updated_at": "2025-01-18T14:30:00Z"
 }
-```
+\`\`\`
 
 ### Question Model
 
-```json
+\`\`\`json
 {
   "_id": "Q123ABC45",
   "question_text": "What is the value of 2x + 3 when x = 5?",
@@ -1740,11 +1740,11 @@ Get user details by ID.
   "difficulty_score": 1.2,
   "created_at": "2025-01-01T10:00:00Z"
 }
-```
+\`\`\`
 
 ### Game Session Model
 
-```json
+\`\`\`json
 {
   "_id": "SESS123ABC45",
   "user_id": "USR123ABC45",
@@ -1758,11 +1758,11 @@ Get user details by ID.
   "xp_earned": 50,
   "time_limit": null
 }
-```
+\`\`\`
 
 ### Achievement Model
 
-```json
+\`\`\`json
 {
   "_id": "ACH001",
   "name": "First Steps",
@@ -1773,7 +1773,7 @@ Get user details by ID.
   "category": "beginner",
   "rarity": "common"
 }
-```
+\`\`\`
 
 ---
 
@@ -1806,9 +1806,9 @@ Get user details by ID.
 
 ### Example Query
 
-```bash
+\`\`\`bash
 GET /quiz/list?page=2&page_size=50&subject=Mathematics&sort_by=created_at&order=desc
-```
+\`\`\`
 
 ---
 
@@ -1819,11 +1819,11 @@ GET /quiz/list?page=2&page_size=50&subject=Mathematics&sort_by=created_at&order=
 
 If rate limit exceeded:
 
-```json
+\`\`\`json
 {
   "detail": "Rate limit exceeded"
 }
-```
+\`\`\`
 
 ---
 
@@ -1841,7 +1841,7 @@ If rate limit exceeded:
 
 ### Complete User Registration & Login Flow
 
-```bash
+\`\`\`bash
 # 1. Register
 curl -X POST http://localhost:8000/auth/register \
   -H "Content-Type: application/json" \
@@ -1871,11 +1871,11 @@ curl -X POST http://localhost:8000/auth/login \
 # 4. Use access token
 curl -X GET http://localhost:8000/auth/profile \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
+\`\`\`
 
 ### Complete Quiz Gameplay Flow
 
-```bash
+\`\`\`bash
 # 1. Get available quizzes
 curl -X GET "http://localhost:8000/quiz/list?subject=Mathematics&limit=10" \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
@@ -1909,7 +1909,7 @@ curl -X POST http://localhost:8000/game-modes/session/SESS123ABC45/submit-quiz \
 # 5. Complete session
 curl -X POST http://localhost:8000/game-modes/session/SESS123ABC45/complete \
   -H "Authorization: Bearer YOUR_ACCESS_TOKEN"
-```
+\`\`\`
 
 ---
 

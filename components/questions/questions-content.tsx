@@ -29,6 +29,9 @@ import {
   Search,
   BookOpen,
   Upload,
+  FileQuestion,
+  GaugeCircle,
+  Layers,
 } from "lucide-react";
 import { CreateQuestionDialog } from "./create-question-dialog";
 import { BulkUploadDialog } from "./bulk-upload-dialog";
@@ -86,7 +89,7 @@ export function QuestionsContent() {
 
   const getStatusColor = (subject: string) => {
     const colors: Record<string, string> = {
-      Mathematics: "bg-blue-100 text-blue-800 hover:bg-blue-100",
+      Mathematics: "bg-blue-500 text-blue-800 hover:bg-blue-100",
       Geography: "bg-green-100 text-green-800 hover:bg-green-100",
       English: "bg-purple-100 text-purple-800 hover:bg-purple-100",
       History: "bg-amber-100 text-amber-800 hover:bg-amber-100",
@@ -111,23 +114,49 @@ export function QuestionsContent() {
       {/* Stats Cards */}
       <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "Total Questions", value: stats.total, color: "bg-blue-50" },
+          {
+            label: "Total Questions",
+            value: stats.total,
+            icon: FileQuestion,
+            gradient: "from-blue-500/10 via-blue-500/5 to-transparent",
+            accent: "text-blue-600",
+          },
           {
             label: "Subjects",
             value: stats.subjects,
-            color: "bg-purple-50",
+            icon: BookOpen,
+            gradient: "from-purple-600/10 via-purple-600/5 to-transparent",
+            accent: "text-purple-700",
           },
-          { label: "Avg Points", value: stats.avgPoints, color: "bg-green-50" },
+          {
+            label: "Avg Points",
+            value: stats.avgPoints,
+            icon: GaugeCircle,
+            gradient: "from-green-500/10 via-green-500/5 to-transparent",
+            accent: "text-green-700",
+          },
           {
             label: "Available Subjects",
             value: subjects.length,
-            color: "bg-amber-50",
+            icon: Layers,
+            gradient: "from-amber-500/10 via-amber-500/5 to-transparent",
+            accent: "text-amber-700",
           },
         ].map((stat) => (
-          <Card key={stat.label} className={`${stat.color} border-0`}>
+          <Card
+            key={stat.label}
+            className={`
+        bg-linear-to-br ${stat.gradient}
+        border border-muted/30 shadow-sm hover:shadow-md transition-all rounded-xl
+      `}
+          >
             <CardContent className="pt-6">
-              <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
-              <p className="text-3xl font-bold">{stat.value}</p>
+              <div className="flex items-center justify-between">
+                <p className="text-sm text-muted-foreground">{stat.label}</p>
+                <stat.icon className={`w-6 h-6 ${stat.accent}`} />
+              </div>
+
+              <p className="text-4xl font-semibold mt-3">{stat.value}</p>
             </CardContent>
           </Card>
         ))}

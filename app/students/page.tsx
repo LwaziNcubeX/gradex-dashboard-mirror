@@ -1,37 +1,27 @@
-import { AppSidebar } from "@/components/app-sidebar";
-import { SiteHeader } from "@/components/site-header";
-import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
-import React from "react";
+import { DashboardShell } from "@/components/dashboard/dashboard-shell"
+import { StudentsContent } from "@/components/students/students-content"
+import { Button } from "@/components/ui/button"
+import { Download, UserPlus } from "lucide-react"
 
-const Students = () => {
+export default function StudentsPage() {
   return (
-    <SidebarProvider
-      style={
-        {
-          "--sidebar-width": "calc(var(--spacing) * 72)",
-          "--header-height": "calc(var(--spacing) * 12)",
-        } as React.CSSProperties
+    <DashboardShell
+      title="Students"
+      description="View and manage student accounts and progress"
+      actions={
+        <>
+          <Button variant="outline" size="sm">
+            <Download className="mr-2 h-4 w-4" />
+            Export
+          </Button>
+          <Button size="sm">
+            <UserPlus className="mr-2 h-4 w-4" />
+            Add Student
+          </Button>
+        </>
       }
-      defaultOpen={false}
     >
-      <AppSidebar variant="sidebar" />
-      <SidebarInset>
-        <SiteHeader />
-        <div className="flex flex-1 flex-col">
-          <div className="@container/main flex flex-1 flex-col gap-2">
-            <div className="flex flex-col gap-4 py-4 md:gap-6 md:py-6 px-4 lg:px-6">
-              <div>
-                <h1 className="text-3xl font-bold tracking-tight">Students</h1>
-                <p className="text-muted-foreground mt-2">
-                  Track project and product lifecycle stages
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
-  );
-};
-
-export default Students;
+      <StudentsContent />
+    </DashboardShell>
+  )
+}

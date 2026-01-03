@@ -1,7 +1,3 @@
-/**
- * Base API client with token management and request/response interceptors
- */
-
 import Cookies from "js-cookie";
 
 const API_BASE_URL =
