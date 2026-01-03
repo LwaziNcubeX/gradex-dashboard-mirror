@@ -23,6 +23,7 @@ import {
   ArrowLeft,
   GraduationCap,
 } from "lucide-react";
+import Image from "next/image";
 
 type LoginStep = "email" | "otp";
 
@@ -105,12 +106,18 @@ export function LoginForm() {
   return (
     <div className="flex min-h-screen">
       {/* Left Panel - Branding */}
-      <div className="hidden lg:flex lg:w-1/2 bg-primary relative overflow-hidden">
-        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-[size:4rem_4rem]" />
+      <div className="hidden lg:flex lg:w-1/2 bg-background relative overflow-hidden">
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.1)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.1)_1px,transparent_1px)] bg-size-[1rem]" />
         <div className="relative z-10 flex flex-col justify-between p-12 text-primary-foreground">
           <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary-foreground/20 backdrop-blur-sm">
-              <GraduationCap className="h-7 w-7" />
+            <div className="flex items-center justify-center">
+              <Image
+                src={"../image.svg"}
+                alt="logo"
+                width={60}
+                height={60}
+                className="rounded-md"
+              />
             </div>
             <div>
               <h1 className="text-2xl font-bold tracking-tight">GradeX</h1>
@@ -120,7 +127,7 @@ export function LoginForm() {
 
           <div className="space-y-6">
             <blockquote className="space-y-2">
-              <p className="text-lg font-medium leading-relaxed text-black">
+              <p className="text-lg font-medium leading-relaxed ">
                 "GradeX has transformed how we manage our educational content.
                 The admin dashboard makes quiz management effortless."
               </p>
