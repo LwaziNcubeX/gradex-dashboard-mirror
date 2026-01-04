@@ -111,7 +111,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   }) => (
     <SidebarGroup className="overflow-hidden ">
       {label && (
-        <SidebarGroupLabel className="text-md font-medium text-muted-foreground uppercase tracking-wider">
+        <SidebarGroupLabel className="text-lg font-medium text-muted-foreground uppercase tracking-wider">
           {label}
         </SidebarGroupLabel>
       )}
@@ -125,14 +125,11 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   asChild
                   isActive={isActive}
                   tooltip={item.title}
-                  className={cn(
-                    "transition-colors",
-                    isActive && "bg-primary/10 text-primary font-medium"
-                  )}
+                  className={cn("transition-colors", isActive && "font-medium")}
                 >
                   <Link href={item.url}>
                     <item.icon
-                      className={cn("h-8 w-8", isActive && "text-primary")}
+                      className={cn("h-12 w-12", isActive && "text-primary")}
                     />
                     {/* <span>{item.title}</span> */}
                   </Link>
@@ -151,7 +148,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       {...props}
       className="overflow-hidden w-fit h-full"
     >
-      <SidebarHeader className="h-14 bg-secondary">
+      <SidebarHeader className="h-14 border-b bg-background">
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild className="hover:bg-transparent">
@@ -170,17 +167,15 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
 
-      <SidebarContent className="overflow-hidden bg-secondary">
+      <SidebarContent className="overflow-hidden bg-background">
         <NavGroup items={mainNavItems} />
-        <SidebarSeparator />
         <NavGroup items={contentNavItems} label="Content" />
-        <SidebarSeparator />
         <NavGroup items={managementNavItems} label="Management" />
-        <SidebarSeparator />
+
         <NavGroup items={systemNavItems} label="System" />
       </SidebarContent>
 
-      <SidebarFooter className="border-t bg-secondary">
+      <SidebarFooter className="bg-background">
         <NavUser user={userData} />
       </SidebarFooter>
     </Sidebar>
