@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUp, Users, Brain, Zap } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, Users, Brain, Zap } from "lucide-react";
 
 const insights = [
   {
@@ -37,26 +43,36 @@ const insights = [
     trend: "+18%",
     color: "bg-orange-50",
   },
-]
+];
 
-import { Clock } from "lucide-react"
+import { Clock } from "lucide-react";
 
 export function DataInsights() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Learning Insights</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Learning Insights
+        </CardTitle>
         <CardDescription>Key patterns and trends</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
         {insights.map((insight, index) => (
-          <div key={index} className={`rounded-lg border-l-4 border-l-blue-500 p-4 ${insight.color}`}>
+          <div
+            key={index}
+            className={`rounded-lg border-l-4 border-l-blue-500 p-4 ${insight.color}`}
+          >
             <div className="flex items-start justify-between mb-2">
               <div className="flex items-center gap-2">
-                <insight.icon className="h-5 w-5" style={{ color: "currentColor" }} />
+                <insight.icon
+                  className="h-5 w-5"
+                  style={{ color: "currentColor" }}
+                />
                 <div>
                   <p className="font-semibold text-sm">{insight.title}</p>
-                  <p className="text-xs text-muted-foreground">{insight.description}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {insight.description}
+                  </p>
                 </div>
               </div>
               <Badge variant="outline" className="ml-2">
@@ -68,5 +84,5 @@ export function DataInsights() {
         ))}
       </CardContent>
     </Card>
-  )
+  );
 }

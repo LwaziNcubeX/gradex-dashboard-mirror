@@ -1,8 +1,14 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { BookOpen, Award, AlertCircle, TrendingUp } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { BookOpen, Award, AlertCircle, TrendingUp } from "lucide-react";
 
 const timeline = [
   {
@@ -37,19 +43,21 @@ const timeline = [
     color: "bg-green-100",
     iconColor: "text-green-600",
   },
-]
+];
 
 export function ActivityTimeline() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Activity Timeline</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Activity Timeline
+        </CardTitle>
         <CardDescription>Recent events and milestones</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
           {timeline.map((item, index) => {
-            const Icon = item.icon
+            const Icon = item.icon;
             return (
               <div key={index} className="flex gap-4">
                 <div className="flex flex-col items-center">
@@ -67,13 +75,15 @@ export function ActivityTimeline() {
                       {item.timestamp}
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">{item.description}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {item.description}
+                  </p>
                 </div>
               </div>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

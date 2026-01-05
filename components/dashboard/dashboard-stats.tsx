@@ -1,8 +1,16 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Users, FileQuestion, Trophy, TrendingUp, ArrowUpRight, ArrowDownRight, Zap } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Card, CardContent } from "@/components/ui/card";
+import {
+  Users,
+  FileQuestion,
+  Trophy,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowDownRight,
+  Zap,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const stats = [
   {
@@ -45,38 +53,51 @@ const stats = [
     bgColor: "bg-orange-50",
     iconColor: "text-orange-600",
   },
-]
+];
 
 export function DashboardStats() {
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat) => (
-        <Card key={stat.title} className={`relative overflow-hidden border-0 ${stat.bgColor}`}>
+        <Card
+          key={stat.title}
+          className={`relative overflow-hidden border-0 ${stat.bgColor}`}
+        >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
-              <div className={`flex h-10 w-10 items-center justify-center rounded-lg ${stat.bgColor} border-2 border-white`}>
+              <div
+                className={`flex h-10 w-10 items-center justify-center rounded-lg ${stat.bgColor} border-2 border-white`}
+              >
                 <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
               </div>
               <div
                 className={cn(
                   "flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1",
-                  stat.trend === "up" 
-                    ? "bg-green-100 text-green-700" 
-                    : "bg-red-100 text-red-700",
+                  stat.trend === "up"
+                    ? "bg-green-100 text-green-700"
+                    : "bg-red-100 text-red-700"
                 )}
               >
-                {stat.trend === "up" ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+                {stat.trend === "up" ? (
+                  <ArrowUpRight className="h-3 w-3" />
+                ) : (
+                  <ArrowDownRight className="h-3 w-3" />
+                )}
                 {stat.change}
               </div>
             </div>
             <div className="mt-4">
               <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
-              <p className="text-sm font-semibold text-foreground mt-2">{stat.title}</p>
-              <p className="text-xs text-muted-foreground mt-1">{stat.description}</p>
+              <p className="text-sm font-semibold text-foreground mt-2">
+                {stat.title}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {stat.description}
+              </p>
             </div>
           </CardContent>
         </Card>
       ))}
     </div>
-  )
+  );
 }

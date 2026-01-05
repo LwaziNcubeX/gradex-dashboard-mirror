@@ -1,7 +1,7 @@
-"use client"
+"use client";
 
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import {
   Download,
   FileText,
@@ -9,7 +9,7 @@ import {
   MessageSquare,
   BarChart3,
   Zap,
-} from "lucide-react"
+} from "lucide-react";
 
 const quickActions = [
   {
@@ -40,7 +40,7 @@ const quickActions = [
     color: "bg-orange-100 hover:bg-orange-200",
     iconColor: "text-orange-600",
   },
-]
+];
 
 export function QuickActions() {
   return (
@@ -49,7 +49,7 @@ export function QuickActions() {
         <h3 className="font-semibold text-sm mb-4">Quick Actions</h3>
         <div className="grid grid-cols-2 gap-3">
           {quickActions.map((action) => {
-            const Icon = action.icon
+            const Icon = action.icon;
             return (
               <Button
                 key={action.label}
@@ -58,12 +58,14 @@ export function QuickActions() {
               >
                 <Icon className={`h-5 w-5 mb-2 ${action.iconColor}`} />
                 <span className="text-xs font-medium">{action.label}</span>
-                <span className="text-xs text-muted-foreground">{action.description}</span>
+                <span className="text-xs text-muted-foreground">
+                  {action.description}
+                </span>
               </Button>
-            )
+            );
           })}
         </div>
       </CardContent>
     </Card>
-  )
+  );
 }

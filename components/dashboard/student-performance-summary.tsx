@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Progress } from "@/components/ui/progress"
-import { Badge } from "@/components/ui/badge"
-import { TrendingUp, Target, Clock } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Progress } from "@/components/ui/progress";
+import { Badge } from "@/components/ui/badge";
+import { TrendingUp, Target, Clock } from "lucide-react";
 
 const performanceSummary = [
   {
@@ -30,20 +36,25 @@ const performanceSummary = [
     icon: TrendingUp,
     color: "hsl(120, 100%, 50%)",
   },
-]
+];
 
 export function StudentPerformanceSummary() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Performance Summary</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Performance Summary
+        </CardTitle>
         <CardDescription>Key metrics at a glance</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {performanceSummary.map((item) => {
-          const Icon = item.icon
-          const progress = "target" in item && item.target ? (item.value / item.target) * 100 : item.value
-          
+          const Icon = item.icon;
+          const progress =
+            "target" in item && item.target
+              ? (item.value / item.target) * 100
+              : item.value;
+
           return (
             <div key={item.metric} className="space-y-3">
               <div className="flex items-center justify-between">
@@ -58,7 +69,8 @@ export function StudentPerformanceSummary() {
                     <p className="text-sm font-medium">{item.metric}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span className="text-lg font-semibold">
-                        {item.value}{("unit" in item) ? item.unit : "%"}
+                        {item.value}
+                        {"unit" in item ? item.unit : "%"}
                       </span>
                       <Badge variant="outline" className="text-xs">
                         {item.trend}
@@ -77,9 +89,9 @@ export function StudentPerformanceSummary() {
                 </div>
               )}
             </div>
-          )
+          );
         })}
       </CardContent>
     </Card>
-  )
+  );
 }

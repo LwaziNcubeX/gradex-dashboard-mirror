@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Eye, Repeat2, Heart, Zap } from "lucide-react"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { Eye, Repeat2, Heart, Zap } from "lucide-react";
 
 const retentionData = [
   {
@@ -38,18 +44,20 @@ const retentionData = [
     icon: Zap,
     color: "hsl(45, 100%, 50%)",
   },
-]
+];
 
 export function RetentionMetrics() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Engagement & Retention</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Engagement & Retention
+        </CardTitle>
         <CardDescription>User activity and retention metrics</CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {retentionData.map((item) => {
-          const Icon = item.icon
+          const Icon = item.icon;
           return (
             <div key={item.metric} className="space-y-3">
               <div className="flex items-center justify-between">
@@ -71,9 +79,9 @@ export function RetentionMetrics() {
               </div>
               <Progress value={item.percentage} className="h-2" />
             </div>
-          )
+          );
         })}
       </CardContent>
     </Card>
-  )
+  );
 }
