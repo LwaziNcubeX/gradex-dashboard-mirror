@@ -62,8 +62,8 @@ export function useQuizzes(options: UseQuizzesOptions = {}) {
 
         const response = await quizzesService.getAdminQuizzes(params);
         setQuizzes(response.data || []);
-        setTotal(response.meta?.total_items || 0);
-        setTotalPages(response.meta?.total_pages || 1);
+        setTotal(response.pagination?.total_items || 0);
+        setTotalPages(response.pagination?.total_pages || 1);
       } catch (err) {
         const error =
           err instanceof Error ? err : new Error("Failed to fetch quizzes");
@@ -260,7 +260,7 @@ export function useAdminQuizzes(
     response: data || {
       success: true,
       data: [],
-      meta: { page: 1, page_size: 20, total_items: 0, total_pages: 0 },
+      pagination: { page: 1, page_size: 20, total_items: 0, total_pages: 0, has_next: false, has_prev: false },
     },
     isLoading: !error && !data,
     error: error instanceof Error ? error : null,

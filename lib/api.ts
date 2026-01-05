@@ -235,11 +235,6 @@ export async function apiRequest<T>(
     // Success - clear any cached errors for this endpoint
     clearErrorCache(endpoint);
 
-    // Extract data from response wrapper
-    if (typeof data === "object" && data !== null && "data" in data) {
-      return (data as Record<string, unknown>).data as T;
-    }
-
     return data as T;
   } catch (error) {
     // Cache network and other errors

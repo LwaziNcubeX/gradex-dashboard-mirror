@@ -248,11 +248,13 @@ export interface AdminQuizzesListResponse {
   success: boolean;
   message?: string;
   data: Quiz[];
-  meta: {
+  pagination: {
     page: number;
     page_size: number;
     total_items: number;
     total_pages: number;
+    has_next: boolean;
+    has_prev: boolean;
   };
 }
 
