@@ -260,7 +260,14 @@ export function useAdminQuizzes(
     response: data || {
       success: true,
       data: [],
-      pagination: { page: 1, page_size: 20, total_items: 0, total_pages: 0, has_next: false, has_prev: false },
+      pagination: {
+        page: 1,
+        page_size: 20,
+        total_items: 0,
+        total_pages: 0,
+        has_next: false,
+        has_prev: false,
+      },
     },
     isLoading: !error && !data,
     error: error instanceof Error ? error : null,

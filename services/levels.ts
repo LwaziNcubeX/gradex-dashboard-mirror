@@ -28,10 +28,13 @@ export async function getAllLevels(subject?: string): Promise<Level[]> {
   const params: Record<string, string> = {};
   if (subject) params.subject = subject;
 
-  const response = await apiGet<Level[]>("/levels", {
-    params,
-  });
-  return response;
+  const response = await apiGet<{ success: boolean; data: Level[] }>(
+    "/levels",
+    {
+      params,
+    }
+  );
+  return response.data || [];
 }
 
 /**
@@ -40,8 +43,10 @@ export async function getAllLevels(subject?: string): Promise<Level[]> {
  * Includes user-specific progress if authenticated
  */
 export async function getLevelDetail(levelId: string): Promise<LevelDetail> {
-  const response = await apiGet<LevelDetail>(`/levels/${levelId}`);
-  return response;
+  const response = await apiGet<{ success: boolean; data: LevelDetail }>(
+    `/levels/${levelId}`
+  );
+  return response.data;
 }
 
 /**
@@ -50,8 +55,11 @@ export async function getLevelDetail(levelId: string): Promise<LevelDetail> {
  * Checks prerequisites and XP requirements before unlocking
  */
 export async function unlockLevel(levelId: string): Promise<Level> {
-  const response = await apiPost<Level>(`/levels/${levelId}/unlock`, {});
-  return response;
+  const response = await apiPost<{ success: boolean; data: Level }>(
+    `/levels/${levelId}/unlock`,
+    {}
+  );
+  return response.data;
 }
 
 /**
@@ -88,8 +96,11 @@ export async function getAdminLevels(
  * POST /levels
  */
 export async function createLevel(data: LevelCreateInput): Promise<Level> {
-  const response = await apiPost<Level>("/levels", data);
-  return response;
+  const response = await apiPost<{ success: boolean; data: Level }>(
+    "/levels",
+    data
+  );
+  return response.data;
 }
 
 /**
@@ -100,8 +111,11 @@ export async function updateLevel(
   levelId: string,
   data: Partial<LevelCreateInput>
 ): Promise<Level> {
-  const response = await apiPatch<Level>(`/levels/${levelId}`, data);
-  return response;
+  const response = await apiPatch<{ success: boolean; data: Level }>(
+    `/levels/${levelId}`,
+    data
+  );
+  return response.data;
 }
 
 /**

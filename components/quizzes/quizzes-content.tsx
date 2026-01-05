@@ -79,16 +79,32 @@ export function QuizzesContent() {
       const matchesDifficulty =
         selectedDifficulty === "all" ||
         (quiz.difficulty_score <= 1 && selectedDifficulty === "easy") ||
-        (quiz.difficulty_score > 1 && quiz.difficulty_score <= 2 && selectedDifficulty === "medium") ||
+        (quiz.difficulty_score > 1 &&
+          quiz.difficulty_score <= 2 &&
+          selectedDifficulty === "medium") ||
         (quiz.difficulty_score > 2 && selectedDifficulty === "hard");
-      return matchesSearch && matchesSubject && matchesLevel && matchesDifficulty;
+      return (
+        matchesSearch && matchesSubject && matchesLevel && matchesDifficulty
+      );
     });
-  }, [quizzes, searchQuery, selectedSubject, selectedLevel, selectedDifficulty]);
+  }, [
+    quizzes,
+    searchQuery,
+    selectedSubject,
+    selectedLevel,
+    selectedDifficulty,
+  ]);
 
   const stats = useMemo(() => {
-    const totalQuestions = quizzes.reduce((sum, q) => sum + (q.questions?.length || 0), 0);
-    const totalCompletions = quizzes.reduce((sum, q) => sum + (q.completion_count || 0), 0);
-    
+    const totalQuestions = quizzes.reduce(
+      (sum, q) => sum + (q.questions?.length || 0),
+      0
+    );
+    const totalCompletions = quizzes.reduce(
+      (sum, q) => sum + (q.completion_count || 0),
+      0
+    );
+
     return {
       total: quizzes.length,
       active: quizzes.filter((q) => q.status === "active").length,
@@ -102,7 +118,8 @@ export function QuizzesContent() {
         : 0,
       avgScore: quizzes.length
         ? Math.round(
-            quizzes.reduce((sum, q) => sum + (q.average_score || 0), 0) / quizzes.length
+            quizzes.reduce((sum, q) => sum + (q.average_score || 0), 0) /
+              quizzes.length
           )
         : 0,
     };
@@ -129,15 +146,28 @@ export function QuizzesContent() {
   };
 
   const getDifficultyColor = (difficulty: number) => {
-    if (difficulty <= 1) return "bg-green-500/10 text-green-400 border-green-500/30";
-    if (difficulty <= 2) return "bg-yellow-500/10 text-yellow-400 border-yellow-500/30";
+    if (difficulty <= 1)
+      return "bg-green-500/10 text-green-400 border-green-500/30";
+    if (difficulty <= 2)
+      return "bg-yellow-500/10 text-yellow-400 border-yellow-500/30";
     return "bg-red-500/10 text-red-400 border-red-500/30";
   };
 
   const getDifficultyBadge = (difficulty: number) => {
-    if (difficulty <= 1) return { label: "Easy", color: "bg-green-500/10 text-green-400 border-green-500/30" };
-    if (difficulty <= 2) return { label: "Medium", color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30" };
-    return { label: "Hard", color: "bg-red-500/10 text-red-400 border-red-500/30" };
+    if (difficulty <= 1)
+      return {
+        label: "Easy",
+        color: "bg-green-500/10 text-green-400 border-green-500/30",
+      };
+    if (difficulty <= 2)
+      return {
+        label: "Medium",
+        color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/30",
+      };
+    return {
+      label: "Hard",
+      color: "bg-red-500/10 text-red-400 border-red-500/30",
+    };
   };
 
   const getSubjectColor = (subject: string) => {
@@ -200,7 +230,9 @@ export function QuizzesContent() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </div>
               <div>
-                <p className="text-sm text-muted-foreground mb-1">{stat.label}</p>
+                <p className="text-sm text-muted-foreground mb-1">
+                  {stat.label}
+                </p>
                 <p className="text-3xl font-bold mb-1">{stat.value}</p>
                 <p className="text-xs text-muted-foreground">{stat.trend}</p>
               </div>
@@ -266,7 +298,7 @@ export function QuizzesContent() {
               </Button>
             </div>
           </div>
-          
+
           <div className="grid gap-3 md:grid-cols-5">
             <div className="md:col-span-2">
               <label className="text-sm font-medium mb-2 block">Search</label>
@@ -297,7 +329,9 @@ export function QuizzesContent() {
                       {subject}
                     </SelectItem>
                   ))}
-                  <SelectItem value="Combined Science">Combined Science</SelectItem>
+                  <SelectItem value="Combined Science">
+                    Combined Science
+                  </SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -320,8 +354,13 @@ export function QuizzesContent() {
             </div>
 
             <div>
-              <label className="text-sm font-medium mb-2 block">Difficulty</label>
-              <Select value={selectedDifficulty} onValueChange={setSelectedDifficulty}>
+              <label className="text-sm font-medium mb-2 block">
+                Difficulty
+              </label>
+              <Select
+                value={selectedDifficulty}
+                onValueChange={setSelectedDifficulty}
+              >
                 <SelectTrigger className="bg-background">
                   <SelectValue placeholder="All difficulties" />
                 </SelectTrigger>
@@ -423,14 +462,18 @@ export function QuizzesContent() {
                         <th className="text-left px-4 py-3 font-semibold">
                           Subject
                         </th>
-                        <th className="text-left px-4 py-3 font-semibold">Level</th>
+                        <th className="text-left px-4 py-3 font-semibold">
+                          Level
+                        </th>
                         <th className="text-left px-4 py-3 font-semibold">
                           Questions
                         </th>
                         <th className="text-left px-4 py-3 font-semibold">
                           Duration
                         </th>
-                        <th className="text-left px-4 py-3 font-semibold">XP</th>
+                        <th className="text-left px-4 py-3 font-semibold">
+                          XP
+                        </th>
                         <th className="text-left px-4 py-3 font-semibold">
                           Difficulty
                         </th>
@@ -444,7 +487,9 @@ export function QuizzesContent() {
                     </thead>
                     <tbody>
                       {filteredQuizzes.map((quiz: Quiz) => {
-                        const difficulty = getDifficultyBadge(quiz.difficulty_score);
+                        const difficulty = getDifficultyBadge(
+                          quiz.difficulty_score
+                        );
                         return (
                           <tr
                             key={quiz._id}
@@ -452,7 +497,9 @@ export function QuizzesContent() {
                           >
                             <td className="px-4 py-4 max-w-xs">
                               <div>
-                                <p className="font-medium line-clamp-1 text-foreground">{quiz.title}</p>
+                                <p className="font-medium line-clamp-1 text-foreground">
+                                  {quiz.title}
+                                </p>
                                 {quiz.description && (
                                   <p className="text-xs text-muted-foreground mt-1 line-clamp-1">
                                     {quiz.description}
@@ -461,7 +508,11 @@ export function QuizzesContent() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${getSubjectColor(quiz.subject)}`}>
+                              <span
+                                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${getSubjectColor(
+                                  quiz.subject
+                                )}`}
+                              >
                                 {quiz.subject}
                               </span>
                             </td>
@@ -471,13 +522,17 @@ export function QuizzesContent() {
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-1 text-muted-foreground">
                                 <Target className="h-4 w-4" />
-                                <span className="font-semibold">{quiz.questions?.length || 0}</span>
+                                <span className="font-semibold">
+                                  {quiz.questions?.length || 0}
+                                </span>
                               </div>
                             </td>
                             <td className="px-4 py-4">
                               <div className="flex items-center gap-1 text-muted-foreground">
                                 <Clock className="h-4 w-4" />
-                                <span className="text-sm">{formatDuration(quiz.duration)}</span>
+                                <span className="text-sm">
+                                  {formatDuration(quiz.duration)}
+                                </span>
                               </div>
                             </td>
                             <td className="px-4 py-4">
@@ -489,7 +544,9 @@ export function QuizzesContent() {
                               </div>
                             </td>
                             <td className="px-4 py-4">
-                              <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${difficulty.color}`}>
+                              <span
+                                className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${difficulty.color}`}
+                              >
                                 {difficulty.label}
                               </span>
                             </td>
@@ -560,10 +617,17 @@ export function QuizzesContent() {
               {filteredQuizzes.map((quiz: Quiz) => {
                 const difficulty = getDifficultyBadge(quiz.difficulty_score);
                 return (
-                  <Card key={quiz._id} className="hover:shadow-lg transition-all group">
+                  <Card
+                    key={quiz._id}
+                    className="hover:shadow-lg transition-all group"
+                  >
                     <CardContent className="p-6">
                       <div className="flex items-start justify-between gap-2 mb-4">
-                        <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${getSubjectColor(quiz.subject)}`}>
+                        <span
+                          className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${getSubjectColor(
+                            quiz.subject
+                          )}`}
+                        >
                           {quiz.subject}
                         </span>
                         <DropdownMenu>
@@ -609,7 +673,7 @@ export function QuizzesContent() {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                      
+
                       <div className="space-y-3">
                         <div>
                           <h3 className="font-semibold text-lg line-clamp-2 mb-1">
@@ -621,42 +685,62 @@ export function QuizzesContent() {
                             </p>
                           )}
                         </div>
-                        
+
                         <div className="flex flex-wrap gap-2">
-                          <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${difficulty.color}`}>
+                          <span
+                            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium border ${difficulty.color}`}
+                          >
                             {difficulty.label}
                           </span>
-                          <span className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getStatusBadgeClass(quiz.status)}`}>
-                            {quiz.status.charAt(0).toUpperCase() + quiz.status.slice(1)}
+                          <span
+                            className={`inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ${getStatusBadgeClass(
+                              quiz.status
+                            )}`}
+                          >
+                            {quiz.status.charAt(0).toUpperCase() +
+                              quiz.status.slice(1)}
                           </span>
                         </div>
-                        
+
                         <div className="grid grid-cols-2 gap-4 pt-3 border-t">
                           <div className="flex items-center gap-2 text-sm">
                             <Target className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">{quiz.questions?.length || 0}</span>
-                            <span className="text-muted-foreground text-xs">questions</span>
+                            <span className="font-medium">
+                              {quiz.questions?.length || 0}
+                            </span>
+                            <span className="text-muted-foreground text-xs">
+                              questions
+                            </span>
                           </div>
                           <div className="flex items-center gap-2 text-sm">
                             <Clock className="h-4 w-4 text-muted-foreground" />
-                            <span className="font-medium">{formatDuration(quiz.duration)}</span>
+                            <span className="font-medium">
+                              {formatDuration(quiz.duration)}
+                            </span>
                           </div>
                         </div>
-                        
+
                         <div className="flex items-center justify-between pt-3 border-t">
                           <div className="flex items-center gap-2">
                             <Zap className="h-5 w-5 text-amber-400" />
-                            <span className="text-lg font-bold">{quiz.xp_reward} XP</span>
+                            <span className="text-lg font-bold">
+                              {quiz.xp_reward} XP
+                            </span>
                           </div>
                           <div className="text-right">
-                            <p className="text-xs text-muted-foreground">{quiz.level}</p>
+                            <p className="text-xs text-muted-foreground">
+                              {quiz.level}
+                            </p>
                             {quiz.category && (
-                              <p className="text-xs text-muted-foreground">{quiz.category}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {quiz.category}
+                              </p>
                             )}
                           </div>
                         </div>
-                        
-                        {(quiz.completion_count > 0 || quiz.average_score > 0) && (
+
+                        {(quiz.completion_count > 0 ||
+                          quiz.average_score > 0) && (
                           <div className="flex items-center gap-4 text-xs text-muted-foreground pt-3 border-t">
                             <div className="flex items-center gap-1">
                               <Users className="h-3 w-3" />
