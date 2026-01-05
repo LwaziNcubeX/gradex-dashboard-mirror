@@ -54,15 +54,15 @@ const subjectData = [
 const chartConfig = {
   students: {
     label: "Active Students",
-    color: "hsl(var(--chart-1))",
+    color: "hsl(200, 100%, 50%)",
   },
   quizzes: {
     label: "Quizzes Taken",
-    color: "hsl(var(--chart-2))",
+    color: "hsl(280, 100%, 50%)",
   },
   completed: {
     label: "Completed",
-    color: "hsl(var(--primary))",
+    color: "hsl(120, 100%, 50%)",
   },
 } satisfies ChartConfig;
 
@@ -115,12 +115,12 @@ export function DashboardCharts() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="hsl(var(--chart-1))"
+                        stopColor="hsl(200, 100%, 50%)"
                         stopOpacity={0.3}
                       />
                       <stop
                         offset="95%"
-                        stopColor="hsl(var(--chart-1))"
+                        stopColor="hsl(200, 100%, 50%)"
                         stopOpacity={0}
                       />
                     </linearGradient>
@@ -133,12 +133,12 @@ export function DashboardCharts() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="hsl(var(--chart-2))"
+                        stopColor="hsl(280, 100%, 50%)"
                         stopOpacity={0.3}
                       />
                       <stop
                         offset="95%"
-                        stopColor="hsl(var(--chart-2))"
+                        stopColor="hsl(280, 100%, 50%)"
                         stopOpacity={0}
                       />
                     </linearGradient>
@@ -146,7 +146,7 @@ export function DashboardCharts() {
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="hsl(var(--border))"
+                    stroke="oklch(var(--border))"
                   />
                   <XAxis
                     dataKey="date"
@@ -165,14 +165,14 @@ export function DashboardCharts() {
                   <Area
                     type="monotone"
                     dataKey="students"
-                    stroke="hsl(var(--chart-1))"
+                    stroke="hsl(200, 100%, 50%)"
                     strokeWidth={2}
                     fill="url(#fillStudents)"
                   />
                   <Area
                     type="monotone"
                     dataKey="quizzes"
-                    stroke="hsl(var(--chart-2))"
+                    stroke="hsl(280, 100%, 50%)"
                     strokeWidth={2}
                     fill="url(#fillQuizzes)"
                   />
@@ -191,7 +191,7 @@ export function DashboardCharts() {
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="hsl(var(--border))"
+                    stroke="oklch(var(--border))"
                   />
                   <XAxis
                     dataKey="subject"
@@ -209,7 +209,7 @@ export function DashboardCharts() {
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar
                     dataKey="completed"
-                    fill="hsl(var(--primary))"
+                    fill="hsl(120, 100%, 50%)"
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>

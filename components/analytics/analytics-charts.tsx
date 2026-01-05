@@ -36,16 +36,16 @@ const performanceData = [
 ];
 
 const difficultyData = [
-  { name: "Easy", value: 45, color: "hsl(142, 76%, 36%)" },
-  { name: "Medium", value: 35, color: "hsl(48, 96%, 53%)" },
-  { name: "Hard", value: 20, color: "hsl(0, 84%, 60%)" },
+  { name: "Easy", value: 45, color: "hsl(120, 100%, 50%)" }, // Bright Green
+  { name: "Medium", value: 35, color: "hsl(45, 100%, 50%)" }, // Bright Yellow
+  { name: "Hard", value: 20, color: "hsl(0, 100%, 50%)" }, // Bright Red
 ];
 
 const chartConfig = {
-  form1: { label: "Form 1", color: "hsl(--chart-1))" },
-  form2: { label: "Form 2", color: "hsl(var(--chart-2))" },
-  form3: { label: "Form 3", color: "hsl(var(--chart-3))" },
-  form4: { label: "Form 4", color: "hsl(var(--chart-4))" },
+  form1: { label: "Form 1", color: "hsl(200, 100%, 50%)" }, // Bright Blue
+  form2: { label: "Form 2", color: "hsl(280, 100%, 50%)" }, // Bright Purple
+  form3: { label: "Form 3", color: "hsl(120, 100%, 50%)" }, // Bright Green
+  form4: { label: "Form 4", color: "hsl(45, 100%, 50%)" }, // Bright Yellow
 } satisfies ChartConfig;
 
 export function AnalyticsCharts() {
@@ -67,7 +67,7 @@ export function AnalyticsCharts() {
           </TabsList>
 
           <TabsContent value="trends">
-            <ChartContainer config={chartConfig} className="h-[300px] w-full">
+            <ChartContainer config={chartConfig} className="h-75 w-full">
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={performanceData}
@@ -76,7 +76,7 @@ export function AnalyticsCharts() {
                   <CartesianGrid
                     strokeDasharray="3 3"
                     vertical={false}
-                    stroke="hsl(var(--border))"
+                    stroke="oklch(var(--border))"
                   />
                   <XAxis
                     dataKey="week"
@@ -94,28 +94,28 @@ export function AnalyticsCharts() {
                   <Line
                     type="monotone"
                     dataKey="form1"
-                    stroke="hsl(var(--chart-1))"
+                    stroke="hsl(200, 100%, 50%)"
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="form2"
-                    stroke="hsl(var(--chart-2))"
+                    stroke="hsl(280, 100%, 50%)"
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="form3"
-                    stroke="hsl(var(--chart-3))"
+                    stroke="hsl(120, 100%, 50%)"
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="form4"
-                    stroke="hsl(var(--chart-4))"
+                    stroke="hsl(45, 100%, 50%)"
                     strokeWidth={2}
                     dot={false}
                   />
@@ -139,20 +139,18 @@ export function AnalyticsCharts() {
 
           <TabsContent value="difficulty">
             <div className="flex items-center justify-center">
-              <ChartContainer
-                config={{}}
-                className="h-[300px] w-full max-w-[400px]"
-              >
+              <ChartContainer config={{}} className="h-87.5 w-full">
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
                     <Pie
                       data={difficultyData}
                       cx="50%"
                       cy="50%"
-                      innerRadius={60}
-                      outerRadius={100}
-                      paddingAngle={4}
+                      innerRadius={70}
+                      outerRadius={120}
+                      paddingAngle={5}
                       dataKey="value"
+                      animationDuration={800}
                     >
                       {difficultyData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -162,19 +160,6 @@ export function AnalyticsCharts() {
                   </PieChart>
                 </ResponsiveContainer>
               </ChartContainer>
-            </div>
-            <div className="flex justify-center gap-6 mt-4">
-              {difficultyData.map((item) => (
-                <div key={item.name} className="flex items-center gap-2">
-                  <div
-                    className="h-3 w-3 rounded-full"
-                    style={{ backgroundColor: item.color }}
-                  />
-                  <span className="text-sm text-muted-foreground">
-                    {item.name}: {item.value}%
-                  </span>
-                </div>
-              ))}
             </div>
           </TabsContent>
         </Tabs>
