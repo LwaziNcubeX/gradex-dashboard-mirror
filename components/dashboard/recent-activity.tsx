@@ -1,9 +1,15 @@
-"use client"
+"use client";
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Badge } from "@/components/ui/badge"
-import { ScrollArea } from "@/components/ui/scroll-area"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 const recentActivities = [
   {
@@ -59,36 +65,38 @@ const recentActivities = [
     score: 71,
     time: "45 min ago",
   },
-]
+];
 
 export function RecentActivity() {
   const getActionColor = (action: string) => {
     switch (action) {
       case "completed":
-        return "bg-green-100 text-green-700"
+        return "bg-green-100 text-green-700";
       case "started":
-        return "bg-blue-100 text-blue-700"
+        return "bg-blue-100 text-blue-700";
       case "achieved":
-        return "bg-yellow-100 text-yellow-700"
+        return "bg-yellow-100 text-yellow-700";
       default:
-        return "bg-gray-100 text-gray-700"
+        return "bg-gray-100 text-gray-700";
     }
-  }
+  };
 
   const getScoreColor = (score: number) => {
-    if (score >= 80) return "text-green-600"
-    if (score >= 60) return "text-yellow-600"
-    return "text-red-600"
-  }
+    if (score >= 80) return "text-green-600";
+    if (score >= 60) return "text-yellow-600";
+    return "text-red-600";
+  };
 
   return (
     <Card className="h-full">
       <CardHeader>
-        <CardTitle className="text-base font-semibold">Recent Activity</CardTitle>
+        <CardTitle className="text-base font-semibold">
+          Recent Activity
+        </CardTitle>
         <CardDescription>Latest student interactions</CardDescription>
       </CardHeader>
       <CardContent className="p-0">
-        <ScrollArea className="h-[340px] px-6">
+        <ScrollArea className="h-85 px-6">
           <div className="space-y-4 pb-4">
             {recentActivities.map((activity) => (
               <div
@@ -106,17 +114,30 @@ export function RecentActivity() {
                 <div className="flex-1 space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-sm font-medium">{activity.user}</span>
-                    <Badge variant="secondary" className={`text-[10px] px-1.5 py-0 ${getActionColor(activity.action)}`}>
+                    <Badge
+                      variant="secondary"
+                      className={`text-[10px] px-1.5 py-0 ${getActionColor(
+                        activity.action
+                      )}`}
+                    >
                       {activity.action}
                     </Badge>
                   </div>
                   <p className="text-sm text-muted-foreground line-clamp-1">
                     {activity.target}
                     {activity.score && (
-                      <span className={`ml-2 font-medium ${getScoreColor(activity.score)}`}>{activity.score}%</span>
+                      <span
+                        className={`ml-2 font-medium ${getScoreColor(
+                          activity.score
+                        )}`}
+                      >
+                        {activity.score}%
+                      </span>
                     )}
                   </p>
-                  <p className="text-xs text-muted-foreground">{activity.time}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {activity.time}
+                  </p>
                 </div>
               </div>
             ))}
@@ -124,5 +145,5 @@ export function RecentActivity() {
         </ScrollArea>
       </CardContent>
     </Card>
-  )
+  );
 }
