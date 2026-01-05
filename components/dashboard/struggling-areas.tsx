@@ -54,11 +54,11 @@ export function StrugglingAreas() {
   const getDifficultyColor = (difficulty: string) => {
     switch (difficulty) {
       case "high":
-        return "bg-red-100 text-red-700";
+        return "bg-red-500/15 text-red-400 border-red-500/30";
       case "medium":
-        return "bg-yellow-100 text-yellow-700";
+        return "bg-yellow-500/15 text-yellow-400 border-yellow-500/30";
       default:
-        return "bg-green-100 text-green-700";
+        return "bg-green-500/15 text-green-400 border-green-500/30";
     }
   };
 
@@ -88,9 +88,9 @@ export function StrugglingAreas() {
             <p className="text-xs text-muted-foreground">
               {area.studentsAffected} students affected
             </p>
-            <Alert className="p-2">
-              <AlertTriangle className="h-3 w-3" />
-              <AlertDescription className="text-xs ml-2">
+            <Alert className="p-2 bg-red-500/10 border-red-500/30">
+              <AlertTriangle className="h-3 w-3 text-red-400" />
+              <AlertDescription className="text-xs ml-2 text-red-400">
                 {area.recommendation}
               </AlertDescription>
             </Alert>

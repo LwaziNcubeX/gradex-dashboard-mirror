@@ -49,11 +49,11 @@ export function LearningGoals() {
   const getStatusIcon = (status: string) => {
     switch (status) {
       case "completed":
-        return <CheckCircle2 className="h-4 w-4 text-green-600" />;
+        return <CheckCircle2 className="h-4 w-4 text-green-400" />;
       case "on-track":
-        return <Clock className="h-4 w-4 text-blue-600" />;
+        return <Clock className="h-4 w-4 text-blue-400" />;
       case "at-risk":
-        return <AlertCircle className="h-4 w-4 text-red-600" />;
+        return <AlertCircle className="h-4 w-4 text-red-400" />;
       default:
         return null;
     }
@@ -62,13 +62,13 @@ export function LearningGoals() {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "completed":
-        return "bg-green-50 border-green-200";
+        return "bg-green-500/10 border-green-500/30 dark:bg-green-500/15";
       case "on-track":
-        return "bg-blue-50 border-blue-200";
+        return "bg-blue-500/10 border-blue-500/30 dark:bg-blue-500/15";
       case "at-risk":
-        return "bg-red-50 border-red-200";
+        return "bg-red-500/10 border-red-500/30 dark:bg-red-500/15";
       default:
-        return "bg-gray-50 border-gray-200";
+        return "bg-gray-500/10 border-gray-500/30 dark:bg-gray-500/15";
     }
   };
 
@@ -96,7 +96,7 @@ export function LearningGoals() {
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-semibold bg-white bg-opacity-60 rounded px-2 py-1">
+              <span className="text-xs font-semibold bg-card/80 backdrop-blur-sm rounded px-2 py-1 border border-border">
                 {goal.progress}%
               </span>
             </div>

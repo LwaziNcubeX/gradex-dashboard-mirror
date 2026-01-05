@@ -16,29 +16,31 @@ const quickActions = [
     label: "Export Report",
     icon: Download,
     description: "Download performance data",
-    color: "bg-blue-100 hover:bg-blue-200",
-    iconColor: "text-blue-600",
+    color: "bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20",
+    iconColor: "text-blue-400",
   },
   {
     label: "Send Feedback",
     icon: MessageSquare,
     description: "Message to students",
-    color: "bg-purple-100 hover:bg-purple-200",
-    iconColor: "text-purple-600",
+    color:
+      "bg-purple-500/10 hover:bg-purple-500/20 border border-purple-500/20",
+    iconColor: "text-purple-400",
   },
   {
     label: "View Reports",
     icon: BarChart3,
     description: "Detailed analytics",
-    color: "bg-green-100 hover:bg-green-200",
-    iconColor: "text-green-600",
+    color: "bg-green-500/10 hover:bg-green-500/20 border border-green-500/20",
+    iconColor: "text-green-400",
   },
   {
     label: "Create Quiz",
     icon: FileText,
     description: "New assessment",
-    color: "bg-orange-100 hover:bg-orange-200",
-    iconColor: "text-orange-600",
+    color:
+      "bg-orange-500/10 hover:bg-orange-500/20 border border-orange-500/20",
+    iconColor: "text-orange-400",
   },
 ];
 

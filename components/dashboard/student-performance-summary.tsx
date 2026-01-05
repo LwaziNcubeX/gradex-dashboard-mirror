@@ -18,7 +18,7 @@ const performanceSummary = [
     target: 90,
     trend: "+2.3%",
     icon: Target,
-    color: "hsl(200, 100%, 50%)",
+    color: "hsl(200, 80%, 60%)",
   },
   {
     metric: "Avg. Response Time",
@@ -26,7 +26,7 @@ const performanceSummary = [
     unit: "min",
     trend: "-0.5 min",
     icon: Clock,
-    color: "hsl(280, 100%, 50%)",
+    color: "hsl(280, 80%, 65%)",
   },
   {
     metric: "Content Mastery",
@@ -34,7 +34,7 @@ const performanceSummary = [
     target: 85,
     trend: "+3.1%",
     icon: TrendingUp,
-    color: "hsl(120, 100%, 50%)",
+    color: "hsl(120, 70%, 55%)",
   },
 ];
 

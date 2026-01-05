@@ -36,16 +36,16 @@ const performanceData = [
 ];
 
 const difficultyData = [
-  { name: "Easy", value: 45, color: "hsl(120, 100%, 50%)" }, // Bright Green
-  { name: "Medium", value: 35, color: "hsl(45, 100%, 50%)" }, // Bright Yellow
-  { name: "Hard", value: 20, color: "hsl(0, 100%, 50%)" }, // Bright Red
+  { name: "Easy", value: 45, color: "hsl(120, 70%, 55%)" }, // Bright Green for dark mode
+  { name: "Medium", value: 35, color: "hsl(45, 90%, 60%)" }, // Bright Yellow for dark mode
+  { name: "Hard", value: 20, color: "hsl(0, 85%, 65%)" }, // Bright Red for dark mode
 ];
 
 const chartConfig = {
-  form1: { label: "Form 1", color: "hsl(200, 100%, 50%)" }, // Bright Blue
-  form2: { label: "Form 2", color: "hsl(280, 100%, 50%)" }, // Bright Purple
-  form3: { label: "Form 3", color: "hsl(120, 100%, 50%)" }, // Bright Green
-  form4: { label: "Form 4", color: "hsl(45, 100%, 50%)" }, // Bright Yellow
+  form1: { label: "Form 1", color: "hsl(200, 80%, 60%)" }, // Bright Blue for dark mode
+  form2: { label: "Form 2", color: "hsl(280, 80%, 65%)" }, // Bright Purple for dark mode
+  form3: { label: "Form 3", color: "hsl(120, 70%, 55%)" }, // Bright Green for dark mode
+  form4: { label: "Form 4", color: "hsl(45, 90%, 60%)" }, // Bright Yellow for dark mode
 } satisfies ChartConfig;
 
 export function AnalyticsCharts() {
@@ -94,28 +94,28 @@ export function AnalyticsCharts() {
                   <Line
                     type="monotone"
                     dataKey="form1"
-                    stroke="hsl(200, 100%, 50%)"
+                    stroke="hsl(200, 80%, 60%)"
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="form2"
-                    stroke="hsl(280, 100%, 50%)"
+                    stroke="hsl(280, 80%, 65%)"
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="form3"
-                    stroke="hsl(120, 100%, 50%)"
+                    stroke="hsl(120, 70%, 55%)"
                     strokeWidth={2}
                     dot={false}
                   />
                   <Line
                     type="monotone"
                     dataKey="form4"
-                    stroke="hsl(45, 100%, 50%)"
+                    stroke="hsl(45, 90%, 60%)"
                     strokeWidth={2}
                     dot={false}
                   />

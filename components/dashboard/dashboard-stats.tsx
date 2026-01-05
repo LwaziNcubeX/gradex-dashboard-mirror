@@ -20,8 +20,8 @@ const stats = [
     trend: "up",
     icon: Users,
     description: "Active learners this month",
-    bgColor: "bg-blue-50",
-    iconColor: "text-blue-600",
+    bgColor: "bg-blue-500/10 dark:bg-blue-500/15 border border-blue-500/20",
+    iconColor: "text-blue-400",
   },
   {
     title: "Quizzes Completed",
@@ -30,8 +30,8 @@ const stats = [
     trend: "up",
     icon: FileQuestion,
     description: "Across all subjects",
-    bgColor: "bg-green-50",
-    iconColor: "text-green-600",
+    bgColor: "bg-green-500/10 dark:bg-green-500/15 border border-green-500/20",
+    iconColor: "text-green-400",
   },
   {
     title: "Avg. Score",
@@ -40,8 +40,9 @@ const stats = [
     trend: "down",
     icon: Trophy,
     description: "Overall performance",
-    bgColor: "bg-purple-50",
-    iconColor: "text-purple-600",
+    bgColor:
+      "bg-purple-500/10 dark:bg-purple-500/15 border border-purple-500/20",
+    iconColor: "text-purple-400",
   },
   {
     title: "Active Streaks",
@@ -50,8 +51,9 @@ const stats = [
     trend: "up",
     icon: TrendingUp,
     description: "Students on learning streaks",
-    bgColor: "bg-orange-50",
-    iconColor: "text-orange-600",
+    bgColor:
+      "bg-orange-500/10 dark:bg-orange-500/15 border border-orange-500/20",
+    iconColor: "text-orange-400",
   },
 ];
 
@@ -61,12 +63,12 @@ export function DashboardStats() {
       {stats.map((stat) => (
         <Card
           key={stat.title}
-          className={`relative overflow-hidden border-0 ${stat.bgColor}`}
+          className={`relative overflow-hidden ${stat.bgColor}`}
         >
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div
-                className={`flex h-10 w-10 items-center justify-center rounded-lg ${stat.bgColor} border-2 border-white`}
+                className={`flex h-10 w-10 items-center justify-center rounded-lg backdrop-blur-sm`}
               >
                 <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
               </div>
@@ -74,8 +76,8 @@ export function DashboardStats() {
                 className={cn(
                   "flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1",
                   stat.trend === "up"
-                    ? "bg-green-100 text-green-700"
-                    : "bg-red-100 text-red-700"
+                    ? "bg-green-500/20 text-green-400 border border-green-500/30"
+                    : "bg-red-500/20 text-red-400 border border-red-500/30"
                 )}
               >
                 {stat.trend === "up" ? (
@@ -87,7 +89,9 @@ export function DashboardStats() {
               </div>
             </div>
             <div className="mt-4">
-              <p className="text-3xl font-bold tracking-tight">{stat.value}</p>
+              <p className="text-3xl font-bold tracking-tight text-foreground">
+                {stat.value}
+              </p>
               <p className="text-sm font-semibold text-foreground mt-2">
                 {stat.title}
               </p>

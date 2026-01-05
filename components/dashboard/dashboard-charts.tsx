@@ -54,15 +54,15 @@ const subjectData = [
 const chartConfig = {
   students: {
     label: "Active Students",
-    color: "hsl(200, 100%, 50%)",
+    color: "hsl(200, 80%, 60%)",
   },
   quizzes: {
     label: "Quizzes Taken",
-    color: "hsl(280, 100%, 50%)",
+    color: "hsl(280, 80%, 65%)",
   },
   completed: {
     label: "Completed",
-    color: "hsl(120, 100%, 50%)",
+    color: "hsl(120, 70%, 55%)",
   },
 } satisfies ChartConfig;
 
@@ -115,12 +115,12 @@ export function DashboardCharts() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="hsl(200, 100%, 50%)"
+                        stopColor="hsl(200, 80%, 60%)"
                         stopOpacity={0.3}
                       />
                       <stop
                         offset="95%"
-                        stopColor="hsl(200, 100%, 50%)"
+                        stopColor="hsl(200, 80%, 60%)"
                         stopOpacity={0}
                       />
                     </linearGradient>
@@ -133,12 +133,12 @@ export function DashboardCharts() {
                     >
                       <stop
                         offset="5%"
-                        stopColor="hsl(280, 100%, 50%)"
+                        stopColor="hsl(280, 80%, 65%)"
                         stopOpacity={0.3}
                       />
                       <stop
                         offset="95%"
-                        stopColor="hsl(280, 100%, 50%)"
+                        stopColor="hsl(280, 80%, 65%)"
                         stopOpacity={0}
                       />
                     </linearGradient>
@@ -165,14 +165,14 @@ export function DashboardCharts() {
                   <Area
                     type="monotone"
                     dataKey="students"
-                    stroke="hsl(200, 100%, 50%)"
+                    stroke="hsl(200, 80%, 60%)"
                     strokeWidth={2}
                     fill="url(#fillStudents)"
                   />
                   <Area
                     type="monotone"
                     dataKey="quizzes"
-                    stroke="hsl(280, 100%, 50%)"
+                    stroke="hsl(280, 80%, 65%)"
                     strokeWidth={2}
                     fill="url(#fillQuizzes)"
                   />
@@ -209,7 +209,7 @@ export function DashboardCharts() {
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar
                     dataKey="completed"
-                    fill="hsl(120, 100%, 50%)"
+                    fill="hsl(120, 70%, 55%)"
                     radius={[4, 4, 0, 0]}
                   />
                 </BarChart>

@@ -18,7 +18,7 @@ const retentionData = [
     percentage: 78,
     change: "+5%",
     icon: Eye,
-    color: "hsl(200, 100%, 50%)",
+    color: "hsl(200, 80%, 60%)",
   },
   {
     metric: "Weekly Returning Rate",
@@ -26,7 +26,7 @@ const retentionData = [
     percentage: 92,
     change: "+2%",
     icon: Repeat2,
-    color: "hsl(120, 100%, 50%)",
+    color: "hsl(120, 70%, 55%)",
   },
   {
     metric: "Student Satisfaction",
@@ -34,7 +34,7 @@ const retentionData = [
     percentage: 92,
     change: "+0.2",
     icon: Heart,
-    color: "hsl(0, 100%, 50%)",
+    color: "hsl(0, 80%, 65%)",
   },
   {
     metric: "Engagement Score",
@@ -42,7 +42,7 @@ const retentionData = [
     percentage: 89,
     change: "+1.2",
     icon: Zap,
-    color: "hsl(45, 100%, 50%)",
+    color: "hsl(45, 90%, 60%)",
   },
 ];
 
