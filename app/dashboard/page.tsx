@@ -21,7 +21,6 @@ export default function DashboardPage() {
           <DashboardCharts />
         </div>
         <div className="lg:col-span-3 flex flex-col gap-6">
-          <RecentActivity />
           <ActivityTimeline />
         </div>
       </div>
@@ -39,10 +38,10 @@ export default function DashboardPage() {
         <QuickActions />
       </div>
 
-      {/* Engagement Metrics */}
+      {/* Engagement Metrics
       <div className="grid gap-6 lg:grid-cols-1">
         <RetentionMetrics />
-      </div>
+      </div> */}
     </DashboardShell>
   );
 }

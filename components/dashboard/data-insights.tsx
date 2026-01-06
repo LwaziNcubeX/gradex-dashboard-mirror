@@ -17,7 +17,7 @@ const insights = [
     icon: Clock,
     metric: "2,451 active",
     trend: "+15%",
-    color: "bg-blue-500/10 dark:bg-blue-500/15",
+    color: "bg-blue-500/2s",
     borderColor: "border-l-blue-500",
   },
   {
@@ -26,7 +26,7 @@ const insights = [
     icon: Brain,
     metric: "34%",
     trend: "+2%",
-    color: "bg-purple-500/10 dark:bg-purple-500/15",
+    color: "bg-purple-500/2 ",
     borderColor: "border-l-purple-500",
   },
   {
@@ -35,7 +35,7 @@ const insights = [
     icon: TrendingUp,
     metric: "+8.2%",
     trend: "This month",
-    color: "bg-green-500/10 dark:bg-green-500/15",
+    color: "bg-green-500/2",
     borderColor: "border-l-green-500",
   },
   {
@@ -44,7 +44,7 @@ const insights = [
     icon: Users,
     metric: "245",
     trend: "+18%",
-    color: "bg-orange-500/10 dark:bg-orange-500/15",
+    color: "bg-orange-500/2",
     borderColor: "border-l-orange-500",
   },
 ];

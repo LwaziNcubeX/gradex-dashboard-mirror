@@ -92,32 +92,32 @@ export function AnalyticsCharts() {
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Line
-                    type="monotone"
+                    type="natural"
                     dataKey="form1"
                     stroke="hsl(200, 80%, 60%)"
                     strokeWidth={2}
-                    dot={false}
+                    dot={true}
                   />
                   <Line
-                    type="monotone"
+                    type="natural"
                     dataKey="form2"
                     stroke="hsl(280, 80%, 65%)"
                     strokeWidth={2}
-                    dot={false}
+                    dot={true}
                   />
                   <Line
-                    type="monotone"
+                    type="natural"
                     dataKey="form3"
                     stroke="hsl(120, 70%, 55%)"
                     strokeWidth={2}
-                    dot={false}
+                    dot={true}
                   />
                   <Line
-                    type="monotone"
+                    type="natural"
                     dataKey="form4"
                     stroke="hsl(45, 90%, 60%)"
                     strokeWidth={2}
-                    dot={false}
+                    dot={true}
                   />
                 </LineChart>
               </ResponsiveContainer>

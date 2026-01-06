@@ -63,18 +63,18 @@ export function DashboardStats() {
       {stats.map((stat) => (
         <Card
           key={stat.title}
-          className={`relative overflow-hidden ${stat.bgColor}`}
+          className={`relative rounded-3xl overflow-hidden `}
         >
-          <CardContent className="p-6">
+          <CardContent>
             <div className="flex items-center justify-between">
               <div
                 className={`flex h-10 w-10 items-center justify-center rounded-lg backdrop-blur-sm`}
               >
-                <stat.icon className={`h-5 w-5 ${stat.iconColor}`} />
+                <stat.icon className={`h-7 w-7 ${stat.iconColor}`} />
               </div>
               <div
                 className={cn(
-                  "flex items-center gap-1 text-xs font-medium rounded-full px-2 py-1",
+                  "flex items-center gap-1 text-xs font-medium rounded-t-md px-2 py-1",
                   stat.trend === "up"
                     ? "bg-green-500/20 text-green-400 border border-green-500/30"
                     : "bg-red-500/20 text-red-400 border border-red-500/30"

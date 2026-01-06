@@ -45,7 +45,7 @@ const engagementData = [
 
 const subjectData = [
   { subject: "Math", completed: 2840, avgScore: 78 },
-  { subject: "Science", completed: 2120, avgScore: 72 },
+  { subject: "Combined Science", completed: 2120, avgScore: 72 },
   { subject: "English", completed: 1890, avgScore: 81 },
   { subject: "History", completed: 1540, avgScore: 75 },
   { subject: "Geography", completed: 1280, avgScore: 69 },
@@ -163,14 +163,14 @@ export function DashboardCharts() {
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Area
-                    type="monotone"
+                    type="linear"
                     dataKey="students"
                     stroke="hsl(200, 80%, 60%)"
                     strokeWidth={2}
                     fill="url(#fillStudents)"
                   />
                   <Area
-                    type="monotone"
+                    type="linear"
                     dataKey="quizzes"
                     stroke="hsl(280, 80%, 65%)"
                     strokeWidth={2}
