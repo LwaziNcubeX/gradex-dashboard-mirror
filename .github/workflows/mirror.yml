@@ -1,22 +1,18 @@
-name: Mirror to personal repo
-
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
   mirror:
+    if: github.actor != 'lwazincubex'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          persist-credentials: false # ← THIS IS THE MISSING PIECE
+          persist-credentials: false
 
-      - name: Push mirror
-        run: |
+      - run: |
           git remote remove mirror || true
           git remote add mirror https://lwazincubex:${{ secrets.MIRROR_TOKEN }}@github.com/lwazincubex/gradex-dashboard-mirror.git
           git push mirror main --force
