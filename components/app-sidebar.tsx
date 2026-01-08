@@ -125,7 +125,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                   asChild
                   isActive={isActive}
                   tooltip={item.title}
-                  className={cn("transition-colors", isActive && "font-medium")}
+                  className={cn(
+                    "transition-colors",
+                    isActive && "font-medium "
+                  )}
                 >
                   <Link href={item.url}>
                     <item.icon
@@ -151,7 +154,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="h-14 border-b bg-background">
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton asChild className="hover:bg-transparent">
+            <SidebarMenuButton
+              asChild
+              className="[&>svg]:size-6 group-data-[collapsible=icon]:[&>svg]:ml-1 hover:bg-transparent"
+            >
               <Link href="/dashboard" className="flex items-center gap-3">
                 <div className="flex items-center justify-center">
                   <Image

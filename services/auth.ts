@@ -8,6 +8,7 @@ import type {
   LogoutRequest,
   LogoutResponse,
   ProfileResponse,
+  User,
 } from "@/types/auth";
 
 /**
@@ -27,20 +28,24 @@ export async function login(
 ): Promise<LoginResponse["data"]> {
   const payload: LoginRequest = { email, otp };
   const response = await apiPost<{
-    access_token: string;
-    refresh_token: string;
-    token_type: string;
-    user: any;
+    success: boolean;
+    message: string;
+    data: {
+      access_token: string;
+      refresh_token: string;
+      token_type: string;
+      user: User;
+    };
   }>("/auth", payload);
 
   // Store tokens
-  setTokens(response.access_token, response.refresh_token);
+  setTokens(response.data.access_token, response.data.refresh_token);
 
   return {
-    access_token: response.access_token,
-    refresh_token: response.refresh_token,
-    token_type: response.token_type as "bearer",
-    user: response.user,
+    access_token: response.data.access_token,
+    refresh_token: response.data.refresh_token,
+    token_type: response.data.token_type as "bearer",
+    user: response.data.user,
   };
 }
 
@@ -50,23 +55,28 @@ export async function login(
 export async function refreshToken(refreshToken: string): Promise<string> {
   const payload: RefreshTokenRequest = { refresh_token: refreshToken };
   const response = await apiPost<{
-    access_token: string;
-    refresh_token: string;
-    token_type: string;
+    success: boolean;
+    message: string;
+    data: {
+      access_token: string;
+      refresh_token: string;
+      token_type: string;
+    };
   }>("/auth/refresh", payload);
 
   // Store new tokens
-  setTokens(response.access_token, response.refresh_token);
+  setTokens(response.data.access_token, response.data.refresh_token);
 
-  return response.access_token;
+  return response.data.access_token;
 }
 
 /**
  * Get current user profile
  */
 export async function getProfile(): Promise<ProfileResponse["data"]> {
-  const response = await apiGet<any>("/auth/profile");
-  return response;
+  const response = await apiGet<ProfileResponse>("/auth/profile");
+  // Backend returns user directly, not wrapped in data
+  return response as unknown as ProfileResponse["data"];
 }
 
 /**
