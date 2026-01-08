@@ -4,7 +4,7 @@ on:
 
 jobs:
   mirror:
-    if: github.actor != 'lwazincubex'
+    if: github.repository == 'rapidshyft/gradex-dashboard'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
