@@ -21,7 +21,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Loader2, X, BookOpen } from "lucide-react";
-import type { QuestionCreateRequest } from "@/services/questions";
+import type { QuestionCreateInput, FormLevel } from "@/types/api";
 
 const SUBJECTS = ["Mathematics", "Geography", "English", "History", "Science"];
 const LEVELS = ["Form 1", "Form 2", "Form 3", "Form 4"];
@@ -91,12 +91,12 @@ export function CreateQuestionDialog({
         throw new Error("Correct answer must be one of the options");
       }
 
-      const payload: QuestionCreateRequest = {
+      const payload: QuestionCreateInput = {
         question_text: formData.question_text,
         answers: validAnswers,
         correct_answer: formData.correct_answer,
         subject: formData.subject,
-        level: formData.level || undefined,
+        ...(formData.level && { level: formData.level as FormLevel }),
         points: Number.parseInt(formData.points),
         explanation: formData.explanation || undefined,
         hint: formData.hint || undefined,

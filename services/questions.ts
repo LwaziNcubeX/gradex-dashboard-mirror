@@ -2,7 +2,6 @@ import { apiPost, apiGet, apiPut, apiDelete } from "@/lib/api";
 import {
   Question,
   QuestionCreateInput,
-  QuestionsListResponse,
   AdminQuestionsListResponse,
   AdminQuestionsQueryParams,
   QuestionStatus,
