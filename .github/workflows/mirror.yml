@@ -1,0 +1,20 @@
+name: Mirror to personal repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push mirror
+        run: |
+          git remote add mirror https://lwazincubex:${{ secrets.MIRROR_TOKEN }}@github.com/lwazincubex/gradex-dashboard-mirror.git
+          git push mirror main --force
