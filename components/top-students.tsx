@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { Trophy, Medal, Award } from "lucide-react"
+import { Trophy, Medal, Award } from "lucide-react";
 
 const students = [
   {
@@ -48,74 +48,96 @@ const students = [
     streak: 12,
     badge: null,
   },
-]
+];
 
 const badgeIcons: Record<string, { icon: typeof Trophy; color: string }> = {
-  gold: { icon: Trophy, color: "text-amber-400" },
-  silver: { icon: Medal, color: "text-gray-300" },
-  bronze: { icon: Award, color: "text-amber-600" },
-}
+  gold: { icon: Trophy, color: "text-chart-3" },
+  silver: { icon: Medal, color: "text-muted-foreground" },
+  bronze: { icon: Award, color: "text-chart-3/70" },
+};
 
 const avatarColors = [
-  "from-emerald-500 to-teal-500",
-  "from-blue-500 to-cyan-500",
-  "from-purple-500 to-pink-500",
-  "from-amber-500 to-orange-500",
-  "from-rose-500 to-red-500",
-]
+  "from-primary to-primary/70",
+  "from-chart-2 to-chart-2/70",
+  "from-chart-5 to-chart-5/70",
+  "from-chart-3 to-chart-3/70",
+  "from-chart-4 to-chart-4/70",
+];
 
 export function TopStudents() {
   return (
-    <div className="bg-[#0D0D0D] rounded-2xl p-6 border border-[#1A1A1A]">
+    <div className="bg-card rounded-2xl p-6 border border-border">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-lg font-semibold text-white">Top Students</h2>
-          <p className="text-sm text-gray-500 mt-1">This month&apos;s leaderboard</p>
+          <h2 className="text-lg font-semibold text-foreground">
+            Top Students
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            This month&apos;s leaderboard
+          </p>
         </div>
-        <button className="text-sm text-emerald-400 hover:text-emerald-300 transition-colors font-medium">
+        <button className="text-sm text-primary hover:text-primary/80 transition-colors font-medium">
           View All
         </button>
       </div>
 
       <div className="flex flex-col gap-2">
         {students.map((student, index) => {
-          const BadgeIcon = student.badge ? badgeIcons[student.badge] : null
+          const BadgeIcon = student.badge ? badgeIcons[student.badge] : null;
           return (
             <div
               key={student.rank}
               className={`flex items-center gap-4 p-3 rounded-xl transition-colors ${
-                index === 0 ? "bg-amber-500/5 border border-amber-500/20" : "hover:bg-[#1A1A1A]"
+                index === 0
+                  ? "bg-chart-3/5 border border-chart-3/20"
+                  : "hover:bg-secondary"
               }`}
             >
-              <span className={`text-sm font-bold w-6 ${index === 0 ? "text-amber-400" : "text-gray-500"}`}>
+              <span
+                className={`text-sm font-bold w-6 ${
+                  index === 0 ? "text-chart-3" : "text-muted-foreground"
+                }`}
+              >
                 #{student.rank}
               </span>
               <div
-                className={`w-10 h-10 rounded-full bg-gradient-to-br ${avatarColors[index]} flex items-center justify-center text-white font-semibold text-sm`}
+                className={`w-10 h-10 rounded-full bg-linear-to-br ${avatarColors[index]} flex items-center justify-center text-foreground font-semibold text-sm`}
               >
                 {student.avatar}
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium text-white text-sm truncate">{student.name}</span>
-                  {BadgeIcon && <BadgeIcon.icon className={`h-4 w-4 ${BadgeIcon.color}`} />}
+                  <span className="font-medium text-foreground text-sm truncate">
+                    {student.name}
+                  </span>
+                  {BadgeIcon && (
+                    <BadgeIcon.icon className={`h-4 w-4 ${BadgeIcon.color}`} />
+                  )}
                 </div>
                 <div className="flex items-center gap-3 mt-1">
-                  <span className="text-xs text-gray-500">{student.quizzes} quizzes</span>
-                  <span className="text-xs text-emerald-400">{student.avgScore}% avg</span>
+                  <span className="text-xs text-muted-foreground">
+                    {student.quizzes} quizzes
+                  </span>
+                  <span className="text-xs text-primary">
+                    {student.avgScore}% avg
+                  </span>
                 </div>
               </div>
               <div className="text-right">
-                <div className="flex items-center gap-1 text-amber-400">
-                  <span className="text-sm font-semibold">{student.streak}</span>
+                <div className="flex items-center gap-1 text-chart-3">
+                  <span className="text-sm font-semibold">
+                    {student.streak}
+                  </span>
                   <span className="text-xs">🔥</span>
                 </div>
-                <span className="text-xs text-gray-500">day streak</span>
+                <span className="text-xs text-muted-foreground">
+                  day streak
+                </span>
               </div>
             </div>
-          )
+          );
         })}
       </div>
     </div>
-  )
+  );
 }

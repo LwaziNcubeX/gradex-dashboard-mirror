@@ -1,10 +1,10 @@
-import type React from "react"
-import { Sidebar } from "@/components/sidebar"
-import { Header } from "@/components/header"
+import type React from "react";
+import { Sidebar } from "@/components/sidebar";
+import { Header } from "@/components/header";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative h-screen w-full bg-black text-white overflow-hidden">
+    <div className="relative h-screen w-full bg-background text-foreground overflow-hidden">
       <Header />
 
       <div className="h-full overflow-y-auto no-scrollbar">
@@ -15,12 +15,14 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
             {children}
 
             <div className="flex items-center justify-end gap-2 mt-4">
-              <div className="w-[13px] h-[13px] rounded-full bg-emerald-400" />
-              <span className="text-sm text-[#919191]">System Online</span>
+              <div className="w-3.25 h-3.25 rounded-full bg-primary" />
+              <span className="text-sm text-muted-foreground">
+                System Online
+              </span>
             </div>
           </div>
         </main>
       </div>
     </div>
-  )
+  );
 }

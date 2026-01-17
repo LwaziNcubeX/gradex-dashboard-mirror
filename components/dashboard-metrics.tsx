@@ -1,6 +1,13 @@
-"use client"
+"use client";
 
-import { Users, BookOpen, Trophy, TrendingUp, Target, Clock } from "lucide-react"
+import {
+  Users,
+  BookOpen,
+  Trophy,
+  TrendingUp,
+  Target,
+  Clock,
+} from "lucide-react";
 
 const metrics = [
   {
@@ -9,7 +16,7 @@ const metrics = [
     change: "+12.5%",
     trend: "up",
     icon: Users,
-    color: "emerald",
+    color: "primary",
   },
   {
     label: "Total Questions",
@@ -17,7 +24,7 @@ const metrics = [
     change: "+248",
     trend: "up",
     icon: BookOpen,
-    color: "blue",
+    color: "chart-2",
   },
   {
     label: "Quizzes Completed",
@@ -25,7 +32,7 @@ const metrics = [
     change: "+8.3%",
     trend: "up",
     icon: Trophy,
-    color: "amber",
+    color: "chart-3",
   },
   {
     label: "Avg. Score",
@@ -33,7 +40,7 @@ const metrics = [
     change: "+2.1%",
     trend: "up",
     icon: Target,
-    color: "rose",
+    color: "chart-4",
   },
   {
     label: "Completion Rate",
@@ -41,7 +48,7 @@ const metrics = [
     change: "+1.8%",
     trend: "up",
     icon: TrendingUp,
-    color: "cyan",
+    color: "chart-1",
   },
   {
     label: "Avg. Time/Quiz",
@@ -49,42 +56,73 @@ const metrics = [
     change: "-12s",
     trend: "up",
     icon: Clock,
-    color: "violet",
+    color: "chart-5",
   },
-]
+];
 
-const colorClasses: Record<string, { bg: string; text: string; icon: string }> = {
-  emerald: { bg: "bg-emerald-500/10", text: "text-emerald-400", icon: "text-emerald-500" },
-  blue: { bg: "bg-blue-500/10", text: "text-blue-400", icon: "text-blue-500" },
-  amber: { bg: "bg-amber-500/10", text: "text-amber-400", icon: "text-amber-500" },
-  rose: { bg: "bg-rose-500/10", text: "text-rose-400", icon: "text-rose-500" },
-  cyan: { bg: "bg-cyan-500/10", text: "text-cyan-400", icon: "text-cyan-500" },
-  violet: { bg: "bg-violet-500/10", text: "text-violet-400", icon: "text-violet-500" },
-}
+const colorClasses: Record<string, { bg: string; text: string; icon: string }> =
+  {
+    primary: {
+      bg: "bg-primary/10",
+      text: "text-primary",
+      icon: "text-primary",
+    },
+    "chart-1": {
+      bg: "bg-chart-1/10",
+      text: "text-chart-1",
+      icon: "text-chart-1",
+    },
+    "chart-2": {
+      bg: "bg-chart-2/10",
+      text: "text-chart-2",
+      icon: "text-chart-2",
+    },
+    "chart-3": {
+      bg: "bg-chart-3/10",
+      text: "text-chart-3",
+      icon: "text-chart-3",
+    },
+    "chart-4": {
+      bg: "bg-chart-4/10",
+      text: "text-chart-4",
+      icon: "text-chart-4",
+    },
+    "chart-5": {
+      bg: "bg-chart-5/10",
+      text: "text-chart-5",
+      icon: "text-chart-5",
+    },
+  };
 
 export function DashboardMetrics() {
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
       {metrics.map((metric) => {
-        const colors = colorClasses[metric.color]
+        const colors = colorClasses[metric.color];
         return (
           <div
             key={metric.label}
-            className="flex flex-col gap-3 p-4 bg-[#0D0D0D] rounded-xl border border-[#1A1A1A] hover:border-[#2A2A2A] transition-colors"
+            className="flex flex-col gap-3 p-4 bg-card rounded-xl border border-border hover:border-accent transition-colors"
           >
             <div className="flex items-center justify-between">
               <div className={`p-2 rounded-lg ${colors.bg}`}>
                 <metric.icon className={`h-4 w-4 ${colors.icon}`} />
               </div>
-              <span className={`text-xs font-medium ${colors.text}`}>{metric.change}</span>
+              <span className={`text-xs font-medium ${colors.text}`}>
+                {metric.change}
+              </span>
             </div>
             <div>
-              <p className="text-2xl font-bold text-white">{metric.value}</p>
-              <p className="text-xs text-gray-500 mt-1">{metric.label}</p>
+              <p className="text-2xl font-bold text-foreground">
+                {metric.value}
+              </p>
+              <p className="text-xs text-muted-foreground mt-1">
+                {metric.label}
+              </p>
             </div>
           </div>
-        )
+        );
       })}
     </div>
-  )
+  );
 }

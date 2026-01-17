@@ -183,13 +183,13 @@ const levels = [
 function getDifficultyColor(difficulty: string) {
   switch (difficulty) {
     case "Easy":
-      return "bg-emerald-500/10 text-emerald-400";
+      return "bg-chart-1/10 text-chart-1";
     case "Medium":
-      return "bg-amber-500/10 text-amber-400";
+      return "bg-chart-3/10 text-chart-3";
     case "Hard":
-      return "bg-red-500/10 text-red-400";
+      return "bg-destructive/10 text-destructive";
     default:
-      return "bg-[#1F1F1F] text-[#919191]";
+      return "bg-secondary text-muted-foreground";
   }
 }
 
@@ -197,21 +197,18 @@ function ActionMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="p-1 hover:bg-[#2A2A2A] rounded transition-colors">
-          <MoreHorizontal className="h-4 w-4 text-[#919191]" />
+        <button className="p-1 hover:bg-accent rounded transition-colors">
+          <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="end"
-        className="bg-[#1F1F1F] border-[#2A2A2A]"
-      >
-        <DropdownMenuItem className="text-[#E7E7E7] focus:bg-[#2A2A2A] focus:text-white cursor-pointer">
+      <DropdownMenuContent align="end" className="bg-secondary border-border">
+        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
           <Edit className="h-4 w-4 mr-2" /> Edit
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-[#E7E7E7] focus:bg-[#2A2A2A] focus:text-white cursor-pointer">
+        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
           <Copy className="h-4 w-4 mr-2" /> Duplicate
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-red-400 focus:bg-[#2A2A2A] focus:text-red-400 cursor-pointer">
+        <DropdownMenuItem className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer">
           <Trash2 className="h-4 w-4 mr-2" /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -227,24 +224,24 @@ export default function ContentPage() {
       </div>
 
       <Tabs defaultValue="questions" className="space-y-6">
-        <TabsList className="bg-[#1F1F1F] border border-[#2A2A2A] p-1">
+        <TabsList className="bg-secondary border border-border p-1">
           <TabsTrigger
             value="questions"
-            className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white text-[#919191]"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <FileQuestion className="h-4 w-4 mr-2" />
             Questions
           </TabsTrigger>
           <TabsTrigger
             value="quizzes"
-            className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white text-[#919191]"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <HelpCircle className="h-4 w-4 mr-2" />
             Quizzes
           </TabsTrigger>
           <TabsTrigger
             value="levels"
-            className="data-[state=active]:bg-emerald-500 data-[state=active]:text-white text-[#919191]"
+            className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground text-muted-foreground"
           >
             <Layers className="h-4 w-4 mr-2" />
             Levels
@@ -254,90 +251,96 @@ export default function ContentPage() {
         {/* Questions Tab */}
         <TabsContent value="questions" className="space-y-6">
           <div className="flex items-center justify-between">
-            <p className="text-[#919191]">
+            <p className="text-muted-foreground">
               Manage individual questions that can be used across quizzes
             </p>
-            <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium transition-colors">
               <Plus className="h-4 w-4" /> Add Question
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-emerald-500/10 rounded-lg">
-                  <FileQuestion className="h-6 w-6 text-emerald-400" />
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <FileQuestion className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Total Questions</p>
-                  <p className="text-2xl font-bold text-white">1,247</p>
+                  <p className="text-sm text-muted-foreground">
+                    Total Questions
+                  </p>
+                  <p className="text-2xl font-bold text-foreground">1,247</p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-blue-500/10 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-blue-400" />
+                <div className="p-3 bg-chart-2/10 rounded-lg">
+                  <HelpCircle className="h-6 w-6 text-chart-2" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Multiple Choice</p>
-                  <p className="text-2xl font-bold text-white">856</p>
+                  <p className="text-sm text-muted-foreground">
+                    Multiple Choice
+                  </p>
+                  <p className="text-2xl font-bold text-foreground">856</p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-purple-500/10 rounded-lg">
-                  <Edit className="h-6 w-6 text-purple-400" />
+                <div className="p-3 bg-chart-5/10 rounded-lg">
+                  <Edit className="h-6 w-6 text-chart-5" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Short/Long Answer</p>
-                  <p className="text-2xl font-bold text-white">391</p>
+                  <p className="text-sm text-muted-foreground">
+                    Short/Long Answer
+                  </p>
+                  <p className="text-2xl font-bold text-foreground">391</p>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white">All Questions</CardTitle>
+              <CardTitle className="text-foreground">All Questions</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#1F1F1F]">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Question
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Type
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Subject
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Difficulty
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Used In
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]"></th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {questions.map((q) => (
                       <tr
                         key={q.id}
-                        className="border-b border-[#1F1F1F] hover:bg-[#1F1F1F]/50 transition-colors"
+                        className="border-b border-border hover:bg-secondary/50 transition-colors"
                       >
-                        <td className="py-3 px-4 text-sm text-white font-medium max-w-xs truncate">
+                        <td className="py-3 px-4 text-sm text-foreground font-medium max-w-xs truncate">
                           {q.text}
                         </td>
-                        <td className="py-3 px-4 text-sm text-[#919191]">
+                        <td className="py-3 px-4 text-sm text-muted-foreground">
                           {q.type}
                         </td>
-                        <td className="py-3 px-4 text-sm text-[#919191]">
+                        <td className="py-3 px-4 text-sm text-muted-foreground">
                           {q.subject}
                         </td>
                         <td className="py-3 px-4">
@@ -349,7 +352,7 @@ export default function ContentPage() {
                             {q.difficulty}
                           </span>
                         </td>
-                        <td className="py-3 px-4 text-sm text-white">
+                        <td className="py-3 px-4 text-sm text-foreground">
                           {q.usedIn} quizzes
                         </td>
                         <td className="py-3 px-4">
@@ -367,107 +370,107 @@ export default function ContentPage() {
         {/* Quizzes Tab */}
         <TabsContent value="quizzes" className="space-y-6">
           <div className="flex items-center justify-between">
-            <p className="text-[#919191]">
+            <p className="text-muted-foreground">
               Manage quizzes - collections of questions that can be standalone
               or part of a level
             </p>
-            <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium transition-colors">
               <Plus className="h-4 w-4" /> Create Quiz
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-emerald-500/10 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-emerald-400" />
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <HelpCircle className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Total Quizzes</p>
-                  <p className="text-2xl font-bold text-white">156</p>
+                  <p className="text-sm text-muted-foreground">Total Quizzes</p>
+                  <p className="text-2xl font-bold text-foreground">156</p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-blue-500/10 rounded-lg">
-                  <Layers className="h-6 w-6 text-blue-400" />
+                <div className="p-3 bg-chart-2/10 rounded-lg">
+                  <Layers className="h-6 w-6 text-chart-2" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">In Levels</p>
-                  <p className="text-2xl font-bold text-white">98</p>
+                  <p className="text-sm text-muted-foreground">In Levels</p>
+                  <p className="text-2xl font-bold text-foreground">98</p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-amber-500/10 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-amber-400" />
+                <div className="p-3 bg-chart-3/10 rounded-lg">
+                  <HelpCircle className="h-6 w-6 text-chart-3" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Standalone</p>
-                  <p className="text-2xl font-bold text-white">58</p>
+                  <p className="text-sm text-muted-foreground">Standalone</p>
+                  <p className="text-2xl font-bold text-foreground">58</p>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white">All Quizzes</CardTitle>
+              <CardTitle className="text-foreground">All Quizzes</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#1F1F1F]">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Quiz Name
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Subject
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Questions
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Attempts
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Avg Score
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Level
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]"></th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {quizzes.map((quiz) => (
                       <tr
                         key={quiz.id}
-                        className="border-b border-[#1F1F1F] hover:bg-[#1F1F1F]/50 transition-colors"
+                        className="border-b border-border hover:bg-secondary/50 transition-colors"
                       >
-                        <td className="py-3 px-4 text-sm text-white font-medium">
+                        <td className="py-3 px-4 text-sm text-foreground font-medium">
                           {quiz.name}
                         </td>
-                        <td className="py-3 px-4 text-sm text-[#919191]">
+                        <td className="py-3 px-4 text-sm text-muted-foreground">
                           {quiz.subject}
                         </td>
-                        <td className="py-3 px-4 text-sm text-white">
+                        <td className="py-3 px-4 text-sm text-foreground">
                           {quiz.questions}
                         </td>
-                        <td className="py-3 px-4 text-sm text-white">
+                        <td className="py-3 px-4 text-sm text-foreground">
                           {quiz.attempts.toLocaleString()}
                         </td>
                         <td className="py-3 px-4">
                           <span
                             className={`text-sm font-medium ${
                               quiz.avgScore >= 80
-                                ? "text-emerald-400"
+                                ? "text-chart-1"
                                 : quiz.avgScore >= 70
-                                ? "text-amber-400"
-                                : "text-red-400"
+                                ? "text-chart-3"
+                                : "text-destructive"
                             }`}
                           >
                             {quiz.avgScore}%
@@ -475,11 +478,11 @@ export default function ContentPage() {
                         </td>
                         <td className="py-3 px-4">
                           {quiz.inLevel ? (
-                            <span className="text-xs px-2 py-1 rounded bg-blue-500/10 text-blue-400">
+                            <span className="text-xs px-2 py-1 rounded bg-chart-2/10 text-chart-2">
                               {quiz.levelName}
                             </span>
                           ) : (
-                            <span className="text-xs px-2 py-1 rounded bg-[#1F1F1F] text-[#919191]">
+                            <span className="text-xs px-2 py-1 rounded bg-secondary text-muted-foreground">
                               Standalone
                             </span>
                           )}
@@ -499,111 +502,113 @@ export default function ContentPage() {
         {/* Levels Tab */}
         <TabsContent value="levels" className="space-y-6">
           <div className="flex items-center justify-between">
-            <p className="text-[#919191]">
+            <p className="text-muted-foreground">
               Manage levels - structured learning paths containing multiple
               quizzes
             </p>
-            <button className="flex items-center gap-2 px-4 py-2 bg-emerald-500 hover:bg-emerald-600 rounded-lg text-sm font-medium transition-colors">
+            <button className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium transition-colors">
               <Plus className="h-4 w-4" /> Create Level
             </button>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-emerald-500/10 rounded-lg">
-                  <Layers className="h-6 w-6 text-emerald-400" />
+                <div className="p-3 bg-primary/10 rounded-lg">
+                  <Layers className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Total Levels</p>
-                  <p className="text-2xl font-bold text-white">24</p>
+                  <p className="text-sm text-muted-foreground">Total Levels</p>
+                  <p className="text-2xl font-bold text-foreground">24</p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-blue-500/10 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-blue-400" />
+                <div className="p-3 bg-chart-2/10 rounded-lg">
+                  <HelpCircle className="h-6 w-6 text-chart-2" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Total Quizzes</p>
-                  <p className="text-2xl font-bold text-white">98</p>
+                  <p className="text-sm text-muted-foreground">Total Quizzes</p>
+                  <p className="text-2xl font-bold text-foreground">98</p>
                 </div>
               </CardContent>
             </Card>
-            <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+            <Card className="bg-card border-border">
               <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-purple-500/10 rounded-lg">
-                  <FileQuestion className="h-6 w-6 text-purple-400" />
+                <div className="p-3 bg-chart-5/10 rounded-lg">
+                  <FileQuestion className="h-6 w-6 text-chart-5" />
                 </div>
                 <div>
-                  <p className="text-sm text-[#919191]">Total Questions</p>
-                  <p className="text-2xl font-bold text-white">1,450</p>
+                  <p className="text-sm text-muted-foreground">
+                    Total Questions
+                  </p>
+                  <p className="text-2xl font-bold text-foreground">1,450</p>
                 </div>
               </CardContent>
             </Card>
           </div>
 
-          <Card className="bg-[#0D0D0D] border-[#1F1F1F]">
+          <Card className="bg-card border-border">
             <CardHeader>
-              <CardTitle className="text-white">All Levels</CardTitle>
+              <CardTitle className="text-foreground">All Levels</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
-                    <tr className="border-b border-[#1F1F1F]">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Level Name
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Quizzes
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Questions
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Students
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]">
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
                         Completion Rate
                       </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-[#919191]"></th>
+                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"></th>
                     </tr>
                   </thead>
                   <tbody>
                     {levels.map((level) => (
                       <tr
                         key={level.id}
-                        className="border-b border-[#1F1F1F] hover:bg-[#1F1F1F]/50 transition-colors"
+                        className="border-b border-border hover:bg-secondary/50 transition-colors"
                       >
-                        <td className="py-3 px-4 text-sm text-white font-medium">
+                        <td className="py-3 px-4 text-sm text-foreground font-medium">
                           {level.name}
                         </td>
-                        <td className="py-3 px-4 text-sm text-white">
+                        <td className="py-3 px-4 text-sm text-foreground">
                           {level.quizzes}
                         </td>
-                        <td className="py-3 px-4 text-sm text-white">
+                        <td className="py-3 px-4 text-sm text-foreground">
                           {level.totalQuestions}
                         </td>
-                        <td className="py-3 px-4 text-sm text-white">
+                        <td className="py-3 px-4 text-sm text-foreground">
                           {level.students.toLocaleString()}
                         </td>
                         <td className="py-3 px-4">
                           <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-[#1F1F1F] rounded-full overflow-hidden">
+                            <div className="w-24 h-2 bg-secondary rounded-full overflow-hidden">
                               <div
                                 className={`h-full rounded-full ${
                                   level.completionRate >= 70
-                                    ? "bg-emerald-500"
+                                    ? "bg-chart-1"
                                     : level.completionRate >= 50
-                                    ? "bg-amber-500"
-                                    : "bg-red-500"
+                                    ? "bg-chart-3"
+                                    : "bg-destructive"
                                 }`}
                                 style={{ width: `${level.completionRate}%` }}
                               />
                             </div>
-                            <span className="text-sm text-white">
+                            <span className="text-sm text-foreground">
                               {level.completionRate}%
                             </span>
                           </div>
