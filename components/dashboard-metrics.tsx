@@ -8,6 +8,7 @@ import {
   Target,
   Clock,
 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
 
 const metrics = [
   {
@@ -100,27 +101,29 @@ export function DashboardMetrics() {
       {metrics.map((metric) => {
         const colors = colorClasses[metric.color];
         return (
-          <div
+          <Card
             key={metric.label}
-            className="flex flex-col gap-3 p-4 bg-card rounded-xl border border-border hover:border-accent transition-colors"
+            className="rounded-xl hover:border-accent transition-colors py-4"
           >
-            <div className="flex items-center justify-between">
-              <div className={`p-2 rounded-lg ${colors.bg}`}>
-                <metric.icon className={`h-4 w-4 ${colors.icon}`} />
+            <CardContent className="p-4 pt-0">
+              <div className="flex items-center justify-between mb-3">
+                <div className={`p-2 rounded-lg ${colors.bg}`}>
+                  <metric.icon className={`h-4 w-4 ${colors.icon}`} />
+                </div>
+                <span className={`text-xs font-medium ${colors.text}`}>
+                  {metric.change}
+                </span>
               </div>
-              <span className={`text-xs font-medium ${colors.text}`}>
-                {metric.change}
-              </span>
-            </div>
-            <div>
-              <p className="text-2xl font-bold text-foreground">
-                {metric.value}
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                {metric.label}
-              </p>
-            </div>
-          </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">
+                  {metric.value}
+                </p>
+                <p className="text-xs text-muted-foreground mt-1">
+                  {metric.label}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
         );
       })}
     </div>

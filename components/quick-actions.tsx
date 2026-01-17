@@ -2,6 +2,13 @@
 
 import { Plus, Upload, Users, FileText } from "lucide-react";
 import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 const actions = [
   {
@@ -58,29 +65,31 @@ const colorClasses: Record<
 
 export function QuickActions() {
   return (
-    <div className="bg-card rounded-2xl p-6 border border-border">
-      <div className="mb-4">
-        <h2 className="text-lg font-semibold text-foreground">Quick Actions</h2>
-        <p className="text-sm text-muted-foreground mt-1">Common tasks</p>
-      </div>
+    <Card className="rounded-2xl">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-lg">Quick Actions</CardTitle>
+        <CardDescription>Common tasks</CardDescription>
+      </CardHeader>
 
-      <div className="grid grid-cols-2 gap-3">
-        {actions.map((action) => {
-          const colors = colorClasses[action.color];
-          return (
-            <Link
-              key={action.label}
-              href={action.href}
-              className={`flex flex-col items-center gap-2 p-4 rounded-xl ${colors.bg} ${colors.hover} transition-colors`}
-            >
-              <action.icon className={`h-5 w-5 ${colors.text}`} />
-              <span className="text-xs font-medium text-foreground text-center">
-                {action.label}
-              </span>
-            </Link>
-          );
-        })}
-      </div>
-    </div>
+      <CardContent>
+        <div className="grid grid-cols-2 gap-3">
+          {actions.map((action) => {
+            const colors = colorClasses[action.color];
+            return (
+              <Link
+                key={action.label}
+                href={action.href}
+                className={`flex flex-col items-center gap-2 p-4 rounded-xl ${colors.bg} ${colors.hover} transition-colors`}
+              >
+                <action.icon className={`h-5 w-5 ${colors.text}`} />
+                <span className="text-xs font-medium text-foreground text-center">
+                  {action.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   );
 }

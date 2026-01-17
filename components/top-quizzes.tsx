@@ -7,13 +7,30 @@ import {
   BookOpen,
   MoreHorizontal,
 } from "lucide-react";
-import { Area, AreaChart, ResponsiveContainer } from "recharts";
+import { Area, AreaChart } from "recharts";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { ChartConfig, ChartContainer } from "@/components/ui/chart";
 
 const quizData = [
   {
@@ -113,49 +130,64 @@ const subjectColors: Record<string, string> = {
   History: "bg-chart-4",
 };
 
+const chartConfig = {
+  value: {
+    label: "Score",
+    color: "var(--chart-1)",
+  },
+} satisfies ChartConfig;
+
 export function TopQuizzes() {
   return (
-    <div className="bg-card rounded-2xl p-6 border border-border">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Top Performing Quizzes
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Based on completion rate and average score
-          </p>
+    <Card className="rounded-2xl">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">Top Performing Quizzes</CardTitle>
+            <CardDescription>
+              Based on completion rate and average score
+            </CardDescription>
+          </div>
+          <Button variant="link" className="text-primary p-0 h-auto">
+            View All
+          </Button>
         </div>
-        <button className="text-sm text-primary hover:text-primary/80 transition-colors font-medium">
-          View All
-        </button>
-      </div>
+      </CardHeader>
 
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-150">
-          <thead>
-            <tr className="text-muted-foreground text-xs border-b border-border">
-              <th className="pb-3 text-left font-medium pl-2">
+      <CardContent>
+        <Table>
+          <TableHeader>
+            <TableRow className="border-border hover:bg-transparent">
+              <TableHead className="text-muted-foreground font-medium">
                 <div className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors">
                   Quiz
                   <ChevronsUpDown className="h-3 w-3" />
                 </div>
-              </th>
-              <th className="pb-3 text-left font-medium w-25">Trend</th>
-              <th className="pb-3 text-right font-medium">Attempts</th>
-              <th className="pb-3 text-right font-medium">Avg. Score</th>
-              <th className="pb-3 text-right font-medium">Completion</th>
-              <th className="pb-3 text-right font-medium pr-2 w-10"></th>
-            </tr>
-          </thead>
-          <tbody>
+              </TableHead>
+              <TableHead className="text-muted-foreground font-medium w-25">
+                Trend
+              </TableHead>
+              <TableHead className="text-muted-foreground font-medium text-right">
+                Attempts
+              </TableHead>
+              <TableHead className="text-muted-foreground font-medium text-right">
+                Avg. Score
+              </TableHead>
+              <TableHead className="text-muted-foreground font-medium text-right">
+                Completion
+              </TableHead>
+              <TableHead className="w-10"></TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
             {quizData.map((item, index) => (
-              <tr
+              <TableRow
                 key={item.id}
-                className={`group transition-colors border-b border-border last:border-0 ${
-                  index === 0 ? "bg-primary/5" : "hover:bg-secondary"
+                className={`group border-border ${
+                  index === 0 ? "bg-primary/5" : ""
                 }`}
               >
-                <td className="py-4 pl-2 rounded-l-xl">
+                <TableCell>
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-9 h-9 rounded-lg ${
@@ -173,65 +205,63 @@ export function TopQuizzes() {
                       </span>
                     </div>
                   </div>
-                </td>
-                <td className="py-4">
-                  <div className="h-8 w-20">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <AreaChart data={item.chartData}>
-                        <defs>
-                          <linearGradient
-                            id={`gradient-${item.id}`}
-                            x1="0"
-                            y1="0"
-                            x2="0"
-                            y2="1"
-                          >
-                            <stop
-                              offset="0%"
-                              stopColor={
-                                item.trend === "up"
-                                  ? "oklch(var(--chart-1))"
-                                  : "oklch(var(--destructive))"
-                              }
-                              stopOpacity={0.3}
-                            />
-                            <stop
-                              offset="100%"
-                              stopColor={
-                                item.trend === "up"
-                                  ? "oklch(var(--chart-1))"
-                                  : "oklch(var(--destructive))"
-                              }
-                              stopOpacity={0}
-                            />
-                          </linearGradient>
-                        </defs>
-                        <Area
-                          type="monotone"
-                          dataKey="value"
-                          stroke={
-                            item.trend === "up"
-                              ? "oklch(var(--chart-1))"
-                              : "oklch(var(--destructive))"
-                          }
-                          strokeWidth={1.5}
-                          fill={`url(#gradient-${item.id})`}
-                        />
-                      </AreaChart>
-                    </ResponsiveContainer>
-                  </div>
-                </td>
-                <td className="py-4 text-right text-foreground font-medium text-sm">
+                </TableCell>
+                <TableCell>
+                  <ChartContainer config={chartConfig} className="h-8 w-20">
+                    <AreaChart data={item.chartData}>
+                      <defs>
+                        <linearGradient
+                          id={`gradient-${item.id}`}
+                          x1="0"
+                          y1="0"
+                          x2="0"
+                          y2="1"
+                        >
+                          <stop
+                            offset="0%"
+                            stopColor={
+                              item.trend === "up"
+                                ? "var(--chart-1)"
+                                : "var(--destructive)"
+                            }
+                            stopOpacity={0.3}
+                          />
+                          <stop
+                            offset="100%"
+                            stopColor={
+                              item.trend === "up"
+                                ? "var(--chart-1)"
+                                : "var(--destructive)"
+                            }
+                            stopOpacity={0}
+                          />
+                        </linearGradient>
+                      </defs>
+                      <Area
+                        type="monotone"
+                        dataKey="value"
+                        stroke={
+                          item.trend === "up"
+                            ? "var(--chart-1)"
+                            : "var(--destructive)"
+                        }
+                        strokeWidth={1.5}
+                        fill={`url(#gradient-${item.id})`}
+                      />
+                    </AreaChart>
+                  </ChartContainer>
+                </TableCell>
+                <TableCell className="text-right text-foreground font-medium text-sm">
                   {item.attempts.toLocaleString()}
-                </td>
-                <td
-                  className={`py-4 text-right font-medium text-sm ${
+                </TableCell>
+                <TableCell
+                  className={`text-right font-medium text-sm ${
                     item.trend === "up" ? "text-chart-1" : "text-destructive"
                   }`}
                 >
                   {item.avgScore}%
-                </td>
-                <td className="py-4 text-right font-medium">
+                </TableCell>
+                <TableCell className="text-right font-medium">
                   <div className="flex items-center justify-end gap-1 text-foreground text-sm">
                     {item.trend === "up" ? (
                       <ArrowUp className="h-3 w-3 text-chart-1" />
@@ -240,32 +270,29 @@ export function TopQuizzes() {
                     )}
                     {item.completion}%
                   </div>
-                </td>
-                <td className="py-4 pr-2 rounded-r-xl">
+                </TableCell>
+                <TableCell>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-accent transition-colors opacity-0 group-hover:opacity-100">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
                         <MoreHorizontal className="h-4 w-4" />
-                      </button>
+                      </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent
-                      align="end"
-                      className="bg-card border-border text-foreground"
-                    >
-                      <DropdownMenuItem className="focus:bg-secondary focus:text-foreground cursor-pointer text-muted-foreground">
-                        View Details
-                      </DropdownMenuItem>
-                      <DropdownMenuItem className="focus:bg-secondary focus:text-foreground cursor-pointer text-muted-foreground">
-                        Edit Quiz
-                      </DropdownMenuItem>
+                    <DropdownMenuContent align="end">
+                      <DropdownMenuItem>View Details</DropdownMenuItem>
+                      <DropdownMenuItem>Edit Quiz</DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
-                </td>
-              </tr>
+                </TableCell>
+              </TableRow>
             ))}
-          </tbody>
-        </table>
-      </div>
-    </div>
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
   );
 }

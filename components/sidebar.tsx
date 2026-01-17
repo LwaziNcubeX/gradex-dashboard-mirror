@@ -34,7 +34,7 @@ export function Sidebar() {
 
   return (
     <aside
-      className={`sticky top-24 h-[calc(100vh-8rem)] bg-card rounded-2xl hidden md:flex flex-col p-4 overflow-y-auto transition-all duration-300 ${
+      className={`sticky top-24 h-[calc(100vh-8rem)] bg-secondary rounded-2xl hidden md:flex flex-col p-4 overflow-y-auto transition-all duration-300 ${
         isExpanded ? "w-64" : "w-16"
       }`}
     >

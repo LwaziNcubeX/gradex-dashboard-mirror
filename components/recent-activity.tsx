@@ -1,6 +1,14 @@
 "use client";
 
 import { Trophy, BookOpen, UserPlus, Star, Clock } from "lucide-react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 const activities = [
   {
@@ -72,60 +80,63 @@ const colorClasses: Record<string, { bg: string; text: string }> = {
 
 export function RecentActivity() {
   return (
-    <div className="bg-card rounded-2xl p-6 border border-border">
-      <div className="flex items-center justify-between mb-6">
-        <div>
-          <h2 className="text-lg font-semibold text-foreground">
-            Recent Activity
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Latest student actions
-          </p>
+    <Card className="rounded-2xl">
+      <CardHeader className="pb-2">
+        <div className="flex items-center justify-between">
+          <div>
+            <CardTitle className="text-lg">Recent Activity</CardTitle>
+            <CardDescription>Latest student actions</CardDescription>
+          </div>
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Clock className="h-4 w-4" />
+            <span className="text-xs">Live updates</span>
+          </div>
         </div>
-        <div className="flex items-center gap-2 text-muted-foreground">
-          <Clock className="h-4 w-4" />
-          <span className="text-xs">Live updates</span>
+      </CardHeader>
+
+      <CardContent>
+        <div className="flex flex-col gap-1">
+          {activities.map((activity) => {
+            const colors = colorClasses[activity.color];
+            return (
+              <div
+                key={activity.id}
+                className="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary transition-colors"
+              >
+                <div className={`p-2 rounded-lg ${colors.bg}`}>
+                  <activity.icon className={`h-4 w-4 ${colors.text}`} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-foreground">
+                    <span className="font-medium">{activity.user}</span>{" "}
+                    <span className="text-muted-foreground">
+                      {activity.action}
+                    </span>{" "}
+                    {activity.target && (
+                      <span className="font-medium">{activity.target}</span>
+                    )}
+                    {activity.score && (
+                      <span className="text-primary ml-1">
+                        ({activity.score}%)
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <span className="text-xs text-muted-foreground whitespace-nowrap">
+                  {activity.time}
+                </span>
+              </div>
+            );
+          })}
         </div>
-      </div>
 
-      <div className="flex flex-col gap-1">
-        {activities.map((activity) => {
-          const colors = colorClasses[activity.color];
-          return (
-            <div
-              key={activity.id}
-              className="flex items-center gap-3 p-3 rounded-xl hover:bg-secondary transition-colors"
-            >
-              <div className={`p-2 rounded-lg ${colors.bg}`}>
-                <activity.icon className={`h-4 w-4 ${colors.text}`} />
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-foreground">
-                  <span className="font-medium">{activity.user}</span>{" "}
-                  <span className="text-muted-foreground">
-                    {activity.action}
-                  </span>{" "}
-                  {activity.target && (
-                    <span className="font-medium">{activity.target}</span>
-                  )}
-                  {activity.score && (
-                    <span className="text-primary ml-1">
-                      ({activity.score}%)
-                    </span>
-                  )}
-                </p>
-              </div>
-              <span className="text-xs text-muted-foreground whitespace-nowrap">
-                {activity.time}
-              </span>
-            </div>
-          );
-        })}
-      </div>
-
-      <button className="w-full mt-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors text-center">
-        View all activity
-      </button>
-    </div>
+        <Button
+          variant="ghost"
+          className="w-full mt-4 text-muted-foreground hover:text-foreground"
+        >
+          View all activity
+        </Button>
+      </CardContent>
+    </Card>
   );
 }
