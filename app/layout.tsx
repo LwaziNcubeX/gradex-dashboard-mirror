@@ -1,11 +1,8 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Space_Grotesk } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { inter } from "@/components/fonts";
-
-const spaceGrotesk = Space_Grotesk({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "GradeX Admin Dashboard",
