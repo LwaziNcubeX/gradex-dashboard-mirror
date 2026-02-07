@@ -47,7 +47,7 @@ const page = () => {
       const data = await response.json();
 
       console.log(data);
-      setMessage(data.message || data.error);
+      setMessage(data.message);
     } catch (error) {
       void error;
       setMessage("Error verifying OTP");
