@@ -219,8 +219,8 @@ function ActionMenu() {
 export default function ContentPage() {
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Content Management</h1>
+      <div className="flex items-center justify-between pl-2">
+        <h1 className="text-4xl font-bold font-oswald">Content Management</h1>
       </div>
 
       <Tabs defaultValue="questions" className="space-y-6">

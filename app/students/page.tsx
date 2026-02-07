@@ -57,8 +57,8 @@ const students = [
 export default function StudentsPage() {
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Students</h1>
+      <div className="flex items-center justify-between pl-2">
+        <h1 className="text-4xl font-bold font-oswald">Students</h1>
         <Button>Add Student</Button>
       </div>
 

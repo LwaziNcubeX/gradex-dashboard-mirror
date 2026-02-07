@@ -46,8 +46,8 @@ const subjectData = [
 export default function AnalyticsPage() {
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold">Analytics</h1>
+      <div className="flex items-center justify-between pl-2">
+        <h1 className="text-4xl font-bold font-oswald">Analytics</h1>
         <select className="bg-secondary border border-border rounded-lg px-3 py-2 text-sm text-foreground">
           <option>Last 30 days</option>
           <option>Last 90 days</option>
