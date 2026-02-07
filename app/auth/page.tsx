@@ -1,4 +1,5 @@
 "use client";
+import { saveAuth } from "@/lib/api";
 import { Button } from "@/ui/button";
 import { Input } from "@/ui/input";
 import React, { useState } from "react";
@@ -45,9 +46,10 @@ const page = () => {
       });
 
       const data = await response.json();
-
-      console.log(data);
       setMessage(data.message);
+      if (data.success) {
+        await saveAuth(data.data);
+      }
     } catch (error) {
       void error;
       setMessage("Error verifying OTP");
