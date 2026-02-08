@@ -17,19 +17,13 @@ import {
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
 import { cookies } from "@/lib/cookie-manager";
-
-function getDifficultyColor(difficulty: string) {
-  switch (difficulty) {
-    case "Form 1":
-      return "bg-chart-1/10 text-chart-1";
-    case "Form 2":
-      return "bg-chart-3/10 text-chart-3";
-    case "Form 3":
-      return "bg-destructive/10 text-destructive";
-    default:
-      return "bg-secondary text-muted-foreground";
-  }
-}
+import {
+  getDifficultyColor,
+  getStatusColor,
+  QuestionTable,
+  QuestionType,
+} from "@/constants/types";
+import { Badge } from "@/ui/badge";
 
 function ActionMenu() {
   return (
@@ -175,35 +169,30 @@ const Questions = () => {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                    Question
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                    Type
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                    Subject
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                    Difficulty
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                    Used In
-                  </th>
-                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"></th>
+                  {QuestionTable.map((item, index) => (
+                    <th
+                      key={index}
+                      className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"
+                    >
+                      {item}
+                    </th>
+                  ))}
                 </tr>
               </thead>
               <tbody>
-                {questions.map((q) => (
+                {questions.map((q: QuestionType, index) => (
                   <tr
                     key={q._id}
                     className="border-b border-border hover:bg-secondary/50 transition-colors"
                   >
+                    <td className="py-3 px-4 text-sm text-foreground font-medium w-1.5 truncate ">
+                      {index}
+                    </td>
                     <td className="py-3 px-4 text-sm text-foreground font-medium max-w-xs truncate">
-                      {q?.question_text}
+                      {q.question_text}
                     </td>
                     <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {q.type}
+                      {q.topic}
                     </td>
                     <td className="py-3 px-4 text-sm text-muted-foreground">
                       {q.subject}
@@ -217,8 +206,16 @@ const Questions = () => {
                         {q.difficulty}
                       </span>
                     </td>
-                    <td className="py-3 px-4 text-sm text-foreground">
-                      {q.usedIn} quizzes
+
+                    <td className="py-3 px-4 text-sm text-foreground rounded-b-md">
+                      <Badge
+                        variant={"secondary"}
+                        className={`${getStatusColor(
+                          q.status
+                        )} w-2/4 text-center justify-center`}
+                      >
+                        {q.status}
+                      </Badge>
                     </td>
                     <td className="py-3 px-4">
                       <ActionMenu />
