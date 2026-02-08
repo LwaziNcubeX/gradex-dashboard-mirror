@@ -24,6 +24,7 @@ import {
   QuestionType,
 } from "@/constants/types";
 import { Badge } from "@/ui/badge";
+import { readableDate } from "@/lib/utils";
 
 function ActionMenu() {
   return (
@@ -188,7 +189,7 @@ const Questions = () => {
                     <td className="py-3 px-4 text-sm text-foreground font-medium w-1.5 truncate ">
                       {index}
                     </td>
-                    <td className="py-3 px-4 text-sm text-foreground font-medium max-w-xs truncate">
+                    <td className="py-3 px-4 text-sm text-foreground font-medium max-w-75 truncate">
                       {q.question_text}
                     </td>
                     <td className="py-3 px-4 text-sm text-muted-foreground">
@@ -207,15 +208,18 @@ const Questions = () => {
                       </span>
                     </td>
 
-                    <td className="py-3 px-4 text-sm text-foreground rounded-b-md">
+                    <td className="py-3 px-4 text-sm text-foreground rounded-b-md justify-center items-center">
                       <Badge
                         variant={"secondary"}
                         className={`${getStatusColor(
                           q.status
-                        )} w-2/4 text-center justify-center`}
+                        )} w-3.4 text-center justify-center`}
                       >
                         {q.status}
                       </Badge>
+                    </td>
+                    <td className="py-3 px-4 text-sm text-muted-foreground">
+                      {readableDate(q.updated_at)}
                     </td>
                     <td className="py-3 px-4">
                       <ActionMenu />

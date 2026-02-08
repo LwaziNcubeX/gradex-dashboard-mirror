@@ -34,6 +34,7 @@ export const QuestionTable = [
   "Subject",
   "Difficulty",
   "Status",
+  "UpdatedAt",
 ];
 
 export function getStatusColor(status: string) {
