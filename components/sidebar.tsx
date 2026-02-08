@@ -10,8 +10,20 @@ import {
   ActivityIcon,
   CreditCard,
   FileText,
+  Copy,
+  Edit,
+  MoreHorizontal,
+  Trash2,
+  LogOut,
+  Settings,
 } from "lucide-react";
 import { Avatar, AvatarImage } from "@/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/ui/dropdown-menu";
 
 const navItems = [
   { icon: LayoutDashboard, label: "DASHBOARD", href: "/" },
@@ -44,9 +56,7 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-auto pt-6 border-t border-border flex flex-col gap-6">
-        <Avatar>
-          <AvatarImage src="profile.png" />
-        </Avatar>
+        <AvatarMenu />
       </div>
     </aside>
   );
@@ -71,5 +81,28 @@ function NavItem({
     >
       <Icon className="h-5 w-5 shrink-0" />
     </Link>
+  );
+}
+
+function AvatarMenu() {
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Avatar>
+          <AvatarImage src="profile.png" />
+        </Avatar>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="start" className="bg-secondary border-border">
+        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
+          <Edit className="h-4 w-4 mr-2" /> Reports
+        </DropdownMenuItem>
+        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
+          <Settings className="h-4 w-4 mr-2" /> Settings
+        </DropdownMenuItem>
+        <DropdownMenuItem className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer">
+          <LogOut className="h-4 w-4 mr-2" /> Log out
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }

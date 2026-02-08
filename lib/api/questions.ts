@@ -1,0 +1,3 @@
+class QuestionService {
+  public fetchQuestions() {}
+}
