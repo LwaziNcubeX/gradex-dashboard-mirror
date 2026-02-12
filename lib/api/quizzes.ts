@@ -1,9 +1,9 @@
 import { accessToken, API_URL } from "./common";
 
-class QuestionService {
+class QuizService {
   public async fetchQuestions() {
     try {
-      const response = await fetch(`${API_URL}/questions`, {
+      const response = await fetch(`${API_URL}/quizzes`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -19,4 +19,4 @@ class QuestionService {
   }
 }
 
-export const questionService = new QuestionService();
+export const quizService = new QuizService();

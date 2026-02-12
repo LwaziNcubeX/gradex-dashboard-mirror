@@ -19,9 +19,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Button } from "@/components/ui/button";
-import { useEffect, useState } from "react";
-import { cookies } from "@/lib/cookie-manager";
 import Questions from "@/components/content/questions";
 
 // Sample data for quizzes

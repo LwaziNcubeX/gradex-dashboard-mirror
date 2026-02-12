@@ -6,6 +6,16 @@ import {
   Copy,
   MoreHorizontal,
   Trash2,
+  ActivitySquare,
+  CheckCircle,
+  LucideFileWarning,
+  FlagTriangleLeft,
+  FlagOff,
+  FlameKindling,
+  BoxIcon,
+  Pen,
+  Pencil,
+  X,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "@/ui/button";
@@ -20,11 +30,21 @@ import { cookies } from "@/lib/cookie-manager";
 import {
   getDifficultyColor,
   getStatusColor,
+  getStatusIcon,
   QuestionTable,
   QuestionType,
+  SubjectsList,
 } from "@/constants/types";
 import { Badge } from "@/ui/badge";
 import { readableDate } from "@/lib/utils";
+import { questionService } from "@/lib/api/questions";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/ui/select";
 
 function ActionMenu() {
   return (
@@ -49,6 +69,11 @@ function ActionMenu() {
   );
 }
 
+export const StatusIcon = ({ status }: { status: string }) => {
+  const IconComponent = getStatusIcon(status);
+  return <IconComponent />;
+};
+
 const Questions = () => {
   const [overview, setOverview] = useState({});
   const [questions, setQuestions] = useState([]);
@@ -57,16 +82,13 @@ const Questions = () => {
     const fetchData = async () => {
       try {
         const accessToken = await cookies.getAccessToken();
-        const response = await fetch(
-          "http://0.0.0.0:8000/v1/overview/questions",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: `Bearer ${accessToken}`,
-            },
-          }
-        );
+        const response = await fetch("http://0.0.0.0:8000/overview/questions", {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
+          },
+        });
 
         const data = await response.json();
         if (data.success) {
@@ -85,20 +107,10 @@ const Questions = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const accessToken = await cookies.getAccessToken();
-        const response = await fetch("http://0.0.0.0:8000/v1/questions", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
-          },
-        });
-
-        const data = await response.json();
+        const data = await questionService.fetchQuestions();
         if (data.success) {
           setQuestions(data.data);
         }
-        console.log(data);
       } catch (error) {
         console.log(error);
       }
@@ -162,8 +174,22 @@ const Questions = () => {
       </div>
 
       <Card className="bg-card border-border">
-        <CardHeader>
+        <CardHeader className="flex-row justify-between gap-3">
           <CardTitle className="text-foreground">All Questions</CardTitle>
+          <div className="w-30">
+            <Select defaultValue="active">
+              <SelectTrigger className="bg-secondary border-border">
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="archive">Archive</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="flagged">Flagged</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -184,7 +210,7 @@ const Questions = () => {
                 {questions.map((q: QuestionType, index) => (
                   <tr
                     key={q._id}
-                    className="border-b border-border hover:bg-secondary/50 transition-colors"
+                    className={`border-b border-border  hover:bg-secondary/50 transition-colors `}
                   >
                     <td className="py-3 px-4 text-sm text-foreground font-medium w-1.5 truncate ">
                       {index}
@@ -208,18 +234,17 @@ const Questions = () => {
                       </span>
                     </td>
 
+                    {/* <td className="py-3 px-4 text-sm text-muted-foreground">
+                      {readableDate(q.updated_at)}
+                    </td> */}
                     <td className="py-3 px-4 text-sm text-foreground rounded-b-md justify-center items-center">
-                      <Badge
-                        variant={"secondary"}
+                      <a
                         className={`${getStatusColor(
                           q.status
-                        )} w-3.4 text-center justify-center`}
+                        )} p-1 text-center justify-center`}
                       >
                         {q.status}
-                      </Badge>
-                    </td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {readableDate(q.updated_at)}
+                      </a>
                     </td>
                     <td className="py-3 px-4">
                       <ActionMenu />

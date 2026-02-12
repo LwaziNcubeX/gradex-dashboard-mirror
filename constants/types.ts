@@ -1,10 +1,21 @@
+//...................INTERFACE...................//
+
+import {
+  Archive,
+  ArchiveX,
+  Box,
+  Check,
+  CheckCheck,
+  Pen,
+  PenOff,
+  X,
+} from "lucide-react";
+
 export interface ResponseType {
   data: {};
   message: string;
   success: boolean;
 }
-
-//...................CONTENT MANAGEMENT...................//
 
 export interface QuestionType {
   _id: string;
@@ -27,6 +38,8 @@ export interface QuestionType {
   created_by: string;
 }
 
+//...................CONSTANTS...................//
+
 export const QuestionTable = [
   "",
   "Question",
@@ -34,19 +47,40 @@ export const QuestionTable = [
   "Subject",
   "Difficulty",
   "Status",
-  "UpdatedAt",
 ];
+
+export const SubjectsList = [
+  "Mathematics",
+  "History",
+  "Geography",
+  "Combined Science",
+];
+
+//...................FUNCTIONS...................//
 
 export function getStatusColor(status: string) {
   switch (status) {
     case "active":
-      return "bg-chart-1/10 text-chart-1";
+      return "text-chart-1";
     case "archive":
-      return "bg-chart-3/10 text-chart-3";
+      return "text-chart-3";
     case "flagged":
-      return "bg-destructive/10 text-destructive";
+      return "text-destructive";
     default:
-      return "bg-secondary text-muted-foreground";
+      return "text-muted-foreground";
+  }
+}
+
+export function getStatusIcon(status: string): React.ComponentType {
+  switch (status) {
+    case "active":
+      return Check;
+    case "archive":
+      return Archive;
+    case "flagged":
+      return X;
+    default:
+      return Pen;
   }
 }
 

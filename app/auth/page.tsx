@@ -19,7 +19,7 @@ const page = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://0.0.0.0:8000/v1/auth/request-otp", {
+      const response = await fetch("http://0.0.0.0:8000/auth/request-otp", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
@@ -39,7 +39,7 @@ const page = () => {
   const handleOtpSubmit = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch("http://0.0.0.0:8000/v1/auth", {
+      const response = await fetch("http://0.0.0.0:8000/auth", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
