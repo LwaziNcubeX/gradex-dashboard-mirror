@@ -45,8 +45,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "../ui/alert-dialog";
+import { AlertDescription } from "../ui/alert";
 
-function ActionMenu() {
+function ActionMenu({ question }: QuestionProps) {
+  const [openDialog, setOpenDialog] = useState(false);
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -61,11 +73,47 @@ function ActionMenu() {
         <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
           <Copy className="h-4 w-4 mr-2" /> Duplicate
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer">
+        <DropdownMenuItem
+          onClick={() => setOpenDialog(true)}
+          className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer"
+        >
           <Trash2 className="h-4 w-4 mr-2" /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+  );
+}
+
+interface QuestionProps {
+  question: QuestionType;
+  setDialog: boolean;
+}
+
+function DeleteQuestion({ question, setDialog }: QuestionProps) {
+  return (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <DropdownMenuItem
+          onClick={() => setOpenDialog(true)}
+          className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer"
+        >
+          <Trash2 className="h-4 w-4 mr-2" /> Delete
+        </DropdownMenuItem>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure, you want to delete</AlertDialogTitle>
+          <AlertDescription>{question.question_text}</AlertDescription>
+        </AlertDialogHeader>
+
+        <AlertDialogFooter>
+          <AlertDialogAction className="bg-destructive hover:bg-destructive/80 cursor-pointer">
+            Yes
+          </AlertDialogAction>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
 
@@ -247,7 +295,7 @@ const Questions = () => {
                       </a>
                     </td>
                     <td className="py-3 px-4">
-                      <ActionMenu />
+                      <ActionMenu question={q} />
                     </td>
                   </tr>
                 ))}
