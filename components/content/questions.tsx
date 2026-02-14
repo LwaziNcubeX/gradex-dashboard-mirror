@@ -6,18 +6,8 @@ import {
   Copy,
   MoreHorizontal,
   Trash2,
-  ActivitySquare,
-  CheckCircle,
-  LucideFileWarning,
-  FlagTriangleLeft,
-  FlagOff,
-  FlameKindling,
-  BoxIcon,
-  Pen,
-  Pencil,
-  X,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/ui/card";
 import {
@@ -34,8 +24,7 @@ import {
   QuestionType,
   SubjectsList,
 } from "@/constants/types";
-import { Badge } from "@/ui/badge";
-import { readableDate, questionService, getAccessToken } from "@/lib";
+import { questionService, getAccessToken } from "@/lib";
 import { QuestionFilters } from "@/lib/api/questions";
 import {
   Select,
@@ -110,11 +99,11 @@ function FilterDialog({
               Subject
             </label>
             <Select
-              value={tempFilters.subject || ""}
+              value={tempFilters.subject || "all"}
               onValueChange={(value) =>
                 setTempFilters((prev) => ({
                   ...prev,
-                  subject: value || undefined,
+                  subject: value === "all" ? undefined : value,
                 }))
               }
             >
@@ -122,7 +111,7 @@ function FilterDialog({
                 <SelectValue placeholder="Select subject" />
               </SelectTrigger>
               <SelectContent className="bg-secondary border-border">
-                <SelectItem value="">All Subjects</SelectItem>
+                <SelectItem value="all">All Subjects</SelectItem>
                 {SubjectsList.map((subject) => (
                   <SelectItem key={subject} value={subject}>
                     {subject}
@@ -138,11 +127,11 @@ function FilterDialog({
               Difficulty
             </label>
             <Select
-              value={tempFilters.difficulty || ""}
+              value={tempFilters.difficulty || "all"}
               onValueChange={(value) =>
                 setTempFilters((prev) => ({
                   ...prev,
-                  difficulty: (value || undefined) as
+                  difficulty: (value === "all" ? undefined : value) as
                     | "Form 1"
                     | "Form 2"
                     | "Form 3"
@@ -156,7 +145,7 @@ function FilterDialog({
                 <SelectValue placeholder="Select difficulty" />
               </SelectTrigger>
               <SelectContent className="bg-secondary border-border">
-                <SelectItem value="">All Difficulties</SelectItem>
+                <SelectItem value="all">All Difficulties</SelectItem>
                 <SelectItem value="Form 1">Form 1</SelectItem>
                 <SelectItem value="Form 2">Form 2</SelectItem>
                 <SelectItem value="Form 3">Form 3</SelectItem>
@@ -189,11 +178,11 @@ function FilterDialog({
               Status
             </label>
             <Select
-              value={tempFilters.status || ""}
+              value={tempFilters.status || "all"}
               onValueChange={(value) =>
                 setTempFilters((prev) => ({
                   ...prev,
-                  status: (value || undefined) as
+                  status: (value === "all" ? undefined : value) as
                     | "draft"
                     | "active"
                     | "archive"
@@ -206,7 +195,7 @@ function FilterDialog({
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent className="bg-secondary border-border">
-                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="all">All Statuses</SelectItem>
                 <SelectItem value="active">Active</SelectItem>
                 <SelectItem value="draft">Draft</SelectItem>
                 <SelectItem value="archive">Archive</SelectItem>

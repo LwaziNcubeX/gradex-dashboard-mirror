@@ -29,7 +29,9 @@ class QuestionService {
     return queryString ? `?${queryString}` : "";
   }
 
-  public async fetchQuestions(filters?: QuestionFilters): Promise<QuestionType[]> {
+  public async fetchQuestions(
+    filters?: QuestionFilters
+  ): Promise<QuestionType[]> {
     try {
       const queryString = filters ? this.buildQueryString(filters) : "";
       const response = await fetch(`${API_URL}/questions${queryString}`, {
