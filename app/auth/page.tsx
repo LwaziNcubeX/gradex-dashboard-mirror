@@ -1,8 +1,8 @@
 "use client";
+import { GridBackground } from "@/components/auth/grid-background";
+import { AdminLoginForm } from "@/components/auth/login-form";
 import { saveAuth } from "@/lib/api";
-import { Button } from "@/ui/button";
-import { Input } from "@/ui/input";
-import React, { useState } from "react";
+import { useState } from "react";
 
 interface ResponseType {
   data: {};
@@ -58,32 +58,22 @@ const page = () => {
 
   return (
     <div>
-      <h1>LOGIN</h1>
-      {!emailSent ? (
-        <div>
-          <form onSubmit={handleSubmit}>
-            <Input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-            <Button type="submit">Request otp</Button>
-            <p>{message}</p>
-          </form>
+      <main className="relative flex min-h-screen items-center justify-center px-4">
+        <GridBackground />
+
+        <div className="relative z-10 flex w-full flex-col items-center gap-8">
+          {/* Branding above card */}
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <div className="h-px w-8 bg-border" />
+            <span className="text-xs font-medium uppercase tracking-[0.2em]">
+              Dashboard
+            </span>
+            <div className="h-px w-8 bg-border" />
+          </div>
+
+          <AdminLoginForm saveAuth={saveAuth} />
         </div>
-      ) : (
-        <div>
-          <form onSubmit={handleOtpSubmit}>
-            <Input
-              type="text"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-            />
-            <Button type="submit">Verify OTP</Button>
-            <p>{message}</p>
-          </form>
-        </div>
-      )}
+      </main>
     </div>
   );
 };
