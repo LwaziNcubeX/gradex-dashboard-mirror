@@ -1,3 +1,5 @@
+"use client";
+
 import { DashboardLayout } from "@/components/dashboard-layout";
 import {
   Card,
@@ -17,7 +19,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { User, Bell, Shield, Palette, Database, Globe } from "lucide-react";
+import { Bell, Shield, Palette, Database, Globe } from "lucide-react";
+import { ProfileSettingsCard } from "@/components/settings/profile-settings";
 
 export default function SettingsPage() {
   return (
@@ -28,57 +31,7 @@ export default function SettingsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-primary/10 rounded-lg">
-                  <User className="h-5 w-5 text-primary" />
-                </div>
-                <div>
-                  <CardTitle className="text-foreground">
-                    Profile Settings
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Manage your admin account details
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <Label className="text-sm text-muted-foreground mb-2 block">
-                    First Name
-                  </Label>
-                  <Input
-                    type="text"
-                    defaultValue="Admin"
-                    className="bg-secondary border-border"
-                  />
-                </div>
-                <div>
-                  <Label className="text-sm text-muted-foreground mb-2 block">
-                    Last Name
-                  </Label>
-                  <Input
-                    type="text"
-                    defaultValue="User"
-                    className="bg-secondary border-border"
-                  />
-                </div>
-              </div>
-              <div>
-                <Label className="text-sm text-muted-foreground mb-2 block">
-                  Email
-                </Label>
-                <Input
-                  type="email"
-                  defaultValue="admin@gradex.com"
-                  className="bg-secondary border-border"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <ProfileSettingsCard />
 
           <Card className="bg-card border-border">
             <CardHeader>
