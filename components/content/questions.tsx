@@ -6,6 +6,7 @@ import {
   Copy,
   MoreHorizontal,
   Trash2,
+  Trash,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/ui/button";
@@ -52,6 +53,7 @@ import {
   DialogTrigger,
 } from "../ui/dialog";
 import { Filter } from "lucide-react";
+import { Checkbox } from "../ui/checkbox";
 
 interface FilterDialogProps {
   filters: QuestionFilters;
@@ -314,6 +316,9 @@ const Questions = () => {
   const [filters, setFilters] = useState<QuestionFilters>({});
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
+    new Set()
+  );
 
   const ITEMS_PER_PAGE = 20;
 
@@ -364,8 +369,66 @@ const Questions = () => {
       await questionService.deleteQuestion(questionId);
       // Remove the deleted question from the list
       setQuestions((prev) => prev.filter((q) => q._id !== questionId));
+      // Remove from selected if it was selected
+      setSelectedQuestions((prev) => {
+        const newSet = new Set(prev);
+        newSet.delete(questionId);
+        return newSet;
+      });
     } catch (error) {
       console.error("Failed to delete question:", error);
+      throw error;
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleSelectQuestion = (questionId: string) => {
+    setSelectedQuestions((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(questionId)) {
+        newSet.delete(questionId);
+      } else {
+        newSet.add(questionId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (
+      selectedQuestions.size === paginatedQuestions.length &&
+      paginatedQuestions.length > 0
+    ) {
+      // Deselect all on current page
+      setSelectedQuestions((prev) => {
+        const newSet = new Set(prev);
+        paginatedQuestions.forEach((q) => newSet.delete(q._id));
+        return newSet;
+      });
+    } else {
+      // Select all on current page
+      setSelectedQuestions((prev) => {
+        const newSet = new Set(prev);
+        paginatedQuestions.forEach((q) => newSet.add(q._id));
+        return newSet;
+      });
+    }
+  };
+
+  const handleDeleteSelected = async () => {
+    if (selectedQuestions.size === 0) return;
+
+    setIsDeleting(true);
+    try {
+      for (const questionId of selectedQuestions) {
+        await questionService.deleteQuestion(questionId);
+      }
+      // Remove all deleted questions
+      setQuestions((prev) => prev.filter((q) => !selectedQuestions.has(q._id)));
+      setSelectedQuestions(new Set());
+    } catch (error) {
+      console.error("Failed to delete selected questions:", error);
       throw error;
     } finally {
       setIsDeleting(false);
@@ -377,6 +440,9 @@ const Questions = () => {
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
   const endIndex = startIndex + ITEMS_PER_PAGE;
   const paginatedQuestions = questions.slice(startIndex, endIndex);
+  const isAllSelected =
+    paginatedQuestions.length > 0 &&
+    selectedQuestions.size === paginatedQuestions.length;
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -435,9 +501,16 @@ const Questions = () => {
 
       <Card className="bg-card border-border">
         <CardHeader className="flex-row justify-between items-center gap-3">
-          <CardTitle className="text-foreground">
-            All Questions ({questions.length})
-          </CardTitle>
+          <div className="flex items-center gap-3">
+            <CardTitle className="text-foreground">
+              All Questions ({questions.length})
+            </CardTitle>
+            {selectedQuestions.size > 0 && (
+              <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded">
+                {selectedQuestions.size} selected
+              </span>
+            )}
+          </div>
           <FilterDialog
             filters={filters}
             onFiltersChange={setFilters}
@@ -446,12 +519,47 @@ const Questions = () => {
             }}
           />
         </CardHeader>
+
+        {/* Bulk Actions Bar */}
+        {selectedQuestions.size > 0 && (
+          <div className="px-6 py-3 bg-primary/5 border-t border-b border-border flex items-center justify-between">
+            <div className="text-sm text-foreground">
+              {selectedQuestions.size} question
+              {selectedQuestions.size !== 1 ? "s" : ""} selected
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setSelectedQuestions(new Set())}
+              >
+                Deselect
+              </Button>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={handleDeleteSelected}
+                disabled={isDeleting}
+              >
+                <Trash className="h-4 w-4 mr-2" />
+                {isDeleting ? "Deleting..." : "Delete Selected"}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <CardContent>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  {QuestionTable.map((item, index) => (
+                  <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground w-12">
+                    <Checkbox
+                      checked={isAllSelected}
+                      onCheckedChange={handleSelectAll}
+                    />
+                  </th>
+                  {QuestionTable.slice(1).map((item, index) => (
                     <th
                       key={index}
                       className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"
@@ -466,7 +574,7 @@ const Questions = () => {
                   <tr>
                     <td
                       className="py-3 px-4 text-center text-muted-foreground"
-                      colSpan={7}
+                      colSpan={8}
                     >
                       Loading...
                     </td>
@@ -475,7 +583,7 @@ const Questions = () => {
                   <tr>
                     <td
                       className="py-3 px-4 text-center text-muted-foreground"
-                      colSpan={7}
+                      colSpan={8}
                     >
                       No questions found
                     </td>
@@ -484,10 +592,15 @@ const Questions = () => {
                   paginatedQuestions.map((q: QuestionType, index) => (
                     <tr
                       key={q._id}
-                      className={`border-b border-border  hover:bg-secondary/50 transition-colors `}
+                      className={`border-b border-border hover:bg-secondary/50 transition-colors ${
+                        selectedQuestions.has(q._id) ? "bg-primary/5" : ""
+                      }`}
                     >
-                      <td className="py-3 px-4 text-sm text-foreground font-medium w-1.5 truncate ">
-                        {startIndex + index + 1}
+                      <td className="py-3 px-4 text-center w-12">
+                        <Checkbox
+                          checked={selectedQuestions.has(q._id)}
+                          onCheckedChange={() => handleSelectQuestion(q._id)}
+                        />
                       </td>
                       <td className="py-3 px-4 text-sm text-foreground font-medium max-w-75 truncate">
                         {q.question_text}

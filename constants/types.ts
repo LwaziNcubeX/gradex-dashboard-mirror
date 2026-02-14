@@ -41,7 +41,7 @@ export interface QuestionType {
 //...................CONSTANTS...................//
 
 export const QuestionTable = [
-  "",
+  "Select",
   "Question",
   "Topic",
   "Subject",
