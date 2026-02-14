@@ -39,14 +39,7 @@ export function proxy(request: NextRequest) {
   const publicRoutes = ["/auth", "/api/auth"];
 
   // Protected routes that require authentication
-  const protectedRoutes = [
-    "/",
-    "/content",
-    "/students",
-    "/feedback",
-    "/analytics",
-    "/settings",
-  ];
+  const protectedRoutes: string[] = [];
 
   const token = getAccessToken(request);
   const isAuthenticated = token !== null;
