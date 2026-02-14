@@ -26,7 +26,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
-import { cookies } from "@/lib/cookie-manager";
 import {
   getDifficultyColor,
   getStatusColor,
@@ -36,8 +35,8 @@ import {
   SubjectsList,
 } from "@/constants/types";
 import { Badge } from "@/ui/badge";
-import { readableDate } from "@/lib/utils";
-import { questionService } from "@/lib/api/questions";
+import { readableDate, questionService, getAccessToken } from "@/lib";
+import { QuestionFilters } from "@/lib/api/questions";
 import {
   Select,
   SelectContent,
@@ -56,61 +55,254 @@ import {
   AlertDialogTrigger,
 } from "../ui/alert-dialog";
 import { AlertDescription } from "../ui/alert";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../ui/dialog";
+import { Filter } from "lucide-react";
 
-function ActionMenu({ question }: QuestionProps) {
-  const [openDialog, setOpenDialog] = useState(false);
+interface FilterDialogProps {
+  filters: QuestionFilters;
+  onFiltersChange: (filters: QuestionFilters) => void;
+  onApply: () => void;
+}
+
+function FilterDialog({
+  filters,
+  onFiltersChange,
+  onApply,
+}: FilterDialogProps) {
+  const [open, setOpen] = useState(false);
+  const [tempFilters, setTempFilters] = useState<QuestionFilters>(filters);
+
+  const clearFilters = () => {
+    setTempFilters({});
+    onFiltersChange({});
+  };
+
+  const handleApply = () => {
+    onFiltersChange(tempFilters);
+    onApply();
+    setOpen(false);
+  };
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button className="p-1 hover:bg-accent rounded transition-colors">
-          <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-secondary border-border">
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Edit className="h-4 w-4 mr-2" /> Edit
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Copy className="h-4 w-4 mr-2" /> Duplicate
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => setOpenDialog(true)}
-          className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer"
-        >
-          <Trash2 className="h-4 w-4 mr-2" /> Delete
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTrigger asChild>
+        <Button variant="outline" className="flex items-center gap-2">
+          <Filter className="h-4 w-4" /> Filters
+        </Button>
+      </DialogTrigger>
+      <DialogContent className="bg-secondary border-border">
+        <DialogHeader>
+          <DialogTitle className="text-foreground">
+            Filter Questions
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="space-y-4 py-4">
+          {/* Subject Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Subject
+            </label>
+            <Select
+              value={tempFilters.subject || ""}
+              onValueChange={(value) =>
+                setTempFilters((prev) => ({
+                  ...prev,
+                  subject: value || undefined,
+                }))
+              }
+            >
+              <SelectTrigger className="bg-primary/5 border-border">
+                <SelectValue placeholder="Select subject" />
+              </SelectTrigger>
+              <SelectContent className="bg-secondary border-border">
+                <SelectItem value="">All Subjects</SelectItem>
+                {SubjectsList.map((subject) => (
+                  <SelectItem key={subject} value={subject}>
+                    {subject}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Difficulty Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Difficulty
+            </label>
+            <Select
+              value={tempFilters.difficulty || ""}
+              onValueChange={(value) =>
+                setTempFilters((prev) => ({
+                  ...prev,
+                  difficulty: (value || undefined) as
+                    | "Form 1"
+                    | "Form 2"
+                    | "Form 3"
+                    | "Form 4"
+                    | "Mixed"
+                    | undefined,
+                }))
+              }
+            >
+              <SelectTrigger className="bg-primary/5 border-border">
+                <SelectValue placeholder="Select difficulty" />
+              </SelectTrigger>
+              <SelectContent className="bg-secondary border-border">
+                <SelectItem value="">All Difficulties</SelectItem>
+                <SelectItem value="Form 1">Form 1</SelectItem>
+                <SelectItem value="Form 2">Form 2</SelectItem>
+                <SelectItem value="Form 3">Form 3</SelectItem>
+                <SelectItem value="Form 4">Form 4</SelectItem>
+                <SelectItem value="Mixed">Mixed</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Topic Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Topic</label>
+            <input
+              type="text"
+              placeholder="Enter topic (optional)"
+              value={tempFilters.topic || ""}
+              onChange={(e) =>
+                setTempFilters((prev) => ({
+                  ...prev,
+                  topic: e.target.value || undefined,
+                }))
+              }
+              className="w-full px-3 py-2 bg-primary/5 border border-border rounded-md text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+
+          {/* Status Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">
+              Status
+            </label>
+            <Select
+              value={tempFilters.status || ""}
+              onValueChange={(value) =>
+                setTempFilters((prev) => ({
+                  ...prev,
+                  status: (value || undefined) as
+                    | "draft"
+                    | "active"
+                    | "archive"
+                    | "flagged"
+                    | undefined,
+                }))
+              }
+            >
+              <SelectTrigger className="bg-primary/5 border-border">
+                <SelectValue placeholder="Select status" />
+              </SelectTrigger>
+              <SelectContent className="bg-secondary border-border">
+                <SelectItem value="">All Statuses</SelectItem>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="draft">Draft</SelectItem>
+                <SelectItem value="archive">Archive</SelectItem>
+                <SelectItem value="flagged">Flagged</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="flex gap-2 justify-end">
+          <Button
+            variant="outline"
+            onClick={clearFilters}
+            className="text-foreground"
+          >
+            Clear All
+          </Button>
+          <Button
+            onClick={handleApply}
+            className="bg-primary hover:bg-primary/90"
+          >
+            Apply Filters
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
   );
 }
 
-interface QuestionProps {
+interface ActionMenuProps {
   question: QuestionType;
-  setDialog: boolean;
+  onDelete: (questionId: string) => Promise<void>;
+  isDeleting: boolean;
 }
 
-function DeleteQuestion({ question, setDialog }: QuestionProps) {
+function ActionMenu({ question, onDelete, isDeleting }: ActionMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+
+  const handleDelete = async () => {
+    setIsLoadingDelete(true);
+    try {
+      await onDelete(question._id);
+      setIsOpen(false);
+    } catch (error) {
+      console.error("Delete failed:", error);
+    } finally {
+      setIsLoadingDelete(false);
+    }
+  };
+
   return (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <DropdownMenuItem
-          onClick={() => setOpenDialog(true)}
-          className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer"
-        >
-          <Trash2 className="h-4 w-4 mr-2" /> Delete
-        </DropdownMenuItem>
-      </AlertDialogTrigger>
+    <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button className="p-1 hover:bg-accent rounded transition-colors">
+            <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="bg-secondary border-border">
+          <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
+            <Edit className="h-4 w-4 mr-2" /> Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
+            <Copy className="h-4 w-4 mr-2" /> Duplicate
+          </DropdownMenuItem>
+          <AlertDialogTrigger asChild>
+            <DropdownMenuItem className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer">
+              <Trash2 className="h-4 w-4 mr-2" /> Delete
+            </DropdownMenuItem>
+          </AlertDialogTrigger>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure, you want to delete</AlertDialogTitle>
-          <AlertDescription>{question.question_text}</AlertDescription>
+          <AlertDialogTitle>Delete Question</AlertDialogTitle>
+          <AlertDescription className="mt-2">
+            Are you sure you want to delete this question?
+            <p className="font-semibold mt-3 text-foreground truncate">
+              "{question.question_text}"
+            </p>
+          </AlertDescription>
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogAction className="bg-destructive hover:bg-destructive/80 cursor-pointer">
-            Yes
+          <AlertDialogCancel disabled={isLoadingDelete}>
+            Cancel
+          </AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={isLoadingDelete}
+            className="bg-destructive hover:bg-destructive/80 cursor-pointer"
+          >
+            {isLoadingDelete ? "Deleting..." : "Delete"}
           </AlertDialogAction>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
         </AlertDialogFooter>
       </AlertDialogContent>
     </AlertDialog>
@@ -123,13 +315,23 @@ export const StatusIcon = ({ status }: { status: string }) => {
 };
 
 const Questions = () => {
-  const [overview, setOverview] = useState({});
-  const [questions, setQuestions] = useState([]);
+  const [overview, setOverview] = useState({
+    questions: 0,
+    multi_choice: 0,
+    other: 0,
+  });
+  const [questions, setQuestions] = useState<QuestionType[]>([]);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [filters, setFilters] = useState<QuestionFilters>({});
+  const [currentPage, setCurrentPage] = useState(1);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const ITEMS_PER_PAGE = 20;
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const accessToken = await cookies.getAccessToken();
+        const accessToken = getAccessToken();
         const response = await fetch("http://0.0.0.0:8000/overview/questions", {
           method: "GET",
           headers: {
@@ -144,9 +346,8 @@ const Questions = () => {
         } else {
           setOverview({ questions: 0, multi_choice: 0, other: 0 });
         }
-        console.log(data);
       } catch (error) {
-        console.log(error);
+        console.error("Failed to fetch overview:", error);
       }
     };
     fetchData();
@@ -154,17 +355,39 @@ const Questions = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const data = await questionService.fetchQuestions();
-        if (data.success) {
-          setQuestions(data.data);
-        }
+        const data = await questionService.fetchQuestions(filters);
+        setQuestions(data);
+        setCurrentPage(1); // Reset to first page when filters change
       } catch (error) {
-        console.log(error);
+        console.error("Failed to fetch questions:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
     fetchData();
-  }, []);
+  }, [filters]);
+
+  const handleDeleteQuestion = async (questionId: string) => {
+    setIsDeleting(true);
+    try {
+      await questionService.deleteQuestion(questionId);
+      // Remove the deleted question from the list
+      setQuestions((prev) => prev.filter((q) => q._id !== questionId));
+    } catch (error) {
+      console.error("Failed to delete question:", error);
+      throw error;
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  // Pagination logic
+  const totalPages = Math.ceil(questions.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const endIndex = startIndex + ITEMS_PER_PAGE;
+  const paginatedQuestions = questions.slice(startIndex, endIndex);
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -222,22 +445,17 @@ const Questions = () => {
       </div>
 
       <Card className="bg-card border-border">
-        <CardHeader className="flex-row justify-between gap-3">
-          <CardTitle className="text-foreground">All Questions</CardTitle>
-          <div className="w-30">
-            <Select defaultValue="active">
-              <SelectTrigger className="bg-secondary border-border">
-                <SelectValue placeholder="Select language" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="archive">Archive</SelectItem>
-                <SelectItem value="draft">Draft</SelectItem>
-                <SelectItem value="flagged">Flagged</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
+        <CardHeader className="flex-row justify-between items-center gap-3">
+          <CardTitle className="text-foreground">
+            All Questions ({questions.length})
+          </CardTitle>
+          <FilterDialog
+            filters={filters}
+            onFiltersChange={setFilters}
+            onApply={() => {
+              // Refetch will be triggered by setFilters
+            }}
+          />
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
@@ -255,52 +473,120 @@ const Questions = () => {
                 </tr>
               </thead>
               <tbody>
-                {questions.map((q: QuestionType, index) => (
-                  <tr
-                    key={q._id}
-                    className={`border-b border-border  hover:bg-secondary/50 transition-colors `}
-                  >
-                    <td className="py-3 px-4 text-sm text-foreground font-medium w-1.5 truncate ">
-                      {index}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-foreground font-medium max-w-75 truncate">
-                      {q.question_text}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {q.topic}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {q.subject}
-                    </td>
-                    <td className="py-3 px-4">
-                      <span
-                        className={`text-xs px-2 py-1 rounded ${getDifficultyColor(
-                          q.difficulty
-                        )}`}
-                      >
-                        {q.difficulty}
-                      </span>
-                    </td>
-
-                    {/* <td className="py-3 px-4 text-sm text-muted-foreground">
-                      {readableDate(q.updated_at)}
-                    </td> */}
-                    <td className="py-3 px-4 text-sm text-foreground rounded-b-md justify-center items-center">
-                      <a
-                        className={`${getStatusColor(
-                          q.status
-                        )} p-1 text-center justify-center`}
-                      >
-                        {q.status}
-                      </a>
-                    </td>
-                    <td className="py-3 px-4">
-                      <ActionMenu question={q} />
+                {isLoading ? (
+                  <tr>
+                    <td
+                      className="py-3 px-4 text-center text-muted-foreground"
+                      colSpan={7}
+                    >
+                      Loading...
                     </td>
                   </tr>
-                ))}
+                ) : paginatedQuestions.length === 0 ? (
+                  <tr>
+                    <td
+                      className="py-3 px-4 text-center text-muted-foreground"
+                      colSpan={7}
+                    >
+                      No questions found
+                    </td>
+                  </tr>
+                ) : (
+                  paginatedQuestions.map((q: QuestionType, index) => (
+                    <tr
+                      key={q._id}
+                      className={`border-b border-border  hover:bg-secondary/50 transition-colors `}
+                    >
+                      <td className="py-3 px-4 text-sm text-foreground font-medium w-1.5 truncate ">
+                        {startIndex + index + 1}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-foreground font-medium max-w-75 truncate">
+                        {q.question_text}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {q.topic}
+                      </td>
+                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {q.subject}
+                      </td>
+                      <td className="py-3 px-4">
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${getDifficultyColor(
+                            q.difficulty
+                          )}`}
+                        >
+                          {q.difficulty}
+                        </span>
+                      </td>
+
+                      {/* <td className="py-3 px-4 text-sm text-muted-foreground">
+                        {readableDate(q.updated_at)}
+                      </td> */}
+                      <td className="py-3 px-4 text-sm text-foreground rounded-b-md justify-center items-center">
+                        <a
+                          className={`${getStatusColor(
+                            q.status
+                          )} p-1 text-center justify-center`}
+                        >
+                          {q.status}
+                        </a>
+                      </td>
+                      <td className="py-3 px-4">
+                        <ActionMenu
+                          question={q}
+                          onDelete={handleDeleteQuestion}
+                          isDeleting={isDeleting}
+                        />
+                      </td>
+                    </tr>
+                  ))
+                )}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+            <div className="text-sm text-muted-foreground">
+              Showing {questions.length === 0 ? 0 : startIndex + 1} to{" "}
+              {Math.min(endIndex, questions.length)} of {questions.length}{" "}
+              questions
+            </div>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1}
+              >
+                Previous
+              </Button>
+              <div className="flex items-center gap-1 px-3 py-2">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCurrentPage(page)}
+                      className={`px-3 py-1 rounded transition-colors ${
+                        currentPage === page
+                          ? "bg-primary text-primary-foreground"
+                          : "hover:bg-secondary text-foreground"
+                      }`}
+                    >
+                      {page}
+                    </button>
+                  )
+                )}
+              </div>
+              <Button
+                variant="outline"
+                onClick={() =>
+                  setCurrentPage((prev) => Math.min(prev + 1, totalPages))
+                }
+                disabled={currentPage === totalPages}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
