@@ -4,7 +4,6 @@ import { PieChart, Pie, Cell } from "recharts";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -48,16 +47,15 @@ export function SubjectDistribution() {
   const total = data.reduce((acc, item) => acc + item.value, 0);
 
   return (
-    <Card className="rounded-2xl">
-      <CardHeader className="pb-2">
-        <CardTitle className="text-lg">Subject Distribution</CardTitle>
-        <CardDescription>Quiz attempts by subject</CardDescription>
+    <Card className="rounded-xl">
+      <CardHeader className="px-4 pt-4 pb-2">
+        <CardTitle className="text-sm font-medium text-foreground">Subject Distribution</CardTitle>
       </CardHeader>
 
-      <CardContent>
-        <div className="flex items-center gap-6">
-          <div className="relative">
-            <ChartContainer config={chartConfig} className="h-40 w-40">
+      <CardContent className="px-4 pb-4">
+        <div className="flex items-center gap-4">
+          <div className="relative shrink-0">
+            <ChartContainer config={chartConfig} className="h-28 w-28">
               <PieChart>
                 <ChartTooltip
                   cursor={false}
@@ -67,8 +65,8 @@ export function SubjectDistribution() {
                   data={data}
                   cx="50%"
                   cy="50%"
-                  innerRadius={50}
-                  outerRadius={75}
+                  innerRadius={36}
+                  outerRadius={52}
                   paddingAngle={2}
                   dataKey="value"
                   nameKey="name"
@@ -82,30 +80,19 @@ export function SubjectDistribution() {
             </ChartContainer>
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
               <div className="text-center">
-                <p className="text-2xl font-bold text-foreground">{total}%</p>
-                <p className="text-xs text-muted-foreground">Total</p>
+                <p className="text-lg font-bold text-foreground leading-none">{total}%</p>
               </div>
             </div>
           </div>
 
-          <div className="flex-1 flex flex-col gap-3">
+          <div className="flex-1 flex flex-col gap-2">
             {data.map((item) => (
-              <div
-                key={item.name}
-                className="flex items-center justify-between"
-              >
+              <div key={item.name} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div
-                    className="w-3 h-3 rounded-full"
-                    style={{ backgroundColor: item.fill }}
-                  />
-                  <span className="text-sm text-muted-foreground">
-                    {item.name}
-                  </span>
+                  <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.fill }} />
+                  <span className="text-xs text-muted-foreground">{item.name}</span>
                 </div>
-                <span className="text-sm font-medium text-foreground">
-                  {item.value}%
-                </span>
+                <span className="text-xs font-medium text-foreground tabular-nums">{item.value}%</span>
               </div>
             ))}
           </div>

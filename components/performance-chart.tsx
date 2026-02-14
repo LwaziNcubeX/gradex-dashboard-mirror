@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar, Download } from "lucide-react";
+import { Download } from "lucide-react";
 import {
   Area,
   AreaChart,
@@ -12,11 +12,6 @@ import {
 } from "recharts";
 import { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import {
-  Tooltip as TooltipUI,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
@@ -86,32 +81,30 @@ export function PerformanceChart() {
   const [period, setPeriod] = useState("6M");
 
   return (
-    <Card className="rounded-2xl">
+    <Card className="rounded-xl">
       <Tabs defaultValue="engagement" className="w-full">
-        <CardHeader className="pb-2">
-          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-4">
-              <TabsList className="bg-secondary">
-                <TabsTrigger value="engagement">Engagement</TabsTrigger>
-                <TabsTrigger value="weekly">Weekly Activity</TabsTrigger>
+        <CardHeader className="pb-2 px-4 pt-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-3">
+              <TabsList className="bg-secondary h-8">
+                <TabsTrigger value="engagement" className="text-xs h-6 px-2.5">Engagement</TabsTrigger>
+                <TabsTrigger value="weekly" className="text-xs h-6 px-2.5">Weekly</TabsTrigger>
               </TabsList>
-              <div className="flex items-center gap-2 px-3 py-1 bg-secondary rounded-full border border-border">
-                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-                <span className="text-sm font-medium text-foreground">
-                  Live
-                </span>
+              <div className="flex items-center gap-1.5 px-2 py-1 bg-secondary rounded-full border border-border">
+                <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                <span className="text-xs font-medium text-foreground">Live</span>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <div className="flex items-center bg-secondary rounded-lg p-1">
-                {["1D", "1W", "1M", "3M", "6M"].map((p) => (
+            <div className="flex items-center gap-2">
+              <div className="flex items-center bg-secondary rounded-md p-0.5">
+                {["1W", "1M", "3M", "6M"].map((p) => (
                   <button
                     key={p}
                     onClick={() => setPeriod(p)}
-                    className={`px-3 py-1 text-sm rounded-md transition-colors ${
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
                       period === p
-                        ? "bg-accent text-foreground shadow-sm"
+                        ? "bg-accent text-foreground"
                         : "text-muted-foreground hover:text-foreground"
                     }`}
                   >
@@ -119,107 +112,59 @@ export function PerformanceChart() {
                   </button>
                 ))}
               </div>
-
-              <div className="flex items-center gap-2">
-                <TooltipUI>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="bg-secondary"
-                    >
-                      <Calendar className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Select date range</TooltipContent>
-                </TooltipUI>
-                <TooltipUI>
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                      className="bg-secondary"
-                    >
-                      <Download className="h-5 w-5" />
-                    </Button>
-                  </TooltipTrigger>
-                  <TooltipContent>Download data</TooltipContent>
-                </TooltipUI>
-              </div>
+              <Button variant="ghost" size="icon" className="h-8 w-8 bg-secondary">
+                <Download className="h-4 w-4" />
+                <span className="sr-only">Download data</span>
+              </Button>
             </div>
           </div>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="px-4 pb-4">
           <TabsContent value="engagement" className="mt-0">
-            <div className="flex items-center gap-6 mb-4">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-chart-1" />
-                <span className="text-sm text-muted-foreground">
-                  Active Users
-                </span>
+            <div className="flex items-center gap-4 mb-3">
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-chart-1" />
+                <span className="text-xs text-muted-foreground">Active Users</span>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-chart-2" />
-                <span className="text-sm text-muted-foreground">
-                  Quizzes Taken
-                </span>
+              <div className="flex items-center gap-1.5">
+                <div className="w-2.5 h-2.5 rounded-full bg-chart-2" />
+                <span className="text-xs text-muted-foreground">Quizzes Taken</span>
               </div>
             </div>
-            <ChartContainer
-              config={engagementChartConfig}
-              className="h-75 w-full"
-            >
+            <ChartContainer config={engagementChartConfig} className="h-64 w-full">
               <AreaChart data={engagementData} accessibilityLayer>
                 <defs>
                   <linearGradient id="colorUsers" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-users)"
-                      stopOpacity={0.3}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-users)"
-                      stopOpacity={0}
-                    />
+                    <stop offset="5%" stopColor="var(--color-users)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="var(--color-users)" stopOpacity={0} />
                   </linearGradient>
                   <linearGradient id="colorQuizzes" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-quizzes)"
-                      stopOpacity={0.3}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-quizzes)"
-                      stopOpacity={0}
-                    />
+                    <stop offset="5%" stopColor="var(--color-quizzes)" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="var(--color-quizzes)" stopOpacity={0} />
                   </linearGradient>
                 </defs>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  className="stroke-border"
-                  vertical={false}
-                />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
                 <XAxis dataKey="date" hide />
                 <YAxis
                   yAxisId="left"
                   orientation="left"
-                  tick={{ fill: "currentColor", fontSize: 12 }}
+                  tick={{ fill: "currentColor", fontSize: 11 }}
                   className="text-muted-foreground"
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                  width={35}
                 />
                 <YAxis
                   yAxisId="right"
                   orientation="right"
-                  tick={{ fill: "currentColor", fontSize: 12 }}
+                  tick={{ fill: "currentColor", fontSize: 11 }}
                   className="text-muted-foreground"
                   axisLine={false}
                   tickLine={false}
                   tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+                  width={35}
                 />
                 <ChartTooltip
                   cursor={false}
@@ -229,19 +174,13 @@ export function PerformanceChart() {
                       formatter={(value, name) => (
                         <div className="flex items-center gap-2">
                           <div
-                            className="h-2.5 w-2.5 shrink-0 rounded-[2px]"
-                            style={{
-                              backgroundColor: `var(--color-${name})`,
-                            }}
+                            className="h-2 w-2 shrink-0 rounded-[2px]"
+                            style={{ backgroundColor: `var(--color-${name})` }}
                           />
-                          <span className="text-muted-foreground">
-                            {
-                              engagementChartConfig[
-                                name as keyof typeof engagementChartConfig
-                              ]?.label
-                            }
+                          <span className="text-muted-foreground text-xs">
+                            {engagementChartConfig[name as keyof typeof engagementChartConfig]?.label}
                           </span>
-                          <span className="font-mono font-medium tabular-nums text-foreground">
+                          <span className="font-mono font-medium tabular-nums text-foreground text-xs">
                             {value?.toLocaleString()}
                           </span>
                         </div>
@@ -249,50 +188,18 @@ export function PerformanceChart() {
                     />
                   }
                 />
-                <Area
-                  yAxisId="left"
-                  type="monotone"
-                  dataKey="users"
-                  stroke="var(--color-users)"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorUsers)"
-                />
-                <Area
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="quizzes"
-                  stroke="var(--color-quizzes)"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#colorQuizzes)"
-                />
+                <Area yAxisId="left" type="monotone" dataKey="users" stroke="var(--color-users)" strokeWidth={2} fillOpacity={1} fill="url(#colorUsers)" />
+                <Area yAxisId="right" type="monotone" dataKey="quizzes" stroke="var(--color-quizzes)" strokeWidth={2} fillOpacity={1} fill="url(#colorQuizzes)" />
               </AreaChart>
             </ChartContainer>
           </TabsContent>
 
           <TabsContent value="weekly" className="mt-0">
-            <ChartContainer config={weeklyChartConfig} className="h-75 w-full">
+            <ChartContainer config={weeklyChartConfig} className="h-64 w-full">
               <BarChart data={weeklyData} accessibilityLayer>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  className="stroke-border"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="day"
-                  tick={{ fill: "currentColor", fontSize: 12 }}
-                  className="text-muted-foreground"
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fill: "currentColor", fontSize: 12 }}
-                  className="text-muted-foreground"
-                  axisLine={false}
-                  tickLine={false}
-                  tickFormatter={(value) => `${(value / 1000).toFixed(1)}k`}
-                />
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" vertical={false} />
+                <XAxis dataKey="day" tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} />
+                <YAxis tick={{ fill: "currentColor", fontSize: 11 }} className="text-muted-foreground" axisLine={false} tickLine={false} tickFormatter={(value) => `${(value / 1000).toFixed(1)}k`} width={35} />
                 <ChartTooltip
                   cursor={false}
                   content={
@@ -301,33 +208,21 @@ export function PerformanceChart() {
                       formatter={(value, name, item) => (
                         <div className="flex flex-col gap-1">
                           <div className="flex items-center gap-2">
-                            <div className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-chart-1" />
-                            <span className="text-muted-foreground">
-                              Quizzes
-                            </span>
-                            <span className="font-mono font-medium tabular-nums text-foreground">
-                              {value?.toLocaleString()}
-                            </span>
+                            <div className="h-2 w-2 shrink-0 rounded-[2px] bg-chart-1" />
+                            <span className="text-muted-foreground text-xs">Quizzes</span>
+                            <span className="font-mono font-medium tabular-nums text-foreground text-xs">{value?.toLocaleString()}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <div className="h-2.5 w-2.5 shrink-0 rounded-[2px] bg-chart-2" />
-                            <span className="text-muted-foreground">
-                              Avg. Score
-                            </span>
-                            <span className="font-mono font-medium tabular-nums text-foreground">
-                              {item.payload.avgScore}%
-                            </span>
+                            <div className="h-2 w-2 shrink-0 rounded-[2px] bg-chart-2" />
+                            <span className="text-muted-foreground text-xs">Avg. Score</span>
+                            <span className="font-mono font-medium tabular-nums text-foreground text-xs">{item.payload.avgScore}%</span>
                           </div>
                         </div>
                       )}
                     />
                   }
                 />
-                <Bar
-                  dataKey="quizzes"
-                  fill="var(--color-quizzes)"
-                  radius={[4, 4, 0, 0]}
-                />
+                <Bar dataKey="quizzes" fill="var(--color-quizzes)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ChartContainer>
           </TabsContent>

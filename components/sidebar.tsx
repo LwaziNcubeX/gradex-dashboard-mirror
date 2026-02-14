@@ -7,56 +7,79 @@ import {
   LayoutDashboard,
   Users,
   Layers,
-  ActivityIcon,
-  CreditCard,
-  FileText,
-  Copy,
-  Edit,
-  MoreHorizontal,
-  Trash2,
-  LogOut,
+  BarChart3,
+  MessageSquare,
   Settings,
 } from "lucide-react";
-import { Avatar, AvatarImage } from "@/ui/avatar";
+import { GradeXLogo } from "@/components/gradex-logo";
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/ui/dropdown-menu";
+  Tooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "@/components/ui/tooltip";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 
-const navItems = [
-  { icon: LayoutDashboard, label: "DASHBOARD", href: "/" },
-  { icon: Users, label: "STUDENTS", href: "/students" },
-  { icon: Layers, label: "CONTENT", href: "/content" },
-  { icon: ActivityIcon, label: "ANALYTICS", href: "/analytics" },
-  { icon: CreditCard, label: "FINANCE", href: "/finance" },
+const mainNavItems = [
+  { icon: LayoutDashboard, label: "Overview", href: "/" },
+  { icon: Users, label: "Students", href: "/students" },
+  { icon: Layers, label: "Content", href: "/content" },
+  { icon: BarChart3, label: "Analytics", href: "/analytics" },
+  { icon: MessageSquare, label: "Feedback", href: "/feedback" },
+];
+
+const bottomNavItems = [
+  { icon: Settings, label: "Settings", href: "/settings" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <aside
-      className={`sticky top-24 h-[calc(100vh-8rem)] bg-secondary rounded-2xl hidden md:flex flex-col p-3 overflow-y-auto transition-all duration-300
-      }`}
-    >
-      <nav className="flex flex-col gap-6 pt-3">
-        {navItems.map((item) => (
-          <NavItem
-            key={item.href}
-            icon={item.icon}
-            label={item.label}
-            href={item.href}
-            active={
-              pathname === item.href || pathname.startsWith(item.href + "/")
-            }
-          />
-        ))}
+    <aside className="hidden md:flex flex-col items-center w-16 border-r border-border bg-background py-4 shrink-0">
+      {/* Logo */}
+      <div className="flex items-center justify-center h-10 mb-6">
+        <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+          <span className="text-sm font-bold text-primary-foreground">G</span>
+        </div>
+      </div>
+
+      {/* Main nav */}
+      <nav className="flex flex-col items-center gap-1 flex-1">
+        {mainNavItems.map((item) => {
+          const isActive =
+            pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(item.href + "/"));
+          return (
+            <NavItem
+              key={item.href}
+              icon={item.icon}
+              label={item.label}
+              href={item.href}
+              active={isActive}
+            />
+          );
+        })}
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-border flex flex-col gap-6">
-        <AvatarMenu />
+      {/* Bottom nav */}
+      <div className="flex flex-col items-center gap-1 pt-4 border-t border-border mt-auto">
+        {bottomNavItems.map((item) => {
+          const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+          return (
+            <NavItem
+              key={item.href}
+              icon={item.icon}
+              label={item.label}
+              href={item.href}
+              active={isActive}
+            />
+          );
+        })}
       </div>
     </aside>
   );
@@ -64,6 +87,7 @@ export function Sidebar() {
 
 function NavItem({
   icon: Icon,
+  label,
   href,
   active = false,
 }: {
@@ -73,36 +97,112 @@ function NavItem({
   active?: boolean;
 }) {
   return (
-    <Link
-      href={href}
-      className={`flex items-center gap-4 cursor-pointer transition-colors ${
-        active ? "text-primary" : "text-muted-foreground hover:text-foreground"
-      } justify-center`}
-    >
-      <Icon className="h-5 w-5 shrink-0" />
-    </Link>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Link
+          href={href}
+          className={`relative flex items-center justify-center w-10 h-10 rounded-lg transition-colors ${
+            active
+              ? "bg-primary/15 text-primary"
+              : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+          }`}
+        >
+          {active && (
+            <span className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-[calc(50%+12px)] w-1 h-5 rounded-full bg-primary" />
+          )}
+          <Icon className="h-[18px] w-[18px]" />
+          <span className="sr-only">{label}</span>
+        </Link>
+      </TooltipTrigger>
+      <TooltipContent side="right" sideOffset={8}>
+        {label}
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
-function AvatarMenu() {
+/* Mobile navigation drawer */
+export function MobileNav({
+  open,
+  onOpenChange,
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}) {
+  const pathname = usePathname();
+
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar>
-          <AvatarImage src="profile.png" />
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="bg-secondary border-border">
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Edit className="h-4 w-4 mr-2" /> Reports
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Settings className="h-4 w-4 mr-2" /> Settings
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer">
-          <LogOut className="h-4 w-4 mr-2" /> Log out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="left" className="w-64 bg-background border-border p-0">
+        <SheetHeader className="p-4 pb-2">
+          <SheetTitle>
+            <GradeXLogo className="text-foreground h-7 w-auto" />
+          </SheetTitle>
+        </SheetHeader>
+
+        <nav className="flex flex-col gap-0.5 px-3 py-2">
+          {mainNavItems.map((item) => {
+            const isActive =
+              pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href + "/"));
+            return (
+              <MobileNavItem
+                key={item.href}
+                icon={item.icon}
+                label={item.label}
+                href={item.href}
+                active={isActive}
+                onClick={() => onOpenChange(false)}
+              />
+            );
+          })}
+        </nav>
+
+        <div className="mt-auto border-t border-border px-3 py-2">
+          {bottomNavItems.map((item) => {
+            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            return (
+              <MobileNavItem
+                key={item.href}
+                icon={item.icon}
+                label={item.label}
+                href={item.href}
+                active={isActive}
+                onClick={() => onOpenChange(false)}
+              />
+            );
+          })}
+        </div>
+      </SheetContent>
+    </Sheet>
+  );
+}
+
+function MobileNavItem({
+  icon: Icon,
+  label,
+  href,
+  active = false,
+  onClick,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  href: string;
+  active?: boolean;
+  onClick?: () => void;
+}) {
+  return (
+    <Link
+      href={href}
+      onClick={onClick}
+      className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
+        active
+          ? "bg-primary/15 text-primary"
+          : "text-muted-foreground hover:text-foreground hover:bg-secondary"
+      }`}
+    >
+      <Icon className="h-[18px] w-[18px] shrink-0" />
+      {label}
+    </Link>
   );
 }

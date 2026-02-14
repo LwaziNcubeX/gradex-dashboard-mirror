@@ -17,7 +17,6 @@ import {
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -42,17 +41,9 @@ const quizData = [
     completion: 94,
     trend: "up",
     chartData: [
-      { value: 70 },
-      { value: 72 },
-      { value: 75 },
-      { value: 78 },
-      { value: 76 },
-      { value: 80 },
-      { value: 79 },
-      { value: 82 },
-      { value: 81 },
-      { value: 84 },
-      { value: 82 },
+      { value: 70 }, { value: 72 }, { value: 75 }, { value: 78 },
+      { value: 76 }, { value: 80 }, { value: 79 }, { value: 82 },
+      { value: 81 }, { value: 84 }, { value: 82 },
     ],
   },
   {
@@ -64,17 +55,9 @@ const quizData = [
     completion: 88,
     trend: "up",
     chartData: [
-      { value: 65 },
-      { value: 68 },
-      { value: 70 },
-      { value: 69 },
-      { value: 72 },
-      { value: 71 },
-      { value: 73 },
-      { value: 74 },
-      { value: 73 },
-      { value: 76 },
-      { value: 75 },
+      { value: 65 }, { value: 68 }, { value: 70 }, { value: 69 },
+      { value: 72 }, { value: 71 }, { value: 73 }, { value: 74 },
+      { value: 73 }, { value: 76 }, { value: 75 },
     ],
   },
   {
@@ -86,17 +69,9 @@ const quizData = [
     completion: 91,
     trend: "down",
     chartData: [
-      { value: 75 },
-      { value: 73 },
-      { value: 74 },
-      { value: 72 },
-      { value: 70 },
-      { value: 71 },
-      { value: 69 },
-      { value: 70 },
-      { value: 68 },
-      { value: 69 },
-      { value: 68 },
+      { value: 75 }, { value: 73 }, { value: 74 }, { value: 72 },
+      { value: 70 }, { value: 71 }, { value: 69 }, { value: 70 },
+      { value: 68 }, { value: 69 }, { value: 68 },
     ],
   },
   {
@@ -108,190 +83,129 @@ const quizData = [
     completion: 86,
     trend: "up",
     chartData: [
-      { value: 72 },
-      { value: 74 },
-      { value: 73 },
-      { value: 76 },
-      { value: 75 },
-      { value: 77 },
-      { value: 76 },
-      { value: 78 },
-      { value: 77 },
-      { value: 80 },
-      { value: 79 },
+      { value: 72 }, { value: 74 }, { value: 73 }, { value: 76 },
+      { value: 75 }, { value: 77 }, { value: 76 }, { value: 78 },
+      { value: 77 }, { value: 80 }, { value: 79 },
     ],
   },
 ];
 
 const subjectColors: Record<string, string> = {
-  Mathematics: "bg-chart-2",
-  Science: "bg-chart-1",
-  English: "bg-chart-3",
-  History: "bg-chart-4",
+  Mathematics: "bg-chart-2/20 text-chart-2",
+  Science: "bg-chart-1/20 text-chart-1",
+  English: "bg-chart-3/20 text-chart-3",
+  History: "bg-chart-4/20 text-chart-4",
 };
 
 const chartConfig = {
-  value: {
-    label: "Score",
-    color: "var(--chart-1)",
-  },
+  value: { label: "Score", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 export function TopQuizzes() {
   return (
-    <Card className="rounded-2xl">
-      <CardHeader className="pb-2">
+    <Card className="rounded-xl">
+      <CardHeader className="px-4 pt-4 pb-2">
         <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-lg">Top Performing Quizzes</CardTitle>
-            <CardDescription>
-              Based on completion rate and average score
-            </CardDescription>
-          </div>
-          <Button variant="link" className="text-primary p-0 h-auto">
+          <CardTitle className="text-sm font-medium text-foreground">Top Performing Quizzes</CardTitle>
+          <Button variant="link" className="text-primary p-0 h-auto text-xs">
             View All
           </Button>
         </div>
       </CardHeader>
 
-      <CardContent>
-        <Table>
-          <TableHeader>
-            <TableRow className="border-border hover:bg-transparent">
-              <TableHead className="text-muted-foreground font-medium">
-                <div className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors">
-                  Quiz
-                  <ChevronsUpDown className="h-3 w-3" />
-                </div>
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium w-25">
-                Trend
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Attempts
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Avg. Score
-              </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Completion
-              </TableHead>
-              <TableHead className="w-10"></TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {quizData.map((item, index) => (
-              <TableRow
-                key={item.id}
-                className={`group border-border ${
-                  index === 0 ? "bg-primary/5" : ""
-                }`}
-              >
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div
-                      className={`w-9 h-9 rounded-lg ${
-                        subjectColors[item.subject]
-                      } flex items-center justify-center`}
-                    >
-                      <BookOpen className="h-4 w-4 text-foreground" />
-                    </div>
-                    <div>
-                      <span className="font-medium text-foreground block text-sm">
-                        {item.name}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        {item.subject}
-                      </span>
-                    </div>
+      <CardContent className="px-4 pb-4">
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow className="border-border hover:bg-transparent">
+                <TableHead className="text-muted-foreground font-medium text-xs">
+                  <div className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors">
+                    Quiz <ChevronsUpDown className="h-3 w-3" />
                   </div>
-                </TableCell>
-                <TableCell>
-                  <ChartContainer config={chartConfig} className="h-8 w-20">
-                    <AreaChart data={item.chartData}>
-                      <defs>
-                        <linearGradient
-                          id={`gradient-${item.id}`}
-                          x1="0"
-                          y1="0"
-                          x2="0"
-                          y2="1"
-                        >
-                          <stop
-                            offset="0%"
-                            stopColor={
-                              item.trend === "up"
-                                ? "var(--chart-1)"
-                                : "var(--destructive)"
-                            }
-                            stopOpacity={0.3}
-                          />
-                          <stop
-                            offset="100%"
-                            stopColor={
-                              item.trend === "up"
-                                ? "var(--chart-1)"
-                                : "var(--destructive)"
-                            }
-                            stopOpacity={0}
-                          />
-                        </linearGradient>
-                      </defs>
-                      <Area
-                        type="monotone"
-                        dataKey="value"
-                        stroke={
-                          item.trend === "up"
-                            ? "var(--chart-1)"
-                            : "var(--destructive)"
-                        }
-                        strokeWidth={1.5}
-                        fill={`url(#gradient-${item.id})`}
-                      />
-                    </AreaChart>
-                  </ChartContainer>
-                </TableCell>
-                <TableCell className="text-right text-foreground font-medium text-sm">
-                  {item.attempts.toLocaleString()}
-                </TableCell>
-                <TableCell
-                  className={`text-right font-medium text-sm ${
-                    item.trend === "up" ? "text-chart-1" : "text-destructive"
-                  }`}
-                >
-                  {item.avgScore}%
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  <div className="flex items-center justify-end gap-1 text-foreground text-sm">
-                    {item.trend === "up" ? (
-                      <ArrowUp className="h-3 w-3 text-chart-1" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3 text-destructive" />
-                    )}
-                    {item.completion}%
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
-                      >
-                        <MoreHorizontal className="h-4 w-4" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuItem>View Details</DropdownMenuItem>
-                      <DropdownMenuItem>Edit Quiz</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
+                </TableHead>
+                <TableHead className="text-muted-foreground font-medium text-xs hidden sm:table-cell w-20">
+                  Trend
+                </TableHead>
+                <TableHead className="text-muted-foreground font-medium text-xs text-right">
+                  Attempts
+                </TableHead>
+                <TableHead className="text-muted-foreground font-medium text-xs text-right">
+                  Avg Score
+                </TableHead>
+                <TableHead className="text-muted-foreground font-medium text-xs text-right hidden sm:table-cell">
+                  Completion
+                </TableHead>
+                <TableHead className="w-8"></TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {quizData.map((item, index) => (
+                <TableRow
+                  key={item.id}
+                  className={`group border-border ${index === 0 ? "bg-primary/5" : ""}`}
+                >
+                  <TableCell className="py-2.5">
+                    <div className="flex items-center gap-2.5">
+                      <div className={`w-7 h-7 rounded-md ${subjectColors[item.subject]} flex items-center justify-center shrink-0`}>
+                        <BookOpen className="h-3.5 w-3.5" />
+                      </div>
+                      <div className="min-w-0">
+                        <span className="font-medium text-foreground block text-sm leading-tight truncate">
+                          {item.name}
+                        </span>
+                        <span className="text-[11px] text-muted-foreground">
+                          {item.subject}
+                        </span>
+                      </div>
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-2.5 hidden sm:table-cell">
+                    <ChartContainer config={chartConfig} className="h-6 w-16">
+                      <AreaChart data={item.chartData}>
+                        <defs>
+                          <linearGradient id={`gradient-${item.id}`} x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor={item.trend === "up" ? "var(--chart-1)" : "var(--destructive)"} stopOpacity={0.3} />
+                            <stop offset="100%" stopColor={item.trend === "up" ? "var(--chart-1)" : "var(--destructive)"} stopOpacity={0} />
+                          </linearGradient>
+                        </defs>
+                        <Area type="monotone" dataKey="value" stroke={item.trend === "up" ? "var(--chart-1)" : "var(--destructive)"} strokeWidth={1.5} fill={`url(#gradient-${item.id})`} />
+                      </AreaChart>
+                    </ChartContainer>
+                  </TableCell>
+                  <TableCell className="text-right text-foreground font-medium text-sm py-2.5 tabular-nums">
+                    {item.attempts.toLocaleString()}
+                  </TableCell>
+                  <TableCell className={`text-right font-medium text-sm py-2.5 tabular-nums ${item.trend === "up" ? "text-chart-1" : "text-destructive"}`}>
+                    {item.avgScore}%
+                  </TableCell>
+                  <TableCell className="text-right font-medium py-2.5 hidden sm:table-cell">
+                    <div className="flex items-center justify-end gap-1 text-foreground text-sm tabular-nums">
+                      {item.trend === "up" ? (
+                        <ArrowUp className="h-3 w-3 text-chart-1" />
+                      ) : (
+                        <ArrowDown className="h-3 w-3 text-destructive" />
+                      )}
+                      {item.completion}%
+                    </div>
+                  </TableCell>
+                  <TableCell className="py-2.5">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-7 w-7 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-card border-border">
+                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                        <DropdownMenuItem>Edit Quiz</DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
       </CardContent>
     </Card>
   );

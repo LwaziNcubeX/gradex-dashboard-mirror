@@ -6,11 +6,11 @@
 :root {
   --font-oswald: "Oswald", "Arial Black", "Helvetica Neue", Arial, sans-serif;
 
-  --background: oklch(0% 0 0);
+  --background: oklch(0.08 0.005 260);
   --foreground: oklch(0.9851 0 0);
-  --card: oklch(0% 0 0);
+  --card: oklch(0.12 0.005 260);
   --card-foreground: oklch(0.9851 0 0);
-  --popover: oklch(0% 0 0);
+  --popover: oklch(0.12 0.005 260);
   --popover-foreground: oklch(0.9851 0 0);
   --primary: oklch(0.6959 0.1491 162.4796);
   --primary-foreground: oklch(0.9851 0 0);
@@ -40,19 +40,19 @@
   --sidebar-ring: oklch(0.6959 0.1491 162.4796);
   --radius: 0.5rem;
   --shadow-x: 0;
-  --shadow-y: 0;
-  --shadow-blur: 0;
+  --shadow-y: 1;
+  --shadow-blur: 3;
   --shadow-spread: 0;
-  --shadow-opacity: 0;
+  --shadow-opacity: 0.3;
   --shadow-color: 0 0 0;
-  --shadow-2xs: 0 0 0 0 hsl(0 0 0 / 0);
-  --shadow-xs: 0 0 0 0 hsl(0 0 0 / 0);
-  --shadow-sm: 0 0 0 0 hsl(0 0 0 / 0), 0 1px 2px -1px hsl(0 0 0 / 0);
-  --shadow: 0 0 0 0 hsl(0 0 0 / 0), 0 1px 2px -1px hsl(0 0 0 / 0);
-  --shadow-md: 0 0 0 0 hsl(0 0 0 / 0), 0 2px 4px -1px hsl(0 0 0 / 0);
-  --shadow-lg: 0 0 0 0 hsl(0 0 0 / 0), 0 4px 6px -1px hsl(0 0 0 / 0);
-  --shadow-xl: 0 0 0 0 hsl(0 0 0 / 0), 0 8px 10px -1px hsl(0 0 0 / 0);
-  --shadow-2xl: 0 0 0 0 hsl(0 0 0 / 0);
+  --shadow-2xs: 0 1px 2px 0 hsl(0 0% 0% / 0.15);
+  --shadow-xs: 0 1px 3px 0 hsl(0 0% 0% / 0.2);
+  --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.2), 0 1px 3px -1px hsl(0 0% 0% / 0.15);
+  --shadow: 0 1px 3px 0 hsl(0 0% 0% / 0.25), 0 1px 2px -1px hsl(0 0% 0% / 0.2);
+  --shadow-md: 0 4px 6px -1px hsl(0 0% 0% / 0.25), 0 2px 4px -2px hsl(0 0% 0% / 0.2);
+  --shadow-lg: 0 10px 15px -3px hsl(0 0% 0% / 0.25), 0 4px 6px -4px hsl(0 0% 0% / 0.2);
+  --shadow-xl: 0 20px 25px -5px hsl(0 0% 0% / 0.25), 0 8px 10px -6px hsl(0 0% 0% / 0.2);
+  --shadow-2xl: 0 25px 50px -12px hsl(0 0% 0% / 0.4);
 }
 
 @theme inline {
@@ -105,6 +105,15 @@
   html {
     scroll-behavior: smooth;
   }
+}
+
+/* Scrollbar hidden utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
 /* Add smooth animation utilities */

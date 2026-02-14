@@ -10,30 +10,41 @@ import { DashboardLayout } from "@/components/dashboard-layout";
 export default function Dashboard() {
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between pl-2">
-        <h1 className="text-4xl font-bold font-oswald">Overview</h1>
+      {/* Page header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold font-oswald tracking-tight text-foreground">
+            Overview
+          </h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Welcome back. Here is what is happening today.
+          </p>
+        </div>
       </div>
+
+      {/* Metrics row */}
       <DashboardMetrics />
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Charts row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <PerformanceChart />
         </div>
-        <div className="flex flex-col gap-6">
+        <div className="flex flex-col gap-4">
           <SubjectDistribution />
           <QuickActions />
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* Tables row */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2">
           <TopQuizzes />
         </div>
-        <div className="flex flex-col gap-6">
-          <TopStudents />
-        </div>
+        <TopStudents />
       </div>
 
+      {/* Activity */}
       <RecentActivity />
     </DashboardLayout>
   );

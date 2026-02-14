@@ -25,147 +25,117 @@ import { ProfileSettingsCard } from "@/components/settings/profile-settings";
 export default function SettingsPage() {
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Settings</h1>
+      {/* Page header */}
+      <div>
+        <h1 className="text-2xl font-bold font-oswald tracking-tight text-foreground">Settings</h1>
+        <p className="text-sm text-muted-foreground mt-0.5">Manage your account and preferences.</p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="lg:col-span-2 flex flex-col gap-4">
           <ProfileSettingsCard />
 
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-chart-2/10 rounded-lg">
-                  <Bell className="h-5 w-5 text-chart-2" />
+          {/* Notifications */}
+          <Card className="rounded-xl">
+            <CardHeader className="px-4 pt-4 pb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-md bg-chart-2/10">
+                  <Bell className="h-4 w-4 text-chart-2" />
                 </div>
                 <div>
-                  <CardTitle className="text-foreground">
-                    Notifications
-                  </CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Configure alert preferences
-                  </CardDescription>
+                  <CardTitle className="text-sm font-medium text-foreground">Notifications</CardTitle>
+                  <CardDescription className="text-xs text-muted-foreground">Configure alert preferences</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+            <CardContent className="px-4 pb-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between p-2.5 bg-secondary/50 rounded-lg">
                 <div>
-                  <p className="text-foreground text-sm font-medium">
-                    Email Notifications
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Receive updates via email
-                  </p>
+                  <p className="text-foreground text-sm font-medium">Email Notifications</p>
+                  <p className="text-[11px] text-muted-foreground">Receive updates via email</p>
                 </div>
                 <Switch defaultChecked />
               </div>
-              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+              <div className="flex items-center justify-between p-2.5 bg-secondary/50 rounded-lg">
                 <div>
-                  <p className="text-foreground text-sm font-medium">
-                    New Student Alerts
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Get notified when students sign up
-                  </p>
+                  <p className="text-foreground text-sm font-medium">New Student Alerts</p>
+                  <p className="text-[11px] text-muted-foreground">Get notified when students sign up</p>
                 </div>
                 <Switch defaultChecked />
               </div>
-              <div className="flex items-center justify-between p-3 bg-secondary/50 rounded-lg">
+              <div className="flex items-center justify-between p-2.5 bg-secondary/50 rounded-lg">
                 <div>
-                  <p className="text-foreground text-sm font-medium">
-                    Bug Report Alerts
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Immediate notification for bug reports
-                  </p>
+                  <p className="text-foreground text-sm font-medium">Bug Report Alerts</p>
+                  <p className="text-[11px] text-muted-foreground">Immediate notification for bug reports</p>
                 </div>
                 <Switch />
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-chart-4/10 rounded-lg">
-                  <Shield className="h-5 w-5 text-chart-4" />
+          {/* Security */}
+          <Card className="rounded-xl">
+            <CardHeader className="px-4 pt-4 pb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-md bg-chart-4/10">
+                  <Shield className="h-4 w-4 text-chart-4" />
                 </div>
                 <div>
-                  <CardTitle className="text-foreground">Security</CardTitle>
-                  <CardDescription className="text-muted-foreground">
-                    Manage security settings
-                  </CardDescription>
+                  <CardTitle className="text-sm font-medium text-foreground">Security</CardTitle>
+                  <CardDescription className="text-xs text-muted-foreground">Manage security settings</CardDescription>
                 </div>
               </div>
             </CardHeader>
-            <CardContent className="space-y-4">
+            <CardContent className="px-4 pb-4 flex flex-col gap-3">
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block">
-                  Current Password
-                </Label>
-                <Input
-                  type="password"
-                  placeholder="Enter current password"
-                  className="bg-secondary border-border"
-                />
+                <Label className="text-xs text-muted-foreground mb-1.5 block">Current Password</Label>
+                <Input type="password" placeholder="Enter current password" className="bg-secondary border-border h-9 text-sm" />
               </div>
               <div>
-                <Label className="text-sm text-muted-foreground mb-2 block">
-                  New Password
-                </Label>
-                <Input
-                  type="password"
-                  placeholder="Enter new password"
-                  className="bg-secondary border-border"
-                />
+                <Label className="text-xs text-muted-foreground mb-1.5 block">New Password</Label>
+                <Input type="password" placeholder="Enter new password" className="bg-secondary border-border h-9 text-sm" />
               </div>
-              <Button>Update Password</Button>
+              <Button size="sm" className="w-fit">Update Password</Button>
             </CardContent>
           </Card>
         </div>
 
-        <div className="space-y-6">
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-chart-3/10 rounded-lg">
-                  <Palette className="h-5 w-5 text-chart-3" />
+        <div className="flex flex-col gap-4">
+          {/* Appearance */}
+          <Card className="rounded-xl">
+            <CardHeader className="px-4 pt-4 pb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-md bg-chart-3/10">
+                  <Palette className="h-4 w-4 text-chart-3" />
                 </div>
-                <CardTitle className="text-foreground">Appearance</CardTitle>
+                <CardTitle className="text-sm font-medium text-foreground">Appearance</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <button className="w-full p-3 bg-secondary border-2 border-primary rounded-lg text-left">
+            <CardContent className="px-4 pb-4 flex flex-col gap-2">
+              <button className="w-full p-2.5 bg-secondary border-2 border-primary rounded-lg text-left">
                 <p className="text-foreground text-sm font-medium">Dark Mode</p>
-                <p className="text-xs text-muted-foreground">
-                  Currently active
-                </p>
+                <p className="text-[11px] text-muted-foreground">Currently active</p>
               </button>
-              <button className="w-full p-3 bg-secondary border border-border rounded-lg text-left hover:border-muted-foreground transition-colors">
-                <p className="text-foreground text-sm font-medium">
-                  Light Mode
-                </p>
-                <p className="text-xs text-muted-foreground">
-                  Switch to light theme
-                </p>
+              <button className="w-full p-2.5 bg-secondary border border-border rounded-lg text-left hover:border-muted-foreground transition-colors">
+                <p className="text-foreground text-sm font-medium">Light Mode</p>
+                <p className="text-[11px] text-muted-foreground">Switch to light theme</p>
               </button>
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-chart-5/10 rounded-lg">
-                  <Globe className="h-5 w-5 text-chart-5" />
+          {/* Language */}
+          <Card className="rounded-xl">
+            <CardHeader className="px-4 pt-4 pb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-md bg-chart-5/10">
+                  <Globe className="h-4 w-4 text-chart-5" />
                 </div>
-                <CardTitle className="text-foreground">Language</CardTitle>
+                <CardTitle className="text-sm font-medium text-foreground">Language</CardTitle>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 pb-4">
               <Select defaultValue="en-us">
-                <SelectTrigger className="bg-secondary border-border">
+                <SelectTrigger className="bg-secondary border-border h-9 text-sm">
                   <SelectValue placeholder="Select language" />
                 </SelectTrigger>
                 <SelectContent>
@@ -178,22 +148,19 @@ export default function SettingsPage() {
             </CardContent>
           </Card>
 
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-destructive/10 rounded-lg">
-                  <Database className="h-5 w-5 text-destructive" />
+          {/* Data */}
+          <Card className="rounded-xl">
+            <CardHeader className="px-4 pt-4 pb-2">
+              <div className="flex items-center gap-2.5">
+                <div className="p-1.5 rounded-md bg-destructive/10">
+                  <Database className="h-4 w-4 text-destructive" />
                 </div>
-                <CardTitle className="text-foreground">Data</CardTitle>
+                <CardTitle className="text-sm font-medium text-foreground">Data</CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="space-y-3">
-              <Button variant="secondary" className="w-full">
-                Export All Data
-              </Button>
-              <Button variant="destructive" className="w-full">
-                Delete Account
-              </Button>
+            <CardContent className="px-4 pb-4 flex flex-col gap-2">
+              <Button variant="secondary" size="sm" className="w-full">Export All Data</Button>
+              <Button variant="destructive" size="sm" className="w-full">Delete Account</Button>
             </CardContent>
           </Card>
         </div>
