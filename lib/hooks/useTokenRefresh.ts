@@ -18,22 +18,23 @@ export function useTokenRefresh(): UseTokenRefreshReturn {
     setError(null);
   }, []);
 
-  const refresh = useCallback(async (): Promise<RefreshTokenResponse | null> => {
-    setRefreshing(true);
-    setError(null);
-    try {
-      const result = await refreshAccessToken();
-      return result;
-    } catch (err) {
-      const message =
-        err instanceof Error ? err.message : "Failed to refresh token";
-      setError(message);
-      console.error("Token refresh error:", err);
-      return null;
-    } finally {
-      setRefreshing(false);
-    }
-  }, []);
+  const refresh =
+    useCallback(async (): Promise<RefreshTokenResponse | null> => {
+      setRefreshing(true);
+      setError(null);
+      try {
+        const result = await refreshAccessToken();
+        return result;
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Failed to refresh token";
+        setError(message);
+        console.error("Token refresh error:", err);
+        return null;
+      } finally {
+        setRefreshing(false);
+      }
+    }, []);
 
   return {
     refreshing,
