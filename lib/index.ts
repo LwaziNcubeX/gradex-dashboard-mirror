@@ -7,7 +7,6 @@ export type { TokenResponse } from "./cookie-manager";
 
 // API services exports
 export { questionService } from "./api/questions";
-export type { QuestionService } from "./api/questions";
 export { quizService } from "./api/quizzes";
 export type { QuizType } from "./api/quizzes";
 
