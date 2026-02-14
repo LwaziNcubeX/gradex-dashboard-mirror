@@ -12,8 +12,13 @@ import {
 } from "@/components/ui/input-otp";
 import { Shield, ArrowLeft, Loader2, Mail, Lock } from "lucide-react";
 
+interface TokenResponse {
+  access_token: string;
+  refresh_token: string;
+}
+
 interface ResponseType {
-  data: Record<string, unknown>;
+  data: TokenResponse;
   message: string;
   success: boolean;
 }
@@ -21,7 +26,7 @@ interface ResponseType {
 export function AdminLoginForm({
   saveAuth,
 }: {
-  saveAuth: (data: Record<string, unknown>) => Promise<void>;
+  saveAuth: (data: TokenResponse) => Promise<void>;
 }) {
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");

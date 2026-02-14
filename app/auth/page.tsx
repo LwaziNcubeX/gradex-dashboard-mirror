@@ -2,59 +2,29 @@
 import { GridBackground } from "@/components/auth/grid-background";
 import { AdminLoginForm } from "@/components/auth/login-form";
 import { saveAuth } from "@/lib/api";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
-interface ResponseType {
-  data: {};
-  message: string;
-  success: boolean;
-}
+const AuthPage = () => {
+  const router = useRouter();
 
-const page = () => {
-  const [email, setEmail] = useState("");
-  const [otp, setOtp] = useState("");
-  const [message, setMessage] = useState("");
-  const [emailSent, setEmailSent] = useState(false);
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://0.0.0.0:8000/auth/request-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
-
-      const data: ResponseType = await response.json();
-      if (data.message) {
-        setEmailSent(true);
+  useEffect(() => {
+    // Check if already authenticated, redirect to dashboard
+    const checkAuth = async () => {
+      try {
+        const response = await fetch("/api/auth/check", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (response.ok) {
+          router.push("/");
+        }
+      } catch (error) {
+        console.error("Auth check error:", error);
       }
-      setMessage(data.message);
-    } catch (error) {
-      void error;
-      setMessage("Error requesting otp");
-    }
-  };
-
-  const handleOtpSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const response = await fetch("http://0.0.0.0:8000/auth", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, otp }),
-      });
-
-      const data = await response.json();
-      setMessage(data.message);
-      if (data.success) {
-        await saveAuth(data.data);
-      }
-    } catch (error) {
-      void error;
-      setMessage("Error verifying OTP");
-    }
-  };
+    };
+    checkAuth();
+  }, [router]);
 
   return (
     <div>
@@ -78,4 +48,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default AuthPage;

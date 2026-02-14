@@ -15,10 +15,20 @@ export async function saveAuth(data: TokenResponse): Promise<void> {
 }
 
 /**
- * Logout user by clearing all tokens
+ * Logout user by clearing all tokens and calling logout API
  */
-export function logoutUser(): void {
+export async function logoutUser(): Promise<void> {
   try {
+    // Call logout API to clear server-side session
+    await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include",
+    }).catch((error) => {
+      console.error("Failed to call logout API:", error);
+      // Continue with client-side logout even if API call fails
+    });
+
+    // Clear client-side tokens
     cookies.clearTokens();
   } catch (error) {
     console.error("Logout failed:", error);
