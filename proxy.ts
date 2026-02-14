@@ -32,7 +32,7 @@ function getAccessToken(request: NextRequest): string | null {
  * Middleware function for route protection
  * Handles authentication and redirects
  */
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
 
   // Public routes that don't require authentication
