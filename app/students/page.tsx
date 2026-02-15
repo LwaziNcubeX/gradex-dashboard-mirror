@@ -161,14 +161,14 @@ export default function StudentsPage() {
           return (
             <Card
               key={metric.label}
-              className="rounded-xl border-border/50 py-0"
+              className="rounded-xl border-border/50 py-3"
             >
               <CardContent className="p-3 flex items-center gap-2.5">
                 <div className={`p-1.5 rounded-md ${colors.bg}`}>
                   <metric.icon className={`h-4 w-4 ${colors.text}`} />
                 </div>
                 <div>
-                  <p className="text-[11px] text-muted-foreground">
+                  <p className="text-sm text-muted-foreground">
                     {metric.label}
                   </p>
                   <p className="text-lg font-bold text-foreground leading-tight">
@@ -183,9 +183,9 @@ export default function StudentsPage() {
 
       {/* Students table */}
       <Card className="rounded-xl">
-        <CardHeader className="px-4 pt-4 pb-3">
+        <CardHeader className="px-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-            <CardTitle className="text-sm font-medium text-foreground">
+            <CardTitle className="text-mg font-medium text-foreground">
               All Students
             </CardTitle>
             <div className="relative w-full sm:w-64">
@@ -195,12 +195,12 @@ export default function StudentsPage() {
                 placeholder="Search students..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-8 pl-9 pr-3 rounded-lg bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                className="w-full h-10 pl-9 pr-3 rounded-lg bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
               />
             </div>
           </div>
         </CardHeader>
-        <CardContent className="px-4 pb-4">
+        <CardContent className="px-4">
           <div className="overflow-x-auto">
             <Table>
               <TableHeader>
