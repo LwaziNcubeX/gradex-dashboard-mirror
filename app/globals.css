@@ -1,29 +1,27 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-@custom-variant dark (&:is(.dark *));
-
 :root {
   --font-oswald: "Oswald", "Arial Black", "Helvetica Neue", Arial, sans-serif;
 
   --background: oklch(0% 0 0);
   --foreground: oklch(0.9851 0 0);
-  --card: oklch(0% 0 0);
+  --card: oklch(14.1% 0.005 285.823);
   --card-foreground: oklch(0.9851 0 0);
   --popover: oklch(0% 0 0);
   --popover-foreground: oklch(0.9851 0 0);
   --primary: oklch(0.6959 0.1491 162.4796);
   --primary-foreground: oklch(0.9851 0 0);
-  --secondary: oklch(17.491% 0.00823 285.492);
+  --secondary: oklch(14.1% 0.005 285.823);
   --secondary-foreground: oklch(0.9851 0 0);
-  --muted: oklch(17.491% 0.00823 285.492);
+  --muted: oklch(14.1% 0.005 285.823);
   --muted-foreground: oklch(0.7118 0.0129 286.0665);
-  --accent: oklch(17.491% 0.00823 285.492);
+  --accent: oklch(14.1% 0.005 285.823);
   --accent-foreground: oklch(0.9851 0 0);
   --destructive: oklch(0.6368 0.2078 25.3313);
   --destructive-foreground: oklch(0.9851 0 0);
-  --border: oklch(17.491% 0.00823 285.492);
-  --input: oklch(17.491% 0.00823 285.492);
+  --border: oklch(14.1% 0.005 285.823);
+  --input: oklch(14.1% 0.005 285.823);
   --ring: oklch(0.6959 0.1491 162.4796);
   --chart-1: oklch(0.6959 0.1491 162.4796);
   --chart-2: oklch(0.5854 0.2041 277.1173);

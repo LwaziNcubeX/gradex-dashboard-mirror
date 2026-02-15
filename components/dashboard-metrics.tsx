@@ -7,6 +7,8 @@ import {
   TrendingUp,
   Target,
   Clock,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -15,7 +17,7 @@ const metrics = [
     label: "Active Students",
     value: "12,847",
     change: "+12.5%",
-    trend: "up",
+    trend: "up" as const,
     icon: Users,
     color: "primary",
   },
@@ -23,7 +25,7 @@ const metrics = [
     label: "Total Questions",
     value: "3,492",
     change: "+248",
-    trend: "up",
+    trend: "up" as const,
     icon: BookOpen,
     color: "chart-2",
   },
@@ -31,7 +33,7 @@ const metrics = [
     label: "Quizzes Completed",
     value: "48,392",
     change: "+8.3%",
-    trend: "up",
+    trend: "up" as const,
     icon: Trophy,
     color: "chart-3",
   },
@@ -39,7 +41,7 @@ const metrics = [
     label: "Avg. Score",
     value: "78.5%",
     change: "+2.1%",
-    trend: "up",
+    trend: "up" as const,
     icon: Target,
     color: "chart-4",
   },
@@ -47,7 +49,7 @@ const metrics = [
     label: "Completion Rate",
     value: "92.3%",
     change: "+1.8%",
-    trend: "up",
+    trend: "up" as const,
     icon: TrendingUp,
     color: "chart-1",
   },
@@ -55,7 +57,7 @@ const metrics = [
     label: "Avg. Time/Quiz",
     value: "4m 32s",
     change: "-12s",
-    trend: "up",
+    trend: "up" as const,
     icon: Clock,
     color: "chart-5",
   },
@@ -97,31 +99,36 @@ const colorClasses: Record<string, { bg: string; text: string; icon: string }> =
 
 export function DashboardMetrics() {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {metrics.map((metric) => {
         const colors = colorClasses[metric.color];
         return (
           <Card
             key={metric.label}
-            className="rounded-xl hover:border-accent transition-colors py-4"
+            className="rounded-xl border-border/50 hover:border-border transition-colors py-0"
           >
-            <CardContent className="p-4 pt-0">
-              <div className="flex items-center justify-between mb-3">
-                <div className={`p-2 rounded-lg ${colors.bg}`}>
-                  <metric.icon className={`h-4 w-4 ${colors.icon}`} />
+            <CardContent className="p-3">
+              <div className="flex items-center justify-between mb-2">
+                <div className={`p-1.5 rounded-md ${colors.bg}`}>
+                  <metric.icon className={`h-3.5 w-3.5 ${colors.icon}`} />
                 </div>
-                <span className={`text-xs font-medium ${colors.text}`}>
+                <span
+                  className={`flex items-center gap-0.5 text-xs font-medium ${colors.text}`}
+                >
+                  {metric.trend === "up" ? (
+                    <ArrowUp className="h-3 w-3" />
+                  ) : (
+                    <ArrowDown className="h-3 w-3" />
+                  )}
                   {metric.change}
                 </span>
               </div>
-              <div>
-                <p className="text-2xl font-bold text-foreground">
-                  {metric.value}
-                </p>
-                <p className="text-xs text-muted-foreground mt-1">
-                  {metric.label}
-                </p>
-              </div>
+              <p className="text-xl font-bold text-foreground leading-none">
+                {metric.value}
+              </p>
+              <p className="text-[11px] text-muted-foreground mt-1">
+                {metric.label}
+              </p>
             </CardContent>
           </Card>
         );

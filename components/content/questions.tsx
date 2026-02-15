@@ -317,7 +317,7 @@ const Questions = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedQuestions, setSelectedQuestions] = useState<Set<string>>(
-    new Set()
+    new Set(),
   );
 
   const ITEMS_PER_PAGE = 20;
@@ -614,7 +614,7 @@ const Questions = () => {
                       <td className="py-3 px-4">
                         <span
                           className={`text-xs px-2 py-1 rounded ${getDifficultyColor(
-                            q.difficulty
+                            q.difficulty,
                           )}`}
                         >
                           {q.difficulty}
@@ -627,7 +627,7 @@ const Questions = () => {
                       <td className="py-3 px-4 text-sm text-foreground rounded-b-md justify-center items-center">
                         <a
                           className={`${getStatusColor(
-                            q.status
+                            q.status,
                           )} p-1 text-center justify-center`}
                         >
                           {q.status}
@@ -676,7 +676,7 @@ const Questions = () => {
                     >
                       {page}
                     </button>
-                  )
+                  ),
                 )}
               </div>
               <Button

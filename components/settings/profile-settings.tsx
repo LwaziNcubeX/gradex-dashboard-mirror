@@ -51,7 +51,7 @@ export function ProfileSettingsCard() {
       setTimeout(() => setSaveMessage(""), 3000);
     } catch (err) {
       setSaveMessage(
-        err instanceof Error ? err.message : "Failed to update profile"
+        err instanceof Error ? err.message : "Failed to update profile",
       );
     } finally {
       setIsSaving(false);

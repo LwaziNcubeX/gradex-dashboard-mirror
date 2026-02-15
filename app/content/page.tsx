@@ -3,6 +3,23 @@
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   HelpCircle,
   FileQuestion,
@@ -12,16 +29,10 @@ import {
   Edit,
   Trash2,
   Copy,
+  Search,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import Questions from "@/components/content/questions";
 
-// Sample data for quizzes
 const quizzes = [
   {
     id: 1,
@@ -85,7 +96,6 @@ const quizzes = [
   },
 ];
 
-// Sample data for levels
 const levels = [
   {
     id: 1,
@@ -133,312 +143,320 @@ function ActionMenu() {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <button className="p-1 hover:bg-accent rounded transition-colors">
+        <Button variant="ghost" size="icon" className="h-7 w-7">
           <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-        </button>
+        </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="bg-secondary border-border">
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Edit className="h-4 w-4 mr-2" /> Edit
+      <DropdownMenuContent align="end" className="bg-card border-border">
+        <DropdownMenuItem className="cursor-pointer">
+          <Edit className="h-3.5 w-3.5 mr-2" /> Edit
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Copy className="h-4 w-4 mr-2" /> Duplicate
+        <DropdownMenuItem className="cursor-pointer">
+          <Copy className="h-3.5 w-3.5 mr-2" /> Duplicate
         </DropdownMenuItem>
-        <DropdownMenuItem className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer">
-          <Trash2 className="h-4 w-4 mr-2" /> Delete
+        <DropdownMenuItem className="text-destructive focus:text-destructive cursor-pointer">
+          <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
 }
 
+function MetricCard({
+  icon: Icon,
+  label,
+  value,
+  color,
+}: {
+  icon: React.ComponentType<{ className?: string }>;
+  label: string;
+  value: string;
+  color: string;
+}) {
+  const colorMap: Record<string, { bg: string; text: string }> = {
+    primary: { bg: "bg-primary/10", text: "text-primary" },
+    "chart-2": { bg: "bg-chart-2/10", text: "text-chart-2" },
+    "chart-3": { bg: "bg-chart-3/10", text: "text-chart-3" },
+    "chart-5": { bg: "bg-chart-5/10", text: "text-chart-5" },
+  };
+  const colors = colorMap[color] || colorMap.primary;
+
+  return (
+    <Card className="rounded-xl border-border/50 py-0">
+      <CardContent className="p-3 flex items-center gap-2.5">
+        <div className={`p-1.5 rounded-md ${colors.bg}`}>
+          <Icon className={`h-4 w-4 ${colors.text}`} />
+        </div>
+        <div>
+          <p className="text-[11px] text-muted-foreground">{label}</p>
+          <p className="text-lg font-bold text-foreground leading-tight">
+            {value}
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function ContentPage() {
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between pl-2">
-        <h1 className="text-4xl font-bold font-oswald">Content Management</h1>
+      {/* Page header */}
+      <div>
+        <h1 className="text-2xl font-bold font-oswald tracking-tight text-foreground">
+          Content Management
+        </h1>
+        <p className="text-sm text-muted-foreground mt-0.5">
+          Manage questions, quizzes, and learning levels.
+        </p>
       </div>
 
-      <Tabs defaultValue="questions" className="space-y-6">
-        <TabsList className="bg-background border border-border p-1">
-          <TabsTrigger
-            value="questions"
-            className="data-[state=active]:bg-secondary data-[state=active]:text-white text-muted-foreground"
-          >
+      <Tabs defaultValue="questions" className="flex flex-col gap-4">
+        <TabsList className="bg-secondary w-fit">
+          <TabsTrigger value="questions" className="text-xs">
             Questions
           </TabsTrigger>
-          <TabsTrigger
-            value="quizzes"
-            className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-muted-foreground"
-          >
+          <TabsTrigger value="quizzes" className="text-xs">
             Quizzes
           </TabsTrigger>
-          <TabsTrigger
-            value="levels"
-            className="data-[state=active]:bg-secondary data-[state=active]:text-primary text-muted-foreground"
-          >
+          <TabsTrigger value="levels" className="text-xs">
             Levels
           </TabsTrigger>
         </TabsList>
 
         {/* Questions Tab */}
-        <TabsContent value="questions">
+        <TabsContent value="questions" className="mt-0">
           <Questions />
         </TabsContent>
 
         {/* Quizzes Tab */}
-        <TabsContent value="quizzes" className="space-y-6">
+        <TabsContent value="quizzes" className="mt-0 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <p className="text-muted-foreground">
-              Manage quizzes - collections of questions that can be standalone
-              or part of a level
+            <p className="text-sm text-muted-foreground">
+              Collections of questions that can be standalone or part of a
+              level.
             </p>
-            <button className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium transition-colors">
-              <Plus className="h-4 w-4" /> Create Quiz
-            </button>
+            <Button
+              size="sm"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4 mr-1.5" /> Create Quiz
+            </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Quizzes</p>
-                  <p className="text-2xl font-bold text-foreground">156</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-chart-2/10 rounded-lg">
-                  <Layers className="h-6 w-6 text-chart-2" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">In Levels</p>
-                  <p className="text-2xl font-bold text-foreground">98</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-chart-3/10 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-chart-3" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Standalone</p>
-                  <p className="text-2xl font-bold text-foreground">58</p>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <MetricCard
+              icon={HelpCircle}
+              label="Total Quizzes"
+              value="156"
+              color="primary"
+            />
+            <MetricCard
+              icon={Layers}
+              label="In Levels"
+              value="98"
+              color="chart-2"
+            />
+            <MetricCard
+              icon={HelpCircle}
+              label="Standalone"
+              value="58"
+              color="chart-3"
+            />
           </div>
 
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="text-foreground">All Quizzes</CardTitle>
+          <Card className="rounded-xl">
+            <CardHeader className="px-4 pt-4 pb-3">
+              <div className="flex items-center justify-between">
+                <CardTitle className="text-sm font-medium text-foreground">
+                  All Quizzes
+                </CardTitle>
+                <div className="relative w-56">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search quizzes..."
+                    className="w-full h-8 pl-9 pr-3 rounded-lg bg-secondary border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring"
+                  />
+                </div>
+              </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 pb-4">
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="text-muted-foreground font-medium text-xs">
                         Quiz Name
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden sm:table-cell">
                         Subject
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                        Questions
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right">
+                        Qs
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right">
                         Attempts
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                        Avg Score
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right">
+                        Score
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden md:table-cell">
                         Level
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                      </TableHead>
+                      <TableHead className="w-8"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {quizzes.map((quiz) => (
-                      <tr
-                        key={quiz.id}
-                        className="border-b border-border hover:bg-secondary/50 transition-colors"
-                      >
-                        <td className="py-3 px-4 text-sm text-foreground font-medium">
+                      <TableRow key={quiz.id} className="border-border group">
+                        <TableCell className="py-2.5 font-medium text-foreground text-sm">
                           {quiz.name}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-muted-foreground">
+                        </TableCell>
+                        <TableCell className="py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
                           {quiz.subject}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-foreground">
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums">
                           {quiz.questions}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-foreground">
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums">
                           {quiz.attempts.toLocaleString()}
-                        </td>
-                        <td className="py-3 px-4">
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right">
                           <span
-                            className={`text-sm font-medium ${
-                              quiz.avgScore >= 80
-                                ? "text-chart-1"
-                                : quiz.avgScore >= 70
-                                ? "text-chart-3"
-                                : "text-destructive"
-                            }`}
+                            className={`text-sm font-medium tabular-nums ${quiz.avgScore >= 80 ? "text-chart-1" : quiz.avgScore >= 70 ? "text-chart-3" : "text-destructive"}`}
                           >
                             {quiz.avgScore}%
                           </span>
-                        </td>
-                        <td className="py-3 px-4">
+                        </TableCell>
+                        <TableCell className="py-2.5 hidden md:table-cell">
                           {quiz.inLevel ? (
-                            <span className="text-xs px-2 py-1 rounded bg-chart-2/10 text-chart-2">
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] px-1.5 py-0 bg-chart-2/10 text-chart-2 border-chart-2/20"
+                            >
                               {quiz.levelName}
-                            </span>
+                            </Badge>
                           ) : (
-                            <span className="text-xs px-2 py-1 rounded bg-secondary text-muted-foreground">
+                            <Badge
+                              variant="secondary"
+                              className="text-[10px] px-1.5 py-0"
+                            >
                               Standalone
-                            </span>
+                            </Badge>
                           )}
-                        </td>
-                        <td className="py-3 px-4">
+                        </TableCell>
+                        <TableCell className="py-2.5">
                           <ActionMenu />
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>
         </TabsContent>
 
         {/* Levels Tab */}
-        <TabsContent value="levels" className="space-y-6">
+        <TabsContent value="levels" className="mt-0 flex flex-col gap-4">
           <div className="flex items-center justify-between">
-            <p className="text-muted-foreground">
-              Manage levels - structured learning paths containing multiple
-              quizzes
+            <p className="text-sm text-muted-foreground">
+              Structured learning paths containing multiple quizzes.
             </p>
-            <button className="flex items-center gap-2 px-4 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-sm font-medium transition-colors">
-              <Plus className="h-4 w-4" /> Create Level
-            </button>
+            <Button
+              size="sm"
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              <Plus className="h-4 w-4 mr-1.5" /> Create Level
+            </Button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-primary/10 rounded-lg">
-                  <Layers className="h-6 w-6 text-primary" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Levels</p>
-                  <p className="text-2xl font-bold text-foreground">24</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-chart-2/10 rounded-lg">
-                  <HelpCircle className="h-6 w-6 text-chart-2" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">Total Quizzes</p>
-                  <p className="text-2xl font-bold text-foreground">98</p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="bg-card border-border">
-              <CardContent className="p-4 flex items-center gap-4">
-                <div className="p-3 bg-chart-5/10 rounded-lg">
-                  <FileQuestion className="h-6 w-6 text-chart-5" />
-                </div>
-                <div>
-                  <p className="text-sm text-muted-foreground">
-                    Total Questions
-                  </p>
-                  <p className="text-2xl font-bold text-foreground">1,450</p>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <MetricCard
+              icon={Layers}
+              label="Total Levels"
+              value="24"
+              color="primary"
+            />
+            <MetricCard
+              icon={HelpCircle}
+              label="Total Quizzes"
+              value="98"
+              color="chart-2"
+            />
+            <MetricCard
+              icon={FileQuestion}
+              label="Total Questions"
+              value="1,450"
+              color="chart-5"
+            />
           </div>
 
-          <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="text-foreground">All Levels</CardTitle>
+          <Card className="rounded-xl">
+            <CardHeader className="px-4 pt-4 pb-3">
+              <CardTitle className="text-sm font-medium text-foreground">
+                All Levels
+              </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-4 pb-4">
               <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="text-muted-foreground font-medium text-xs">
                         Level Name
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right">
                         Quizzes
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right hidden sm:table-cell">
                         Questions
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right hidden sm:table-cell">
                         Students
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground">
-                        Completion Rate
-                      </th>
-                      <th className="text-left py-3 px-4 text-sm font-medium text-muted-foreground"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs">
+                        Completion
+                      </TableHead>
+                      <TableHead className="w-8"></TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
                     {levels.map((level) => (
-                      <tr
-                        key={level.id}
-                        className="border-b border-border hover:bg-secondary/50 transition-colors"
-                      >
-                        <td className="py-3 px-4 text-sm text-foreground font-medium">
+                      <TableRow key={level.id} className="border-border group">
+                        <TableCell className="py-2.5 font-medium text-foreground text-sm">
                           {level.name}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-foreground">
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums">
                           {level.quizzes}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-foreground">
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums hidden sm:table-cell">
                           {level.totalQuestions}
-                        </td>
-                        <td className="py-3 px-4 text-sm text-foreground">
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums hidden sm:table-cell">
                           {level.students.toLocaleString()}
-                        </td>
-                        <td className="py-3 px-4">
+                        </TableCell>
+                        <TableCell className="py-2.5">
                           <div className="flex items-center gap-2">
-                            <div className="w-24 h-2 bg-secondary rounded-full overflow-hidden">
-                              <div
-                                className={`h-full rounded-full ${
-                                  level.completionRate >= 70
-                                    ? "bg-chart-1"
-                                    : level.completionRate >= 50
-                                    ? "bg-chart-3"
-                                    : "bg-destructive"
-                                }`}
-                                style={{ width: `${level.completionRate}%` }}
-                              />
-                            </div>
-                            <span className="text-sm text-foreground">
+                            <Progress
+                              value={level.completionRate}
+                              className="h-1.5 w-20 bg-secondary"
+                            />
+                            <span
+                              className={`text-xs font-medium tabular-nums ${level.completionRate >= 70 ? "text-chart-1" : level.completionRate >= 50 ? "text-chart-3" : "text-destructive"}`}
+                            >
                               {level.completionRate}%
                             </span>
                           </div>
-                        </td>
-                        <td className="py-3 px-4">
+                        </TableCell>
+                        <TableCell className="py-2.5">
                           <ActionMenu />
-                        </td>
-                      </tr>
+                        </TableCell>
+                      </TableRow>
                     ))}
-                  </tbody>
-                </table>
+                  </TableBody>
+                </Table>
               </div>
             </CardContent>
           </Card>

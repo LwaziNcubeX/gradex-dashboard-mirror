@@ -1,26 +1,30 @@
+"use client";
+
 import type React from "react";
+import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
-import { Header } from "@/components/header";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
+
   return (
-    <div className="relative h-screen w-full bg-background text-foreground overflow-hidden">
-      <div className="h-full overflow-y-auto no-scrollbar">
-        <main className="flex gap-6 p-6 pt-12 min-h-full ">
-          <Sidebar />
+    <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
+      {/* Desktop sidebar */}
+      <div className="ml-2">
+        <Sidebar />
+      </div>
 
-          <div className="flex-1 flex flex-col gap-6 p-4 rounded-3xl min-w-0 bg-secondary">
-            {children}
+      {/* Main area: header + content */}
+      <div className="flex flex-1 flex-col min-w-0">
+        {/* <Header onMobileMenuToggle={() => setMobileNavOpen(true)} /> */}
 
-            <div className="flex items-center justify-end gap-2 mt-4">
-              <div className="w-3.25 h-3.25 rounded-full bg-primary" />
-              <span className="text-sm text-muted-foreground">
-                System Online
-              </span>
-            </div>
-          </div>
+        <main className="flex-1 overflow-y-auto no-scrollbar">
+          <div className="flex flex-col gap-4 p-4 md:p-6">{children}</div>
         </main>
       </div>
+
+      {/* Mobile navigation drawer */}
+      {/* <MobileNav open={mobileNavOpen} onOpenChange={setMobileNavOpen} /> */}
     </div>
   );
 }
