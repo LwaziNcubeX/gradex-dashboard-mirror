@@ -27,7 +27,7 @@ export default function SettingsPage() {
     <DashboardLayout>
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold font-oswald tracking-tight text-foreground">
+        <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
           Settings
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">

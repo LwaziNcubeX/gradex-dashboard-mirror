@@ -203,7 +203,7 @@ export default function ContentPage() {
     <DashboardLayout>
       {/* Page header */}
       <div>
-        <h1 className="text-2xl font-bold font-oswald tracking-tight text-foreground">
+        <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
           Content Management
         </h1>
         <p className="text-sm text-muted-foreground mt-0.5">
