@@ -201,16 +201,6 @@ function MetricCard({
 export default function ContentPage() {
   return (
     <DashboardLayout>
-      {/* Page header */}
-      <div>
-        <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
-          Content Management
-        </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Manage questions, quizzes, and learning levels.
-        </p>
-      </div>
-
       <Tabs defaultValue="questions" className="flex flex-col gap-4">
         <TabsList className="bg-secondary w-fit">
           <TabsTrigger value="questions" className="text-xs">

@@ -16,6 +16,7 @@ import {
   Trash2,
   LogOut,
   Settings,
+  Settings2,
 } from "lucide-react";
 import { Avatar, AvatarImage } from "@/ui/avatar";
 import {
@@ -31,10 +32,13 @@ const navItems = [
   { icon: Layers, label: "CONTENT", href: "/content" },
   { icon: ActivityIcon, label: "ANALYTICS", href: "/analytics" },
   { icon: CreditCard, label: "FINANCE", href: "/finance" },
+  { icon: Settings2, label: "SETTINGS", href: "/settings" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
+  const bottomItems = navItems[navItems.length - 1];
+  const topItems = navItems.slice(0, -1);
 
   return (
     <aside
@@ -42,7 +46,7 @@ export function Sidebar() {
       }`}
     >
       <nav className="flex flex-col gap-6 pt-3">
-        {navItems.map((item) => (
+        {topItems.map((item) => (
           <NavItem
             key={item.href}
             icon={item.icon}
@@ -56,7 +60,18 @@ export function Sidebar() {
       </nav>
 
       <div className="mt-auto pt-6 border-t border-border flex flex-col gap-6">
-        <AvatarMenu />
+        <div>
+          <NavItem
+            key={bottomItems.href}
+            icon={bottomItems.icon}
+            label={bottomItems.label}
+            href={bottomItems.href}
+            active={
+              pathname === bottomItems.href ||
+              pathname.startsWith(bottomItems.href + "/")
+            }
+          />
+        </div>
       </div>
     </aside>
   );
@@ -89,7 +104,7 @@ function AvatarMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar>
-          <AvatarImage src="profile.png" />
+          <AvatarImage src="profile.webp" />
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="bg-secondary border-border">

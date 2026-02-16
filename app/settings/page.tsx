@@ -25,16 +25,6 @@ import { ProfileSettingsCard } from "@/components/settings/profile-settings";
 export default function SettingsPage() {
   return (
     <DashboardLayout>
-      {/* Page header */}
-      <div>
-        <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
-          Settings
-        </h1>
-        <p className="text-sm text-muted-foreground mt-0.5">
-          Manage your account and preferences.
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 flex flex-col gap-4">
           <ProfileSettingsCard />

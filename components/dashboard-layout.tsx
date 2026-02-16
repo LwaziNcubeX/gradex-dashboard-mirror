@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 import { Sidebar } from "@/components/sidebar";
+import { Header } from "./header";
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -16,7 +17,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
 
       {/* Main area: header + content */}
       <div className="flex flex-1 flex-col min-w-0">
-        {/* <Header onMobileMenuToggle={() => setMobileNavOpen(true)} /> */}
+        <Header onMobileMenuToggle={() => setMobileNavOpen(true)} />
 
         <main className="flex-1 overflow-y-auto no-scrollbar">
           <div className="flex flex-col gap-4 p-4 md:p-6">{children}</div>

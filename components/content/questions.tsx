@@ -7,6 +7,8 @@ import {
   MoreHorizontal,
   Trash2,
   Trash,
+  CheckCircle,
+  X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/ui/button";
@@ -83,7 +85,7 @@ function FilterDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline" className="flex items-center gap-2">
+        <Button variant="link" className="flex items-center gap-2">
           <Filter className="h-4 w-4" /> Filters
         </Button>
       </DialogTrigger>
@@ -511,45 +513,38 @@ const Questions = () => {
               </span>
             )}
           </div>
-          <FilterDialog
-            filters={filters}
-            onFiltersChange={setFilters}
-            onApply={() => {
-              // Refetch will be triggered by setFilters
-            }}
-          />
+          <div className="flex gap-2">
+            {selectedQuestions.size > 0 && (
+              <div className="flex items-center justify-between">
+                <div className="flex gap-2 items-center">
+                  <div
+                    onClick={() => setSelectedQuestions(new Set())}
+                    className="bg-primary/80 rounded-full w-8 h-8 items-center justify-center flex"
+                  >
+                    <X className="w-4 h-4 text-white" />
+                  </div>
+
+                  <div
+                    onClick={handleDeleteSelected}
+                    className="bg-destructive/80 rounded-full w-8 h-8 items-center justify-center flex"
+                  >
+                    <Trash className="w-4 h-4 text-white" />
+                  </div>
+                </div>
+              </div>
+            )}
+            <FilterDialog
+              filters={filters}
+              onFiltersChange={setFilters}
+              onApply={() => {
+                // Refetch will be triggered by setFilters
+              }}
+            />
+          </div>
         </CardHeader>
 
-        {/* Bulk Actions Bar */}
-        {selectedQuestions.size > 0 && (
-          <div className="px-6 py-3 bg-primary/5 border-t border-b border-border flex items-center justify-between">
-            <div className="text-sm text-foreground">
-              {selectedQuestions.size} question
-              {selectedQuestions.size !== 1 ? "s" : ""} selected
-            </div>
-            <div className="flex gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setSelectedQuestions(new Set())}
-              >
-                Deselect
-              </Button>
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={handleDeleteSelected}
-                disabled={isDeleting}
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                {isDeleting ? "Deleting..." : "Delete Selected"}
-              </Button>
-            </div>
-          </div>
-        )}
-
-        <CardContent>
-          <div className="overflow-x-auto">
+        <CardContent className="pl-0 ml-0">
+          <div className="overflow-x-auto overflow-y-hidden">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
@@ -592,26 +587,28 @@ const Questions = () => {
                   paginatedQuestions.map((q: QuestionType, index) => (
                     <tr
                       key={q._id}
-                      className={`border-b border-border hover:bg-secondary/50 transition-colors ${
+                      className={`border-b border-border transition-colors ${
                         selectedQuestions.has(q._id) ? "bg-primary/5" : ""
                       }`}
+                      onClick={() => handleSelectQuestion(q._id)}
                     >
-                      <td className="py-3 px-4 text-center w-12">
+                      <td className="text-center">
                         <Checkbox
                           checked={selectedQuestions.has(q._id)}
                           onCheckedChange={() => handleSelectQuestion(q._id)}
+                          className="border-gray-600 w-4 h-4"
                         />
                       </td>
-                      <td className="py-3 px-4 text-sm text-foreground font-medium max-w-75 truncate">
+                      <td className="px-4 text-sm text-foreground font-medium max-w-75 truncate">
                         {q.question_text}
                       </td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                      <td className="px-4 text-sm text-muted-foreground">
                         {q.topic}
                       </td>
-                      <td className="py-3 px-4 text-sm text-muted-foreground">
+                      <td className="px-4 text-sm text-muted-foreground">
                         {q.subject}
                       </td>
-                      <td className="py-3 px-4">
+                      <td className="px-4">
                         <span
                           className={`text-xs px-2 py-1 rounded ${getDifficultyColor(
                             q.difficulty,
@@ -621,19 +618,18 @@ const Questions = () => {
                         </span>
                       </td>
 
-                      {/* <td className="py-3 px-4 text-sm text-muted-foreground">
-                        {readableDate(q.updated_at)}
-                      </td> */}
-                      <td className="py-3 px-4 text-sm text-foreground rounded-b-md justify-center items-center">
+                      <td className="px-4 text-sm text-foreground rounded-b-md justify-center items-center">
                         <a
                           className={`${getStatusColor(
                             q.status,
                           )} p-1 text-center justify-center`}
                         >
-                          {q.status}
+                          <CheckCircle />
                         </a>
                       </td>
-                      <td className="py-3 px-4">
+                      <td
+                        className={`${selectedQuestions.size > 0 ? "hidden" : ""}`}
+                      >
                         <ActionMenu
                           question={q}
                           onDelete={handleDeleteQuestion}
@@ -648,7 +644,7 @@ const Questions = () => {
           </div>
 
           {/* Pagination Controls */}
-          <div className="flex items-center justify-between mt-4 pt-4 border-t border-border">
+          <div className="flex items-center justify-between p-4 border-t border-border">
             <div className="text-sm text-muted-foreground">
               Showing {questions.length === 0 ? 0 : startIndex + 1} to{" "}
               {Math.min(endIndex, questions.length)} of {questions.length}{" "}

@@ -109,14 +109,6 @@ export default function AnalyticsPage() {
     <DashboardLayout>
       {/* Page header */}
       <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
-            Analytics
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Track performance and engagement trends.
-          </p>
-        </div>
         <select className="bg-secondary border border-border rounded-lg px-3 py-1.5 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-ring">
           <option>Last 30 days</option>
           <option>Last 90 days</option>
