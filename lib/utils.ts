@@ -1,16 +1,11 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-/**
- * Merge CSS class names with Tailwind CSS utilities
- */
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs));
 }
 
-/**
- * Format date to readable string format (MM/DD/YY HH:MM:SS)
- */
+// Format date to readable string format (MM/DD/YY HH:MM:SS)
 export function readableDate(date: string): string {
   try {
     const rDate = new Date(date).toLocaleString("en-US", {
@@ -28,17 +23,11 @@ export function readableDate(date: string): string {
   }
 }
 
-/**
- * Validate email format
- */
 export function isValidEmail(email: string): boolean {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
 
-/**
- * Safely parse JSON with error handling
- */
 export function safeJsonParse<T>(json: string, fallback: T): T {
   try {
     return JSON.parse(json);
@@ -48,12 +37,9 @@ export function safeJsonParse<T>(json: string, fallback: T): T {
   }
 }
 
-/**
- * Debounce function execution
- */
 export function debounce<T extends (...args: any[]) => any>(
   func: T,
-  wait: number
+  wait: number,
 ): (...args: Parameters<T>) => void {
   let timeout: NodeJS.Timeout;
   return function executedFunction(...args: Parameters<T>) {

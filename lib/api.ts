@@ -22,11 +22,6 @@ export interface RefreshTokenResponse {
   message: string;
 }
 
-/**
- * Save authentication tokens to secure cookies
- * @param data - Token response containing access_token and refresh_token
- * @throws Error if token storage fails
- */
 export async function saveAuth(data: TokenResponse): Promise<void> {
   try {
     cookies.saveTokens(data);
@@ -36,10 +31,6 @@ export async function saveAuth(data: TokenResponse): Promise<void> {
   }
 }
 
-/**
- * Get user profile information
- * @throws ApiError if the request fails
- */
 export async function getProfile(): Promise<UserProfile> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/profile`, {
@@ -60,13 +51,9 @@ export async function getProfile(): Promise<UserProfile> {
   }
 }
 
-/**
- * Update user profile (first_name and last_name)
- * @throws ApiError if the request fails
- */
 export async function updateProfile(
   firstName: string,
-  lastName: string
+  lastName: string,
 ): Promise<UserProfile> {
   try {
     const response = await fetch(`${API_BASE_URL}/auth/update/profile`, {
@@ -91,10 +78,6 @@ export async function updateProfile(
   }
 }
 
-/**
- * Refresh access token using refresh token
- * @throws ApiError if refresh fails
- */
 export async function refreshAccessToken(): Promise<RefreshTokenResponse> {
   try {
     const refreshToken = cookies.getRefreshToken();
@@ -133,9 +116,6 @@ export async function refreshAccessToken(): Promise<RefreshTokenResponse> {
   }
 }
 
-/**
- * Logout user by clearing all tokens and calling logout API
- */
 export async function logoutUser(): Promise<void> {
   try {
     const refreshToken = cookies.getRefreshToken();
@@ -171,16 +151,10 @@ export async function logoutUser(): Promise<void> {
   }
 }
 
-/**
- * Get current access token
- */
 export function getAccessToken(): string | undefined {
   return cookies.getAccessToken();
 }
 
-/**
- * Check if user is authenticated
- */
 export function isAuthenticated(): boolean {
   const token = cookies.getAccessToken();
   if (!token) return false;

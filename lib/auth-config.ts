@@ -1,17 +1,8 @@
-/**
- * Authentication Configuration
- * Defines public and protected routes
- */
-
 export const AUTH_CONFIG = {
-  /**
-   * Public routes that don't require authentication
-   */
+  // Public routes that don't require authentication
   publicRoutes: ["/auth", "/api/auth"],
 
-  /**
-   * Protected routes that require authentication
-   */
+  // Protected routes that require authentication
   protectedRoutes: [
     "/",
     "/content",
@@ -21,9 +12,7 @@ export const AUTH_CONFIG = {
     "/settings",
   ],
 
-  /**
-   * API endpoints
-   */
+  // API endpoints
   api: {
     AUTH_CHECK: "/api/auth/check",
     LOGOUT: "/api/auth/logout",
@@ -31,25 +20,18 @@ export const AUTH_CONFIG = {
     VERIFY_OTP: "http://0.0.0.0:8000/auth",
   },
 
-  /**
-   * Cookie names
-   */
+  // Cookie names
   cookies: {
     ACCESS_TOKEN: "accessToken",
     REFRESH_TOKEN: "refreshToken",
   },
 
-  /**
-   * Token expiration times (in days)
-   */
   tokenExpiry: {
     ACCESS_TOKEN: 14,
     REFRESH_TOKEN: 30,
   },
 
-  /**
-   * Default redirect paths
-   */
+  // Default redirect paths
   redirects: {
     AFTER_LOGIN: "/",
     AFTER_LOGOUT: "/auth",

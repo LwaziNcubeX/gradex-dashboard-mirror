@@ -7,10 +7,9 @@ interface UseAuthReturn {
   logout: () => Promise<void>;
 }
 
-/**
- * Custom hook for authentication management
- * Provides authentication status and logout functionality
- */
+// Custom hook for authentication management
+// Provides authentication status and logout functionality
+
 export function useAuth(): UseAuthReturn {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
