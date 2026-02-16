@@ -81,16 +81,22 @@ export function PerformanceChart() {
   const [period, setPeriod] = useState("6M");
 
   return (
-    <Card className="rounded-xl">
-      <Tabs defaultValue="engagement" className="w-full">
-        <CardHeader className="pb-2 px-4 pt-4">
+    <Card className="rounded-xl ">
+      <Tabs defaultValue="engagement" className="w-full pt-0 ">
+        <CardHeader className="pb-2 px-4 pt-0">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div className="flex items-center gap-3">
-              <TabsList className="bg-secondary h-8">
-                <TabsTrigger value="engagement" className="text-xs h-6 px-2.5">
+              <TabsList className="h-8 bg-background">
+                <TabsTrigger
+                  value="engagement"
+                  className="text-xs h-6 px-2.5 [&[aria-selected='true']]:bg-primary/60"
+                >
                   Engagement
                 </TabsTrigger>
-                <TabsTrigger value="weekly" className="text-xs h-6 px-2.5">
+                <TabsTrigger
+                  value="weekly"
+                  className="text-xs h-6 px-2.5 [&[aria-selected='true']]:bg-primary/60"
+                >
                   Weekly
                 </TabsTrigger>
               </TabsList>

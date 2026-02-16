@@ -118,7 +118,7 @@ export default function FeedbackPage() {
               onClick={() => setActiveFilter(filter)}
               className={`px-3 py-1.5 text-xs font-medium rounded transition-colors ${
                 activeFilter === filter
-                  ? "bg-accent text-foreground"
+                  ? "bg-primary/60 text-foreground"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >

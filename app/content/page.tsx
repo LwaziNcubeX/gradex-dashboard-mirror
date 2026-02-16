@@ -202,14 +202,23 @@ export default function ContentPage() {
   return (
     <DashboardLayout>
       <Tabs defaultValue="questions" className="flex flex-col gap-4">
-        <TabsList className="bg-secondary w-fit">
-          <TabsTrigger value="questions" className="text-xs">
+        <TabsList className="bg-secondary font-medium">
+          <TabsTrigger
+            value="questions"
+            className="text-xs [&[aria-selected='true']]:bg-primary/60"
+          >
             Questions
           </TabsTrigger>
-          <TabsTrigger value="quizzes" className="text-xs">
+          <TabsTrigger
+            value="quizzes"
+            className="text-xs [&[aria-selected='true']]:bg-primary/60"
+          >
             Quizzes
           </TabsTrigger>
-          <TabsTrigger value="levels" className="text-xs">
+          <TabsTrigger
+            value="levels"
+            className="text-xs [&[aria-selected='true']]:bg-primary/60"
+          >
             Levels
           </TabsTrigger>
         </TabsList>
