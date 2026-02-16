@@ -136,24 +136,6 @@ export default function StudentsPage() {
 
   return (
     <DashboardLayout>
-      {/* Page header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
-            Students
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Manage and monitor student performance.
-          </p>
-        </div>
-        <Button
-          size="sm"
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-        >
-          Add Student
-        </Button>
-      </div>
-
       {/* Summary metrics */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {summaryMetrics.map((metric) => {

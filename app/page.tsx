@@ -10,17 +10,6 @@ import { DashboardLayout } from "@/components/dashboard-layout";
 export default function Dashboard() {
   return (
     <DashboardLayout>
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
-            Overview
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Welcome back. Here is what is happening today.
-          </p>
-        </div>
-      </div>
-
       <DashboardMetrics />
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

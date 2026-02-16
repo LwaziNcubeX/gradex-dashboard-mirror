@@ -110,16 +110,7 @@ export default function FeedbackPage() {
 
   return (
     <DashboardLayout>
-      {/* Page header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-        <div>
-          <h1 className="text-3xl font-bold font-oswald tracking-tight text-foreground">
-            Feedback
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Review and manage user feedback.
-          </p>
-        </div>
         <div className="flex items-center bg-secondary rounded-md p-0.5">
           {filters.map((filter) => (
             <button

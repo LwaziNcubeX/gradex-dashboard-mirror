@@ -26,11 +26,11 @@ const pageTitles: Record<string, string> = {
   "/settings": "Settings",
 };
 const pageDTitles: Record<string, string> = {
-  "/": "Overview",
-  "/students": "Students",
+  "/": "Welcome back. Here is what is happening today.",
+  "/students": "Manage and monitor student performance.",
   "/content": "Manage questions, quizzes, and learning levels.",
   "/analytics": "Track performance and engagement trends.",
-  "/feedback": "Feedback",
+  "/feedback": "Review and manage user feedback.",
   "/settings": "Manage your account and preferences.",
 };
 
@@ -70,30 +70,7 @@ export function Header({
       </div>
 
       {/* Right actions */}
-      <div className="flex items-center gap-1 ml-auto">
-        {/* Mobile search button */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button className="md:hidden flex items-center justify-center h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-              <Search className="h-[18px] w-[18px]" />
-              <span className="sr-only">Search</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Search</TooltipContent>
-        </Tooltip>
-
-        {/* Notifications */}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <button className="relative flex items-center justify-center h-9 w-9 rounded-lg text-muted-foreground hover:text-foreground hover:bg-secondary transition-colors">
-              <Bell className="h-[18px] w-[18px]" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-primary rounded-full" />
-              <span className="sr-only">Notifications</span>
-            </button>
-          </TooltipTrigger>
-          <TooltipContent>Notifications</TooltipContent>
-        </Tooltip>
-
+      <div className="flex items-center gap-1 ml-auto p-3">
         {/* Profile menu */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>

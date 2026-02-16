@@ -17,6 +17,7 @@ import {
   LogOut,
   Settings,
   Settings2,
+  MessageCircle,
 } from "lucide-react";
 import { Avatar, AvatarImage } from "@/ui/avatar";
 import {
@@ -25,6 +26,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/ui/dropdown-menu";
+import { Label } from "recharts";
 
 const navItems = [
   { icon: LayoutDashboard, label: "DASHBOARD", href: "/" },
@@ -32,13 +34,14 @@ const navItems = [
   { icon: Layers, label: "CONTENT", href: "/content" },
   { icon: ActivityIcon, label: "ANALYTICS", href: "/analytics" },
   { icon: CreditCard, label: "FINANCE", href: "/finance" },
+  { icon: MessageCircle, label: "FEEDBACK", href: "/feedback" },
   { icon: Settings2, label: "SETTINGS", href: "/settings" },
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
-  const bottomItems = navItems[navItems.length - 1];
-  const topItems = navItems.slice(0, -1);
+  const bottomItems = navItems.slice(-2);
+  const topItems = navItems.slice(0, -2);
 
   return (
     <aside
@@ -59,19 +62,18 @@ export function Sidebar() {
         ))}
       </nav>
 
-      <div className="mt-auto pt-6 border-t border-border flex flex-col gap-6">
-        <div>
+      <div className="mt-auto border-t border-border flex flex-col gap-4 pt-2">
+        {bottomItems.map((item) => (
           <NavItem
-            key={bottomItems.href}
-            icon={bottomItems.icon}
-            label={bottomItems.label}
-            href={bottomItems.href}
+            key={item.href}
+            icon={item.icon}
+            label={item.label}
+            href={item.href}
             active={
-              pathname === bottomItems.href ||
-              pathname.startsWith(bottomItems.href + "/")
+              pathname === item.href || pathname.startsWith(item.href + "/")
             }
           />
-        </div>
+        ))}
       </div>
     </aside>
   );
@@ -96,28 +98,5 @@ function NavItem({
     >
       <Icon className="h-5 w-5 shrink-0" />
     </Link>
-  );
-}
-
-function AvatarMenu() {
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar>
-          <AvatarImage src="profile.webp" />
-        </Avatar>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="bg-secondary border-border">
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Edit className="h-4 w-4 mr-2" /> Reports
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-foreground focus:bg-accent focus:text-foreground cursor-pointer">
-          <Settings className="h-4 w-4 mr-2" /> Settings
-        </DropdownMenuItem>
-        <DropdownMenuItem className="text-destructive focus:bg-accent focus:text-destructive cursor-pointer">
-          <LogOut className="h-4 w-4 mr-2" /> Log out
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
   );
 }
