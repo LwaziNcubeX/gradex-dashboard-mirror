@@ -56,6 +56,8 @@ import {
 } from "../ui/dialog";
 import { Filter } from "lucide-react";
 import { Checkbox } from "../ui/checkbox";
+import { Badge } from "@/ui/badge";
+import { TableCell } from "@/ui/table";
 
 interface FilterDialogProps {
   filters: QuestionFilters;
@@ -618,15 +620,16 @@ const Questions = () => {
                         </span>
                       </td>
 
-                      <td className="px-4 text-sm text-foreground rounded-b-md justify-center items-center">
-                        <a
-                          className={`${getStatusColor(
+                      <TableCell className=" py-2.5 hidden sm:table-cell">
+                        <Badge
+                          className={`text-[10px] cursor-default px-1.5 py-0 ${getStatusColor(
                             q.status,
-                          )} p-1 text-center justify-center`}
+                          )}`}
+                          variant={"outline"}
                         >
-                          <CheckCircle />
-                        </a>
-                      </td>
+                          {q.status}
+                        </Badge>
+                      </TableCell>
                       <td
                         className={`${selectedQuestions.size > 0 ? "hidden" : ""}`}
                       >

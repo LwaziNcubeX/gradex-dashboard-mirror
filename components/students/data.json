@@ -1,0 +1,41 @@
+{
+  "_id": "696d537e15f541e6051c08a9",
+  "user_id": "AM7110",
+  "email": "Lnx5885@gmail.com",
+  "first_name": "Zee",
+  "last_name": "X",
+  "role": "student",
+  "status": "active",
+  "avatar_url": null,
+  "total_xp": 0,
+  "current_level": 1,
+  "is_verified": true,
+  "stats": {
+    "arcade": {
+      "attempts": 0,
+      "abandoned": 0,
+      "completed": 0,
+      "best_score": 0,
+      "avg_score": 0
+    },
+    "speed_run": {
+      "attempts": 0,
+      "abandoned": 0,
+      "completed": 0,
+      "best_time": 0,
+      "avg_score": 0
+    },
+    "wild_card": {
+      "attempts": 0,
+      "abandoned": 0,
+      "completed": 0,
+      "best_score": 0,
+      "avg_score": 0
+    }
+  },
+  "preferences": {},
+  "last_login_at": "2026-01-18T21:41:18.322000",
+  "created_at": "2026-01-18T21:41:18.322000",
+  "updated_at": "2026-01-18T21:42:40.913312",
+  "last_login": "2026-01-18T21:41:18.393000"
+}

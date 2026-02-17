@@ -41,17 +41,29 @@ export interface QuestionType {
 export interface StudentType {
   _id: string;
   user_id: string;
+  first_name: string;
+  last_name: string;
+  status: string;
 }
 
 //...................CONSTANTS...................//
 
 export const QuestionTable = [
   "Select",
-  "Question",
-  "Topic",
-  "Subject",
-  "Difficulty",
-  "Status",
+  "QUESTION",
+  "TOPIC",
+  "SUBJECT",
+  "DIFFICULTY",
+  "STATUS",
+];
+
+export const StudentTableHeader = [
+  "STUDENT ID",
+  "FULL NAME",
+  "RANK POS",
+  "AVG SCORE",
+  "STREAK",
+  "STATUS",
 ];
 
 export const SubjectsList = [
@@ -66,13 +78,13 @@ export const SubjectsList = [
 export function getStatusColor(status: string) {
   switch (status) {
     case "active":
-      return "text-chart-1";
+      return "bg-chart-1/10 text-chart-1 border-chart-1/20";
     case "archive":
-      return "text-chart-3";
+      return "bg-chart-3/10 text-chart-3 border-chart-3/20";
     case "flagged":
-      return "text-destructive";
+      return "bg-chart-4/10 text-chart-4 border-chart-4/20";
     default:
-      return "text-muted-foreground";
+      return "bg-gray-300/10 text-gray-300 border-gray-300/20";
   }
 }
 

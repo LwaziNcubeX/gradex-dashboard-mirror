@@ -16,83 +16,12 @@ import {
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import { QuestionType, StudentType } from "@/constants/types";
+import {
+  StudentTable,
+  StudentTableHeader,
+  StudentType,
+} from "@/constants/types";
 import { studentService } from "@/lib/api/students";
-
-const allStudents = [
-  {
-    id: 1,
-    name: "Sarah Johnson",
-    email: "sarah@email.com",
-    quizzes: 45,
-    avgScore: 92,
-    streak: 12,
-    status: "active",
-  },
-  {
-    id: 2,
-    name: "Mike Chen",
-    email: "mike@email.com",
-    quizzes: 38,
-    avgScore: 88,
-    streak: 7,
-    status: "active",
-  },
-  {
-    id: 3,
-    name: "Emily Davis",
-    email: "emily@email.com",
-    quizzes: 52,
-    avgScore: 95,
-    streak: 21,
-    status: "active",
-  },
-  {
-    id: 4,
-    name: "James Wilson",
-    email: "james@email.com",
-    quizzes: 29,
-    avgScore: 79,
-    streak: 3,
-    status: "inactive",
-  },
-  {
-    id: 5,
-    name: "Anna Martinez",
-    email: "anna@email.com",
-    quizzes: 41,
-    avgScore: 86,
-    streak: 9,
-    status: "active",
-  },
-  {
-    id: 6,
-    name: "David Lee",
-    email: "david@email.com",
-    quizzes: 33,
-    avgScore: 91,
-    streak: 14,
-    status: "active",
-  },
-  {
-    id: 7,
-    name: "Sophie Brown",
-    email: "sophie@email.com",
-    quizzes: 27,
-    avgScore: 74,
-    streak: 2,
-    status: "inactive",
-  },
-  {
-    id: 8,
-    name: "Ryan Taylor",
-    email: "ryan@email.com",
-    quizzes: 48,
-    avgScore: 89,
-    streak: 16,
-    status: "active",
-  },
-];
 
 const StudentsTable = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -111,10 +40,10 @@ const StudentsTable = () => {
     fetchStudents();
   }, []);
 
-  const filteredStudents = allStudents.filter(
+  const filteredStudents = students.filter(
     (s) =>
-      s.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      s.email.toLowerCase().includes(searchQuery.toLowerCase()),
+      s.user_id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      s.user_id.toLowerCase().includes(searchQuery.toLowerCase()),
   );
   return (
     <div>
@@ -141,45 +70,29 @@ const StudentsTable = () => {
             <Table>
               <TableHeader>
                 <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-muted-foreground font-medium text-xs">
-                    <div className="flex items-center gap-1 cursor-pointer hover:text-foreground transition-colors">
-                      Student <ChevronsUpDown className="h-3 w-3" />
-                    </div>
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs hidden md:table-cell">
-                    Email
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs text-right">
-                    Quizzes
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs text-right">
-                    Avg Score
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs text-right hidden sm:table-cell">
-                    Streak
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs text-right hidden sm:table-cell">
-                    Status
-                  </TableHead>
+                  {StudentTableHeader.map((item, index) => (
+                    <TableHead
+                      key={index}
+                      className="text-muted-foreground font-medium text-xs hidden md:table-cell"
+                    >
+                      {item}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {students.map((student, index) => (
-                  <TableRow key={student.id} className="border-border group">
-                    <TableCell className="py-2.5">
-                      <div className="flex items-center gap-2.5">
-                        <span className="font-medium text-foreground text-sm">
-                          {student.first_name} {student.last_name}
-                        </span>
-                      </div>
-                    </TableCell>
+                  <TableRow key={student._id} className="border-border ">
                     <TableCell className="text-muted-foreground text-sm py-2.5 hidden md:table-cell">
-                      {student.email}
+                      {student.user_id}
                     </TableCell>
-                    <TableCell className="text-right text-foreground text-sm py-2.5 tabular-nums">
-                      {student.quizzes}
+                    <TableCell className="text-foreground text-sm py-2.5 tabular-nums">
+                      {student.first_name + " " + student.last_name}
                     </TableCell>
-                    <TableCell className="text-right py-2.5">
+                    <TableCell className=" text-foreground text-sm py-2.5 tabular-nums">
+                      0
+                    </TableCell>
+                    <TableCell className=" py-2.5">
                       <span
                         className={`text-sm font-medium tabular-nums ${
                           student.avgScore >= 90
@@ -189,15 +102,15 @@ const StudentsTable = () => {
                               : "text-destructive"
                         }`}
                       >
-                        {student.avgScore}%
+                        {student.avgScore || 0}%
                       </span>
                     </TableCell>
-                    <TableCell className="text-right text-sm py-2.5 hidden sm:table-cell">
+                    <TableCell className=" text-sm py-2.5 hidden sm:table-cell">
                       <span className="text-foreground tabular-nums">
-                        {student.streak}d
+                        {student.streak || 0} days
                       </span>
                     </TableCell>
-                    <TableCell className="text-right py-2.5 hidden sm:table-cell">
+                    <TableCell className=" py-2.5 hidden sm:table-cell">
                       <Badge
                         variant={
                           student.status === "active" ? "default" : "secondary"
@@ -220,7 +133,7 @@ const StudentsTable = () => {
           {/* Pagination */}
           <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
             <span className="text-xs text-muted-foreground">
-              Showing {filteredStudents.length} of {allStudents.length} students
+              Showing {filteredStudents.length} of {students.length} students
             </span>
             <div className="flex items-center gap-1">
               <Button
