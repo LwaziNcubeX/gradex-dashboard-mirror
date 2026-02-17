@@ -38,6 +38,11 @@ export interface QuestionType {
   created_by: string;
 }
 
+export interface StudentType {
+  _id: string;
+  user_id: string;
+}
+
 //...................CONSTANTS...................//
 
 export const QuestionTable = [
