@@ -44,6 +44,8 @@ export interface StudentType {
   first_name: string;
   last_name: string;
   status: string;
+  avgScore: number;
+  streak: number;
 }
 
 //...................CONSTANTS...................//
