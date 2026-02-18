@@ -55,6 +55,7 @@ export const QuestionTable = [
   "SUBJECT",
   "DIFFICULTY",
   "STATUS",
+  "TIMES USED",
 ];
 
 export const StudentTableHeader = [

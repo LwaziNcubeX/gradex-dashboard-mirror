@@ -630,15 +630,7 @@ const Questions = () => {
                           {q.status}
                         </Badge>
                       </TableCell>
-                      <td
-                        className={`${selectedQuestions.size > 0 ? "hidden" : ""}`}
-                      >
-                        <ActionMenu
-                          question={q}
-                          onDelete={handleDeleteQuestion}
-                          isDeleting={isDeleting}
-                        />
-                      </td>
+                      <td className=" px-4 text-sm text-muted-foreground">0</td>
                     </tr>
                   ))
                 )}
