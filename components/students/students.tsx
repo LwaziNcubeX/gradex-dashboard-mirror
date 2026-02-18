@@ -7,20 +7,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/ui/table";
-import {
-  ChevronLeft,
-  ChevronRight,
-  ChevronsUpDown,
-  Search,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Search } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { Button } from "../ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "../ui/card";
-import {
-  StudentTable,
-  StudentTableHeader,
-  StudentType,
-} from "@/constants/types";
+import { StudentTableHeader, StudentType } from "@/constants/types";
 import { studentService } from "@/lib/api/students";
 
 const StudentsTable = () => {
