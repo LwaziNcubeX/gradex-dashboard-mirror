@@ -80,10 +80,12 @@ export default function FeedbackPage() {
         ...FILTER_MAP[filter],
       };
       const result = await feedbackService.getFeedback(params);
+      const totalCount =
+        result.pagination.total ?? result.pagination.total_items ?? 0;
       setFeedbackItems(result.data);
       setPagination({
         page: result.pagination.page,
-        total: result.pagination.total,
+        total: totalCount,
         total_pages: result.pagination.total_pages,
       });
 
@@ -98,7 +100,7 @@ export default function FeedbackPage() {
           },
           { praise: 0, suggestion: 0, bug: 0 },
         );
-        setCounts({ total: result.pagination.total, ...typeCount });
+        setCounts({ total: totalCount, ...typeCount });
       }
     } catch {
       toast.error("Failed to load feedback");
@@ -129,25 +131,25 @@ export default function FeedbackPage() {
   const summaryMetrics = [
     {
       label: "Total Feedback",
-      value: counts.total.toLocaleString(),
+      value: (counts.total ?? 0).toLocaleString(),
       icon: MessageSquare,
       color: "primary",
     },
     {
       label: "Praise",
-      value: counts.praise.toLocaleString(),
+      value: (counts.praise ?? 0).toLocaleString(),
       icon: ThumbsUp,
       color: "chart-1",
     },
     {
       label: "Suggestions",
-      value: counts.suggestion.toLocaleString(),
+      value: (counts.suggestion ?? 0).toLocaleString(),
       icon: AlertCircle,
       color: "chart-3",
     },
     {
       label: "Bug Reports",
-      value: counts.bug.toLocaleString(),
+      value: (counts.bug ?? 0).toLocaleString(),
       icon: ThumbsDown,
       color: "destructive",
     },

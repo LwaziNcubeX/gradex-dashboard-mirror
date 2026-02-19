@@ -27,7 +27,8 @@ export interface PaginatedFeedback {
   pagination: {
     page: number;
     page_size: number;
-    total: number;
+    total?: number;
+    total_items?: number;
     total_pages: number;
   };
 }
