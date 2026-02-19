@@ -163,6 +163,37 @@ class QuizService {
       throw new Error("Failed to delete quiz");
     }
   }
+
+  /** Search quizzes by text query with optional filters */
+  public async searchQuizzes(
+    query: string,
+    filters?: QuizFilters,
+  ): Promise<QuizType[]> {
+    try {
+      const params = new URLSearchParams();
+      params.set("q", query);
+      if (filters?.subject) params.set("subject", filters.subject);
+      if (filters?.level) params.set("level", filters.level);
+      if (filters?.status) params.set("status", filters.status);
+      const response = await fetch(
+        `${API_URL}/quizzes/search?${params.toString()}`,
+        {
+          method: "GET",
+          headers: getHeaders(),
+          cache: "no-store",
+        },
+      );
+      const data = await handleApiResponse<{
+        success: boolean;
+        data: QuizType[];
+      }>(response);
+      return data.data || [];
+    } catch (error) {
+      console.error("Failed to search quizzes:", error);
+      if (error instanceof ApiError) throw error;
+      throw new Error("Failed to search quizzes");
+    }
+  }
 }
 
 export const quizService = new QuizService();

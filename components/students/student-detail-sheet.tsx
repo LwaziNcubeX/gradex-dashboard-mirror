@@ -27,11 +27,22 @@ import {
   ClipboardCheck,
   Loader2,
   Clock,
+  Crown,
+  Calendar,
 } from "lucide-react";
 import { studentService, type StudentDetail } from "@/lib/api/students";
 import { StudentType } from "@/constants/types";
 import { toast } from "sonner";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, format } from "date-fns";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 interface StudentDetailSheetProps {
   student: StudentType | null;
@@ -89,6 +100,11 @@ export function StudentDetailSheet({
   const [loading, setLoading] = useState(false);
   const [statusValue, setStatusValue] = useState<StudentStatus>("active");
   const [updatingStatus, setUpdatingStatus] = useState(false);
+  const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
+  const [premiumAmount, setPremiumAmount] = useState("2");
+  const [upgradingPremium, setUpgradingPremium] = useState(false);
+  const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
+  const [pendingStatus, setPendingStatus] = useState<string | null>(null);
 
   useEffect(() => {
     if (!student || !open) return;
@@ -123,6 +139,43 @@ export function StudentDetailSheet({
       );
     } finally {
       setUpdatingStatus(false);
+      setStatusConfirmOpen(false);
+      setPendingStatus(null);
+    }
+  };
+
+  const requestStatusChange = (newStatus: string) => {
+    if (newStatus === statusValue) return;
+    setPendingStatus(newStatus);
+    setStatusConfirmOpen(true);
+  };
+
+  const handlePremiumUpgrade = async () => {
+    if (!student) return;
+    const amount = parseFloat(premiumAmount);
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Enter a valid amount");
+      return;
+    }
+    setUpgradingPremium(true);
+    try {
+      const result = await studentService.upgradeToPremium(
+        student.user_id,
+        amount,
+      );
+      toast.success(
+        result.message || `Premium activated for ${result.data.days} days`,
+      );
+      setPremiumDialogOpen(false);
+      // Refresh detail
+      const d = await studentService.getStudent(student.user_id);
+      setDetail(d);
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error ? err.message : "Failed to upgrade student",
+      );
+    } finally {
+      setUpgradingPremium(false);
     }
   };
 
@@ -217,7 +270,7 @@ export function StudentDetailSheet({
               <div className="flex items-center gap-2">
                 <Select
                   value={statusValue}
-                  onValueChange={handleStatusChange}
+                  onValueChange={requestStatusChange}
                   disabled={updatingStatus}
                 >
                   <SelectTrigger className="bg-secondary border-border h-9 text-sm flex-1">
@@ -233,6 +286,74 @@ export function StudentDetailSheet({
                   <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
                 )}
               </div>
+            </div>
+
+            {/* Premium status */}
+            <div>
+              <p className="text-xs font-medium text-muted-foreground mb-1.5">
+                Premium Status
+              </p>
+              {profile?.is_premium && profile?.premium_expires_at ? (
+                <div className="flex flex-col gap-2 p-3 bg-chart-3/5 border border-chart-3/20 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-1.5">
+                      <Crown className="h-3.5 w-3.5 text-chart-3" />
+                      <span className="text-sm font-medium text-foreground">
+                        Premium Active
+                      </span>
+                    </div>
+                    <Badge className="bg-chart-3/10 text-chart-3 border-chart-3/20 text-[10px] px-1.5 py-0">
+                      Active
+                    </Badge>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                    <Calendar className="h-3 w-3" />
+                    Expires{" "}
+                    {format(
+                      new Date(profile.premium_expires_at),
+                      "MMM d, yyyy",
+                    )}
+                  </div>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="w-full mt-1 h-8 text-xs border-chart-3/30 text-chart-3 hover:bg-chart-3/10"
+                    onClick={() => {
+                      setPremiumAmount("2");
+                      setPremiumDialogOpen(true);
+                    }}
+                  >
+                    <Crown className="h-3 w-3 mr-1" /> Extend Premium
+                  </Button>
+                </div>
+              ) : (
+                <div className="flex flex-col gap-2 p-3 bg-secondary/50 rounded-lg">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm text-muted-foreground">
+                      Free Plan
+                    </span>
+                    <Badge
+                      variant="secondary"
+                      className="text-[10px] px-1.5 py-0"
+                    >
+                      Free
+                    </Badge>
+                  </div>
+                  <Button
+                    size="sm"
+                    className="w-full mt-1 h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+                    onClick={() => {
+                      setPremiumAmount("2");
+                      setPremiumDialogOpen(true);
+                    }}
+                  >
+                    <Crown className="h-3 w-3 mr-1" /> Upgrade to Premium — $2
+                  </Button>
+                  <p className="text-[10px] text-muted-foreground text-center">
+                    $2 = 30 days of premium access
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Account info */}
@@ -359,6 +480,130 @@ export function StudentDetailSheet({
           </>
         )}
       </SheetContent>
+
+      {/* Status change confirmation dialog */}
+      <Dialog
+        open={statusConfirmOpen}
+        onOpenChange={(open) => {
+          if (!open) {
+            setStatusConfirmOpen(false);
+            setPendingStatus(null);
+          }
+        }}
+      >
+        <DialogContent className="bg-card border-border sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              Change Account Status
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            Are you sure you want to change{" "}
+            <span className="font-medium text-foreground">
+              {student?.first_name} {student?.last_name}
+            </span>
+            &apos;s status from{" "}
+            <span className="font-medium text-foreground">{statusValue}</span>{" "}
+            to{" "}
+            <span className="font-medium text-foreground">
+              {pendingStatus}
+            </span>
+            ?
+            {pendingStatus === "disabled" && (
+              <span className="block mt-1 text-destructive text-xs">
+                This will prevent the student from accessing their account.
+              </span>
+            )}
+          </p>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => {
+                setStatusConfirmOpen(false);
+                setPendingStatus(null);
+              }}
+              disabled={updatingStatus}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant={pendingStatus === "disabled" ? "destructive" : "default"}
+              size="sm"
+              onClick={() => pendingStatus && handleStatusChange(pendingStatus)}
+              disabled={updatingStatus}
+            >
+              {updatingStatus ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+              ) : null}
+              Confirm
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Premium upgrade dialog */}
+      <Dialog open={premiumDialogOpen} onOpenChange={setPremiumDialogOpen}>
+        <DialogContent className="bg-card border-border sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-foreground flex items-center gap-2">
+              <Crown className="h-4 w-4 text-chart-3" />
+              {profile?.is_premium ? "Extend Premium" : "Upgrade to Premium"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-3 py-2">
+            <p className="text-sm text-muted-foreground">
+              {profile?.is_premium
+                ? `Extend premium access for ${student?.first_name} ${student?.last_name}. $2 adds 30 more days.`
+                : `Activate premium access for ${student?.first_name} ${student?.last_name}. $2 = 30 days.`}
+            </p>
+            <div>
+              <Label className="text-xs text-muted-foreground mb-1.5 block">
+                Amount ($)
+              </Label>
+              <Input
+                type="number"
+                min="1"
+                step="1"
+                value={premiumAmount}
+                onChange={(e) => setPremiumAmount(e.target.value)}
+                placeholder="2"
+                className="bg-secondary border-border h-9 text-sm"
+              />
+              <p className="text-[10px] text-muted-foreground mt-1">
+                Every $2 = 30 days.{" "}
+                {premiumAmount &&
+                  !isNaN(parseFloat(premiumAmount)) &&
+                  parseFloat(premiumAmount) > 0 &&
+                  `This gives ${Math.floor((parseFloat(premiumAmount) / 2) * 30)} days.`}
+              </p>
+            </div>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setPremiumDialogOpen(false)}
+              disabled={upgradingPremium}
+            >
+              Cancel
+            </Button>
+            <Button
+              size="sm"
+              onClick={handlePremiumUpgrade}
+              disabled={upgradingPremium}
+              className="bg-primary text-primary-foreground hover:bg-primary/90"
+            >
+              {upgradingPremium ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+              ) : (
+                <Crown className="h-3.5 w-3.5 mr-1.5" />
+              )}
+              Confirm Upgrade
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </Sheet>
   );
 }

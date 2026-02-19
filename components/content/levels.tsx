@@ -4,7 +4,6 @@ import { useState, useEffect, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import {
   Table,
   TableBody,
@@ -26,19 +25,10 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
+  HelpCircle,
   Layers,
   FileQuestion,
-  HelpCircle,
   Plus,
   MoreHorizontal,
   Edit,
@@ -49,10 +39,10 @@ import {
 import {
   levelService,
   type LevelType,
-  type CreateLevelPayload,
 } from "@/lib/api/levels";
 import { adminService } from "@/lib/api/admin";
 import { toast } from "sonner";
+import { LevelWizard } from "./level-wizard";
 
 const SUBJECTS = [
   "Mathematics",
@@ -97,28 +87,6 @@ function MetricCard({
   );
 }
 
-interface LevelFormState {
-  level_number: string;
-  title: string;
-  description: string;
-  form_level: "Form 1" | "Form 2" | "Form 3" | "Form 4";
-  subject: string;
-  xp_required: string;
-  total_xp_reward: string;
-  is_starter_level: boolean;
-}
-
-const DEFAULT_FORM: LevelFormState = {
-  level_number: "1",
-  title: "",
-  description: "",
-  form_level: "Form 1",
-  subject: "Mathematics",
-  xp_required: "0",
-  total_xp_reward: "200",
-  is_starter_level: false,
-};
-
 export default function LevelsTab() {
   const [levels, setLevels] = useState<LevelType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,11 +96,11 @@ export default function LevelsTab() {
     questions: 0,
   });
 
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
+  // Wizard state
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [editingLevel, setEditingLevel] = useState<LevelType | null>(null);
-  const [formState, setFormState] = useState<LevelFormState>(DEFAULT_FORM);
-  const [saving, setSaving] = useState(false);
+
+  // Delete state
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -164,63 +132,12 @@ export default function LevelsTab() {
 
   const openCreate = () => {
     setEditingLevel(null);
-    setFormState(DEFAULT_FORM);
-    setDialogOpen(true);
+    setWizardOpen(true);
   };
 
   const openEdit = (level: LevelType) => {
     setEditingLevel(level);
-    setFormState({
-      level_number: String(level.level_number),
-      title: level.title,
-      description: level.description || "",
-      form_level: level.form_level,
-      subject: level.subject,
-      xp_required: String(level.xp_required ?? 0),
-      total_xp_reward: String(level.total_xp_reward ?? 200),
-      is_starter_level: level.is_starter_level ?? false,
-    });
-    setDialogOpen(true);
-  };
-
-  const handleSave = async () => {
-    if (!formState.title.trim()) {
-      toast.error("Title is required");
-      return;
-    }
-    setSaving(true);
-    try {
-      if (editingLevel) {
-        const payload: Partial<CreateLevelPayload> = {
-          title: formState.title.trim(),
-          description: formState.description.trim() || undefined,
-          xp_required: Number(formState.xp_required) || 0,
-          total_xp_reward: Number(formState.total_xp_reward) || 200,
-          is_starter_level: formState.is_starter_level,
-        };
-        await levelService.updateLevel(editingLevel._id, payload);
-        toast.success("Level updated");
-      } else {
-        const payload: CreateLevelPayload = {
-          level_number: Number(formState.level_number) || 1,
-          title: formState.title.trim(),
-          description: formState.description.trim() || undefined,
-          form_level: formState.form_level,
-          subject: formState.subject,
-          xp_required: Number(formState.xp_required) || 0,
-          total_xp_reward: Number(formState.total_xp_reward) || 200,
-          is_starter_level: formState.is_starter_level,
-        };
-        await levelService.createLevel(payload);
-        toast.success("Level created");
-      }
-      setDialogOpen(false);
-      fetchLevels();
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to save level");
-    } finally {
-      setSaving(false);
-    }
+    setWizardOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -401,189 +318,13 @@ export default function LevelsTab() {
         </CardContent>
       </Card>
 
-      {/* Create / Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-card border-border sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-foreground">
-              {editingLevel ? "Edit Level" : "Create Level"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-3 py-2">
-            {!editingLevel && (
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Level Number *
-                </Label>
-                <Input
-                  type="number"
-                  value={formState.level_number}
-                  onChange={(e) =>
-                    setFormState((p) => ({
-                      ...p,
-                      level_number: e.target.value,
-                    }))
-                  }
-                  placeholder="1"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
-              </div>
-            )}
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1.5 block">
-                Title *
-              </Label>
-              <Input
-                value={formState.title}
-                onChange={(e) =>
-                  setFormState((p) => ({ ...p, title: e.target.value }))
-                }
-                placeholder="e.g. Math Fundamentals"
-                className="bg-secondary border-border h-9 text-sm"
-              />
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1.5 block">
-                Description
-              </Label>
-              <Input
-                value={formState.description}
-                onChange={(e) =>
-                  setFormState((p) => ({
-                    ...p,
-                    description: e.target.value,
-                  }))
-                }
-                placeholder="Short description..."
-                className="bg-secondary border-border h-9 text-sm"
-              />
-            </div>
-            {!editingLevel && (
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">
-                    Subject
-                  </Label>
-                  <Select
-                    value={formState.subject}
-                    onValueChange={(v) =>
-                      setFormState((p) => ({ ...p, subject: v }))
-                    }
-                  >
-                    <SelectTrigger className="bg-secondary border-border h-9 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      {SUBJECTS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">
-                    Form Level
-                  </Label>
-                  <Select
-                    value={formState.form_level}
-                    onValueChange={(v) =>
-                      setFormState((p) => ({
-                        ...p,
-                        form_level: v as (typeof FORM_LEVELS)[number],
-                      }))
-                    }
-                  >
-                    <SelectTrigger className="bg-secondary border-border h-9 text-sm">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      {FORM_LEVELS.map((l) => (
-                        <SelectItem key={l} value={l}>
-                          {l}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            )}
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  XP Required
-                </Label>
-                <Input
-                  type="number"
-                  value={formState.xp_required}
-                  onChange={(e) =>
-                    setFormState((p) => ({
-                      ...p,
-                      xp_required: e.target.value,
-                    }))
-                  }
-                  placeholder="0"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  XP Reward
-                </Label>
-                <Input
-                  type="number"
-                  value={formState.total_xp_reward}
-                  onChange={(e) =>
-                    setFormState((p) => ({
-                      ...p,
-                      total_xp_reward: e.target.value,
-                    }))
-                  }
-                  placeholder="200"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="starter"
-                checked={formState.is_starter_level}
-                onChange={(e) =>
-                  setFormState((p) => ({
-                    ...p,
-                    is_starter_level: e.target.checked,
-                  }))
-                }
-                className="rounded border-border"
-              />
-              <Label
-                htmlFor="starter"
-                className="text-sm text-foreground cursor-pointer"
-              >
-                Starter level (auto-unlocked)
-              </Label>
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setDialogOpen(false)}
-              disabled={saving}
-            >
-              Cancel
-            </Button>
-            <Button size="sm" onClick={handleSave} disabled={saving}>
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-              ) : null}
-              {editingLevel ? "Save Changes" : "Create"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Level Wizard (Create/Edit) */}
+      <LevelWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        editingLevel={editingLevel}
+        onSaved={fetchLevels}
+      />
 
       {/* Delete Confirmation */}
       <Dialog

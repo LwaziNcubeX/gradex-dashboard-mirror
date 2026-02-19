@@ -140,6 +140,37 @@ class QuestionService {
       throw new Error("Failed to delete question");
     }
   }
+
+  /** Search questions by text query with optional filters */
+  public async searchQuestions(
+    query: string,
+    filters?: QuestionFilters,
+  ): Promise<QuestionType[]> {
+    try {
+      const params = new URLSearchParams();
+      params.set("q", query);
+      if (filters?.subject) params.set("subject", filters.subject);
+      if (filters?.difficulty) params.set("difficulty", filters.difficulty);
+      if (filters?.status) params.set("status", filters.status);
+      const response = await fetch(
+        `${API_URL}/questions/search?${params.toString()}`,
+        {
+          method: "GET",
+          headers: getHeaders(),
+          cache: "no-store",
+        },
+      );
+      const data = await handleApiResponse<{
+        success: boolean;
+        data: QuestionType[];
+      }>(response);
+      return data.data || [];
+    } catch (error) {
+      console.error("Failed to search questions:", error);
+      if (error instanceof ApiError) throw error;
+      throw new Error("Failed to search questions");
+    }
+  }
 }
 
 export const questionService = new QuestionService();

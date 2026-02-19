@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import {
   Card,
@@ -8,70 +9,54 @@ import {
   CardTitle,
   CardDescription,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  CreditCard,
-  Star,
-  Zap,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import {
+  DollarSign,
+  TrendingUp,
   Users,
-  BarChart3,
-  Shield,
-  Bot,
-  Check,
   Crown,
-  Rocket,
+  Calendar,
+  Loader2,
+  CreditCard,
 } from "lucide-react";
+import {
+  studentService,
+  type FinanceOverview,
+  type PremiumTransaction,
+} from "@/lib/api/students";
+import { toast } from "sonner";
+import {
+  Area,
+  AreaChart,
+  CartesianGrid,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-const FREE_FEATURES = [
-  "Up to 50 students",
-  "5 subjects",
-  "Basic analytics",
-  "Arcade & Speed Run game modes",
-  "Email support",
-];
-
-const PREMIUM_FEATURES = [
-  "Unlimited students",
-  "All subjects + custom subjects",
-  "Advanced analytics & exports",
-  "All game modes incl. Wild Card",
-  "AI question generation",
-  "Custom branding",
-  "Priority support",
-  "Bulk content import",
-  "Student progress reports",
-  "API access",
-];
-
-const MONTHLY_PRICE = 2;
-const ANNUAL_PRICE = 20; // ~$1.67/month
-
-function FeatureRow({ text, included }: { text: string; included?: boolean }) {
-  return (
-    <div className="flex items-center gap-2.5">
-      <Check
-        className={`h-3.5 w-3.5 flex-shrink-0 ${included ? "text-chart-1" : "text-muted-foreground"}`}
-      />
-      <span
-        className={`text-sm ${included ? "text-foreground" : "text-muted-foreground"}`}
-      >
-        {text}
-      </span>
-    </div>
-  );
-}
-
-function StatCard({
+function MetricCard({
   icon: Icon,
   label,
   value,
+  sub,
   color,
+  loading,
 }: {
   icon: React.ComponentType<{ className?: string }>;
   label: string;
   value: string;
+  sub?: string;
   color: string;
+  loading?: boolean;
 }) {
   const colorMap: Record<string, { bg: string; text: string }> = {
     primary: { bg: "bg-primary/10", text: "text-primary" },
@@ -83,15 +68,26 @@ function StatCard({
   const c = colorMap[color] || colorMap.primary;
   return (
     <Card className="rounded-xl border-border/50 py-0">
-      <CardContent className="p-3 flex items-center gap-2.5">
-        <div className={`p-1.5 rounded-md ${c.bg}`}>
-          <Icon className={`h-4 w-4 ${c.text}`} />
+      <CardContent className="p-4 flex items-center gap-3">
+        <div className={`p-2 rounded-lg ${c.bg}`}>
+          <Icon className={`h-5 w-5 ${c.text}`} />
         </div>
         <div>
           <p className="text-[11px] text-muted-foreground">{label}</p>
-          <p className="text-lg font-bold text-foreground leading-tight">
-            {value}
-          </p>
+          {loading ? (
+            <div className="h-6 w-16 bg-secondary rounded animate-pulse mt-0.5" />
+          ) : (
+            <>
+              <p className="text-xl font-bold text-foreground leading-tight tabular-nums">
+                {value}
+              </p>
+              {sub && (
+                <p className="text-[10px] text-muted-foreground mt-0.5">
+                  {sub}
+                </p>
+              )}
+            </>
+          )}
         </div>
       </CardContent>
     </Card>
@@ -99,208 +95,183 @@ function StatCard({
 }
 
 export default function FinancePage() {
+  const [data, setData] = useState<FinanceOverview | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    studentService
+      .getFinanceOverview()
+      .then((d) => setData(d))
+      .catch(() => {
+        // If endpoint not ready yet, show empty state
+        setData({
+          total_revenue: 0,
+          monthly_revenue: 0,
+          weekly_revenue: 0,
+          total_premium_users: 0,
+          active_premium_users: 0,
+          expired_premium_users: 0,
+          recent_transactions: [],
+          monthly_chart: [],
+        });
+      })
+      .finally(() => setLoading(false));
+  }, []);
+
+  const formatCurrency = (amount: number) =>
+    `$${amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6">
         {/* Header */}
         <div>
           <h1 className="text-xl font-semibold text-foreground">
-            Finance &amp; Billing
+            Revenue &amp; Finance
           </h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            Manage your subscription and unlock premium features for your GradeX
-            platform.
+            Track premium upgrade revenue, active subscriptions, and billing
+            history.
           </p>
         </div>
 
-        {/* Current plan banner */}
-        <Card className="rounded-xl bg-secondary/30 border-border">
-          <CardContent className="p-4 flex items-center justify-between gap-4 flex-wrap">
-            <div className="flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-primary/10">
-                <Rocket className="h-5 w-5 text-primary" />
+        {/* Metrics */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+          <MetricCard
+            icon={DollarSign}
+            label="Total Revenue"
+            value={formatCurrency(data?.total_revenue ?? 0)}
+            sub="All time"
+            color="chart-1"
+            loading={loading}
+          />
+          <MetricCard
+            icon={TrendingUp}
+            label="This Month"
+            value={formatCurrency(data?.monthly_revenue ?? 0)}
+            sub="Current month"
+            color="primary"
+            loading={loading}
+          />
+          <MetricCard
+            icon={Crown}
+            label="Active Premium"
+            value={String(data?.active_premium_users ?? 0)}
+            sub={`${data?.expired_premium_users ?? 0} expired`}
+            color="chart-3"
+            loading={loading}
+          />
+          <MetricCard
+            icon={Users}
+            label="Total Upgraded"
+            value={String(data?.total_premium_users ?? 0)}
+            sub="All time"
+            color="chart-2"
+            loading={loading}
+          />
+        </div>
+
+        {/* Revenue Chart */}
+        <Card className="rounded-xl">
+          <CardHeader className="px-4 pt-4 pb-2">
+            <div className="flex items-center gap-2.5">
+              <div className="p-1.5 rounded-md bg-chart-1/10">
+                <TrendingUp className="h-4 w-4 text-chart-1" />
               </div>
               <div>
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground">
-                    Free Plan
-                  </p>
-                  <Badge
-                    variant="secondary"
-                    className="text-[10px] px-1.5 py-0"
-                  >
-                    Current
-                  </Badge>
-                </div>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  $0 / month — Great for getting started
-                </p>
+                <CardTitle className="text-sm font-medium text-foreground">
+                  Monthly Revenue
+                </CardTitle>
+                <CardDescription className="text-[11px] text-muted-foreground">
+                  Revenue from premium student upgrades
+                </CardDescription>
               </div>
             </div>
-            <Button
-              size="sm"
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
-            >
-              <Crown className="h-4 w-4 mr-1.5" /> Upgrade to Premium
-            </Button>
+          </CardHeader>
+          <CardContent className="px-4 pb-4">
+            {loading ? (
+              <div className="h-[250px] flex items-center justify-center">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : data?.monthly_chart && data.monthly_chart.length > 0 ? (
+              <ResponsiveContainer width="100%" height={250}>
+                <AreaChart data={data.monthly_chart}>
+                  <defs>
+                    <linearGradient
+                      id="revenueGradient"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="hsl(var(--chart-1))"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="hsl(var(--chart-1))"
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    stroke="hsl(var(--border))"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="month"
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tickLine={false}
+                    axisLine={false}
+                  />
+                  <YAxis
+                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(v) => `$${v}`}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "hsl(var(--card))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "8px",
+                      fontSize: "12px",
+                    }}
+                    formatter={(value: number, name: string) => [
+                      name === "revenue"
+                        ? formatCurrency(value)
+                        : `${value} upgrades`,
+                      name === "revenue" ? "Revenue" : "Upgrades",
+                    ]}
+                  />
+                  <Area
+                    type="monotone"
+                    dataKey="revenue"
+                    stroke="hsl(var(--chart-1))"
+                    strokeWidth={2}
+                    fill="url(#revenueGradient)"
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            ) : (
+              <div className="h-[250px] flex flex-col items-center justify-center gap-2">
+                <TrendingUp className="h-8 w-8 text-muted-foreground/30" />
+                <p className="text-sm text-muted-foreground">
+                  No revenue data yet
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  Revenue will appear here after premium upgrades are processed.
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
-        {/* Usage stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          <StatCard icon={Users} label="Students" value="—" color="primary" />
-          <StatCard icon={Zap} label="XP Issued" value="—" color="chart-1" />
-          <StatCard
-            icon={BarChart3}
-            label="Quiz Attempts"
-            value="—"
-            color="chart-2"
-          />
-          <StatCard
-            icon={Star}
-            label="Active Levels"
-            value="—"
-            color="chart-3"
-          />
-        </div>
-
-        {/* Pricing cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {/* Free */}
-          <Card className="rounded-xl border-border">
-            <CardHeader className="px-5 pt-5 pb-3">
-              <div className="flex items-start justify-between">
-                <div>
-                  <CardTitle className="text-base font-semibold text-foreground">
-                    Free
-                  </CardTitle>
-                  <CardDescription className="text-xs text-muted-foreground mt-0.5">
-                    Perfect for small classrooms
-                  </CardDescription>
-                </div>
-                <Badge variant="secondary" className="text-[10px]">
-                  Current Plan
-                </Badge>
-              </div>
-              <div className="mt-3">
-                <span className="text-3xl font-bold text-foreground">$0</span>
-                <span className="text-sm text-muted-foreground ml-1">
-                  / month
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="px-5 pb-5 flex flex-col gap-2.5">
-              <div className="flex flex-col gap-2 py-3 border-y border-border">
-                {FREE_FEATURES.map((f) => (
-                  <FeatureRow key={f} text={f} included />
-                ))}
-              </div>
-              <Button variant="secondary" size="sm" className="w-full" disabled>
-                Current Plan
-              </Button>
-            </CardContent>
-          </Card>
-
-          {/* Premium */}
-          <Card className="rounded-xl border-primary/40 relative overflow-hidden">
-            {/* Glow effect */}
-            <div className="absolute inset-0 bg-primary/3 pointer-events-none" />
-            <CardHeader className="px-5 pt-5 pb-3 relative">
-              <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <CardTitle className="text-base font-semibold text-foreground">
-                      Premium
-                    </CardTitle>
-                    <Crown className="h-4 w-4 text-chart-3" />
-                  </div>
-                  <CardDescription className="text-xs text-muted-foreground mt-0.5">
-                    For serious educators &amp; institutions
-                  </CardDescription>
-                </div>
-                <Badge className="bg-primary/10 text-primary border-primary/20 text-[10px]">
-                  Best Value
-                </Badge>
-              </div>
-              <div className="mt-3 flex items-end gap-3">
-                <div>
-                  <span className="text-3xl font-bold text-foreground">
-                    ${MONTHLY_PRICE}
-                  </span>
-                  <span className="text-sm text-muted-foreground ml-1">
-                    / month
-                  </span>
-                </div>
-                <span className="text-xs text-muted-foreground mb-1">
-                  or ${ANNUAL_PRICE}/year (save 17%)
-                </span>
-              </div>
-            </CardHeader>
-            <CardContent className="px-5 pb-5 flex flex-col gap-2.5 relative">
-              <div className="flex flex-col gap-2 py-3 border-y border-border">
-                {PREMIUM_FEATURES.map((f) => (
-                  <FeatureRow key={f} text={f} included />
-                ))}
-              </div>
-              <Button
-                size="sm"
-                className="w-full bg-primary text-primary-foreground hover:bg-primary/90"
-              >
-                <CreditCard className="h-4 w-4 mr-1.5" /> Upgrade for $
-                {MONTHLY_PRICE}/month
-              </Button>
-              <p className="text-[11px] text-muted-foreground text-center">
-                Cancel anytime. No hidden fees.
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Feature highlights */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-          {[
-            {
-              icon: Bot,
-              title: "AI Question Generation",
-              desc: "Generate questions for any subject and form level instantly using AI.",
-              color: "primary",
-            },
-            {
-              icon: BarChart3,
-              title: "Advanced Analytics",
-              desc: "Deep insights into student performance, mastery levels, and learning gaps.",
-              color: "chart-2",
-            },
-            {
-              icon: Shield,
-              title: "Priority Support",
-              desc: "Get dedicated support with guaranteed response times for your institution.",
-              color: "chart-4",
-            },
-          ].map(({ icon: Icon, title, desc, color }) => {
-            const colorMap: Record<string, { bg: string; text: string }> = {
-              primary: { bg: "bg-primary/10", text: "text-primary" },
-              "chart-2": { bg: "bg-chart-2/10", text: "text-chart-2" },
-              "chart-4": { bg: "bg-chart-4/10", text: "text-chart-4" },
-            };
-            const c = colorMap[color] || colorMap.primary;
-            return (
-              <Card key={title} className="rounded-xl border-border/50">
-                <CardContent className="p-4">
-                  <div className={`p-2 rounded-lg ${c.bg} w-fit mb-3`}>
-                    <Icon className={`h-4 w-4 ${c.text}`} />
-                  </div>
-                  <p className="text-sm font-medium text-foreground">{title}</p>
-                  <p className="text-[11px] text-muted-foreground mt-1 leading-relaxed">
-                    {desc}
-                  </p>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </div>
-
-        {/* Billing history placeholder */}
+        {/* Recent Transactions */}
         <Card className="rounded-xl">
           <CardHeader className="px-4 pt-4 pb-2">
             <div className="flex items-center gap-2.5">
@@ -308,18 +279,110 @@ export default function FinancePage() {
                 <CreditCard className="h-4 w-4 text-muted-foreground" />
               </div>
               <CardTitle className="text-sm font-medium text-foreground">
-                Billing History
+                Recent Transactions
               </CardTitle>
             </div>
           </CardHeader>
-          <CardContent className="px-4 pb-6">
-            <div className="flex flex-col items-center justify-center py-8 gap-2">
-              <CreditCard className="h-8 w-8 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">
-                No billing history
+          <CardContent className="px-4 pb-4">
+            {loading ? (
+              <div className="space-y-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-10 bg-secondary rounded animate-pulse"
+                  />
+                ))}
+              </div>
+            ) : data?.recent_transactions &&
+              data.recent_transactions.length > 0 ? (
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="text-muted-foreground font-medium text-xs">
+                        Student
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden sm:table-cell">
+                        User ID
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right">
+                        Amount
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right hidden md:table-cell">
+                        Days
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden md:table-cell">
+                        Activated
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden lg:table-cell">
+                        Expires
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {data.recent_transactions.map((tx, i) => (
+                      <TableRow
+                        key={tx._id || i}
+                        className="border-border"
+                      >
+                        <TableCell className="py-2.5 text-sm font-medium text-foreground">
+                          <div className="flex items-center gap-1.5">
+                            <Crown className="h-3 w-3 text-chart-3 flex-shrink-0" />
+                            {tx.student_name}
+                          </div>
+                        </TableCell>
+                        <TableCell className="py-2.5 text-xs text-muted-foreground hidden sm:table-cell font-mono">
+                          {tx.user_id}
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right text-sm font-semibold text-chart-1 tabular-nums">
+                          ${tx.amount.toFixed(2)}
+                        </TableCell>
+                        <TableCell className="py-2.5 text-right text-sm text-foreground tabular-nums hidden md:table-cell">
+                          {tx.days}
+                        </TableCell>
+                        <TableCell className="py-2.5 text-xs text-muted-foreground hidden md:table-cell">
+                          {tx.activated_at
+                            ? new Date(tx.activated_at).toLocaleDateString()
+                            : "—"}
+                        </TableCell>
+                        <TableCell className="py-2.5 text-xs text-muted-foreground hidden lg:table-cell">
+                          {tx.expires_at
+                            ? new Date(tx.expires_at).toLocaleDateString()
+                            : "—"}
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-10 gap-2">
+                <CreditCard className="h-8 w-8 text-muted-foreground/30" />
+                <p className="text-sm text-muted-foreground">
+                  No transactions yet
+                </p>
+                <p className="text-[11px] text-muted-foreground">
+                  Premium upgrade transactions will appear here.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* Info banner */}
+        <Card className="rounded-xl bg-secondary/30 border-border">
+          <CardContent className="p-4 flex items-start gap-3">
+            <div className="p-2 rounded-lg bg-chart-3/10 flex-shrink-0">
+              <Crown className="h-5 w-5 text-chart-3" />
+            </div>
+            <div>
+              <p className="text-sm font-medium text-foreground">
+                Premium Pricing
               </p>
-              <p className="text-[11px] text-muted-foreground">
-                Invoices will appear here once you upgrade.
+              <p className="text-xs text-muted-foreground mt-0.5 leading-relaxed">
+                Each $2 payment grants a student 30 days of premium access.
+                Admins can upgrade students from the student detail panel.
+                Revenue is tracked automatically.
               </p>
             </div>
           </CardContent>

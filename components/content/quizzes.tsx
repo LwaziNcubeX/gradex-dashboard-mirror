@@ -25,15 +25,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import {
   HelpCircle,
   Layers,
@@ -49,19 +40,10 @@ import {
 import {
   quizService,
   type QuizType,
-  type CreateQuizPayload,
 } from "@/lib/api/quizzes";
 import { adminService } from "@/lib/api/admin";
 import { toast } from "sonner";
-
-const SUBJECTS = [
-  "Mathematics",
-  "English",
-  "Geography",
-  "History",
-  "Combined Science",
-];
-const LEVELS = ["Form 1", "Form 2", "Form 3", "Form 4"] as const;
+import { QuizWizard } from "./quiz-wizard";
 
 function MetricCard({
   icon: Icon,
@@ -97,24 +79,6 @@ function MetricCard({
   );
 }
 
-interface QuizFormState {
-  title: string;
-  description: string;
-  subject: string;
-  level: "Form 1" | "Form 2" | "Form 3" | "Form 4";
-  duration: string;
-  xp_reward: string;
-}
-
-const DEFAULT_FORM: QuizFormState = {
-  title: "",
-  description: "",
-  subject: "Mathematics",
-  level: "Form 1",
-  duration: "600",
-  xp_reward: "50",
-};
-
 export default function QuizzesTab() {
   const [quizzes, setQuizzes] = useState<QuizType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -128,11 +92,11 @@ export default function QuizzesTab() {
   });
   const [metrics, setMetrics] = useState({ total: 0, active: 0 });
 
-  // Dialog state
-  const [dialogOpen, setDialogOpen] = useState(false);
+  // Wizard state
+  const [wizardOpen, setWizardOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<QuizType | null>(null);
-  const [formState, setFormState] = useState<QuizFormState>(DEFAULT_FORM);
-  const [saving, setSaving] = useState(false);
+
+  // Delete state
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
@@ -161,7 +125,6 @@ export default function QuizzesTab() {
 
   useEffect(() => {
     fetchQuizzes(1);
-    // Fetch metrics from overview
     adminService
       .getOverview()
       .then((d) => {
@@ -172,53 +135,12 @@ export default function QuizzesTab() {
 
   const openCreate = () => {
     setEditingQuiz(null);
-    setFormState(DEFAULT_FORM);
-    setDialogOpen(true);
+    setWizardOpen(true);
   };
 
   const openEdit = (quiz: QuizType) => {
     setEditingQuiz(quiz);
-    setFormState({
-      title: quiz.title,
-      description: quiz.description || "",
-      subject: quiz.subject,
-      level: quiz.level,
-      duration: String(quiz.duration || 600),
-      xp_reward: String(quiz.xp_reward || 50),
-    });
-    setDialogOpen(true);
-  };
-
-  const handleSave = async () => {
-    if (!formState.title.trim()) {
-      toast.error("Title is required");
-      return;
-    }
-    setSaving(true);
-    try {
-      const payload: CreateQuizPayload = {
-        title: formState.title.trim(),
-        description: formState.description.trim() || undefined,
-        subject: formState.subject,
-        level: formState.level,
-        duration: Number(formState.duration) || 600,
-        xp_reward: Number(formState.xp_reward) || 50,
-        is_active: true,
-      };
-      if (editingQuiz) {
-        await quizService.updateQuiz(editingQuiz._id, payload);
-        toast.success("Quiz updated");
-      } else {
-        await quizService.createQuiz(payload);
-        toast.success("Quiz created");
-      }
-      setDialogOpen(false);
-      fetchQuizzes(pagination.page);
-    } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to save quiz");
-    } finally {
-      setSaving(false);
-    }
+    setWizardOpen(true);
   };
 
   const handleDelete = async (id: string) => {
@@ -466,139 +388,13 @@ export default function QuizzesTab() {
         </CardContent>
       </Card>
 
-      {/* Create / Edit Dialog */}
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="bg-card border-border sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-foreground">
-              {editingQuiz ? "Edit Quiz" : "Create Quiz"}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="flex flex-col gap-3 py-2">
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1.5 block">
-                Title *
-              </Label>
-              <Input
-                value={formState.title}
-                onChange={(e) =>
-                  setFormState((p) => ({ ...p, title: e.target.value }))
-                }
-                placeholder="e.g. Algebra Basics"
-                className="bg-secondary border-border h-9 text-sm"
-              />
-            </div>
-            <div>
-              <Label className="text-xs text-muted-foreground mb-1.5 block">
-                Description
-              </Label>
-              <Input
-                value={formState.description}
-                onChange={(e) =>
-                  setFormState((p) => ({ ...p, description: e.target.value }))
-                }
-                placeholder="Short description..."
-                className="bg-secondary border-border h-9 text-sm"
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Subject
-                </Label>
-                <Select
-                  value={formState.subject}
-                  onValueChange={(v) =>
-                    setFormState((p) => ({ ...p, subject: v }))
-                  }
-                >
-                  <SelectTrigger className="bg-secondary border-border h-9 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    {SUBJECTS.map((s) => (
-                      <SelectItem key={s} value={s}>
-                        {s}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Form Level
-                </Label>
-                <Select
-                  value={formState.level}
-                  onValueChange={(v) =>
-                    setFormState((p) => ({
-                      ...p,
-                      level: v as (typeof LEVELS)[number],
-                    }))
-                  }
-                >
-                  <SelectTrigger className="bg-secondary border-border h-9 text-sm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent className="bg-card border-border">
-                    {LEVELS.map((l) => (
-                      <SelectItem key={l} value={l}>
-                        {l}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Duration (seconds)
-                </Label>
-                <Input
-                  type="number"
-                  value={formState.duration}
-                  onChange={(e) =>
-                    setFormState((p) => ({ ...p, duration: e.target.value }))
-                  }
-                  placeholder="600"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  XP Reward
-                </Label>
-                <Input
-                  type="number"
-                  value={formState.xp_reward}
-                  onChange={(e) =>
-                    setFormState((p) => ({ ...p, xp_reward: e.target.value }))
-                  }
-                  placeholder="50"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
-              </div>
-            </div>
-          </div>
-          <DialogFooter className="gap-2">
-            <Button
-              variant="secondary"
-              size="sm"
-              onClick={() => setDialogOpen(false)}
-              disabled={saving}
-            >
-              Cancel
-            </Button>
-            <Button size="sm" onClick={handleSave} disabled={saving}>
-              {saving ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-              ) : null}
-              {editingQuiz ? "Save Changes" : "Create"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Quiz Wizard (Create/Edit) */}
+      <QuizWizard
+        open={wizardOpen}
+        onOpenChange={setWizardOpen}
+        editingQuiz={editingQuiz}
+        onSaved={() => fetchQuizzes(pagination.page)}
+      />
 
       {/* Delete Confirmation Dialog */}
       <Dialog

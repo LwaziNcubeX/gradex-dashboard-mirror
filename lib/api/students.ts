@@ -10,6 +10,8 @@ export interface StudentDetail {
     last_login_at: string;
     created_at: string;
     email: string;
+    is_premium?: boolean;
+    premium_expires_at?: string;
   };
   recent_attempts: {
     _id: string;
@@ -24,6 +26,39 @@ export interface StudentDetail {
     completion_percentage: number;
     xp_earned: number;
   }[];
+}
+
+export interface PremiumUpgradeResponse {
+  success: boolean;
+  message: string;
+  data: {
+    user_id: string;
+    is_premium: boolean;
+    premium_expires_at: string;
+    amount: number;
+    days: number;
+  };
+}
+
+export interface PremiumTransaction {
+  _id: string;
+  user_id: string;
+  student_name: string;
+  amount: number;
+  days: number;
+  activated_at: string;
+  expires_at: string;
+}
+
+export interface FinanceOverview {
+  total_revenue: number;
+  monthly_revenue: number;
+  weekly_revenue: number;
+  total_premium_users: number;
+  active_premium_users: number;
+  expired_premium_users: number;
+  recent_transactions: PremiumTransaction[];
+  monthly_chart: { month: string; revenue: number; upgrades: number }[];
 }
 
 export interface PaginatedStudents {
@@ -132,6 +167,45 @@ class StudentService {
       console.error(`Failed to update status for ${userId}:`, error);
       if (error instanceof ApiError) throw error;
       throw new Error("Failed to update student status");
+    }
+  }
+
+  /** Upgrade a student to premium ($2 = 30 days) */
+  public async upgradeToPremium(
+    userId: string,
+    amount: number,
+  ): Promise<PremiumUpgradeResponse> {
+    try {
+      const response = await fetch(`${API_URL}/students/${userId}/premium`, {
+        method: "POST",
+        headers: getHeaders(),
+        body: JSON.stringify({ amount }),
+      });
+      return await handleApiResponse<PremiumUpgradeResponse>(response);
+    } catch (error) {
+      console.error(`Failed to upgrade ${userId} to premium:`, error);
+      if (error instanceof ApiError) throw error;
+      throw new Error("Failed to upgrade student to premium");
+    }
+  }
+
+  /** Get finance / revenue overview */
+  public async getFinanceOverview(): Promise<FinanceOverview> {
+    try {
+      const response = await fetch(`${API_URL}/finance/overview`, {
+        method: "GET",
+        headers: getHeaders(),
+        cache: "no-store",
+      });
+      const data = await handleApiResponse<{
+        success: boolean;
+        data: FinanceOverview;
+      }>(response);
+      return data.data;
+    } catch (error) {
+      console.error("Failed to fetch finance overview:", error);
+      if (error instanceof ApiError) throw error;
+      throw new Error("Failed to fetch finance data");
     }
   }
 }
