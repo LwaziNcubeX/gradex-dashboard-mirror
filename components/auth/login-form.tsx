@@ -46,11 +46,14 @@ export function AdminLoginForm({
     setMessage("");
     setIsError(false);
     try {
-      const response = await fetch("http://0.0.0.0:8000/auth/request-otp", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/auth/request-otp`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        },
+      );
 
       const data: ResponseType = await response.json();
       if (data.message) {
@@ -72,7 +75,7 @@ export function AdminLoginForm({
     setMessage("");
     setIsError(false);
     try {
-      const response = await fetch("http://0.0.0.0:8000/auth", {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, otp }),
@@ -104,12 +107,12 @@ export function AdminLoginForm({
   return (
     <div className="relative w-full max-w-md">
       {/* Glow effect behind card */}
-      <div className="absolute -inset-1 rounded-2xl bg-gradient-to-b from-[hsl(220,60%,30%)]/20 via-transparent to-transparent blur-xl" />
+      <div className="absolute -inset-1 rounded-2xl bg-linear-to-b from-[hsl(220,60%,30%)]/20 via-transparent to-transparent blur-xl" />
 
       <div className="relative rounded-2xl border border-border/50 bg-card/80 p-8 shadow-2xl backdrop-blur-sm">
         {/* Header */}
         <div className="mb-8 flex flex-col items-center gap-4">
-          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-gradient-to-b from-[hsl(220,60%,30%)] to-[hsl(220,60%,20%)] shadow-lg shadow-[hsl(220,60%,30%)]/20">
+          <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-linear-to-b from-[hsl(220,60%,30%)] to-[hsl(220,60%,20%)] shadow-lg shadow-[hsl(220,60%,30%)]/20">
             <Shield className="h-7 w-7 text-foreground" />
           </div>
           <div className="text-center">

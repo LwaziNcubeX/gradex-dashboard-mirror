@@ -10,8 +10,8 @@ const getApiUrl = (): string => {
 export const API_BASE_URL = getApiUrl();
 export const API_URL = `${API_BASE_URL}/admin`;
 
-export const getHeaders = (): Record<string, string> => {
-  const accessToken = cookies.getAccessToken();
+export const getHeaders = (token?: string): Record<string, string> => {
+  const accessToken = token ?? cookies.getAccessToken();
 
   if (!accessToken) {
     return {
@@ -29,7 +29,7 @@ export class ApiError extends Error {
   constructor(
     public status: number,
     public message: string,
-    public data?: any
+    public data?: any,
   ) {
     super(message);
     this.name = "ApiError";
@@ -43,7 +43,7 @@ export async function handleApiResponse<T>(response: Response): Promise<T> {
     throw new ApiError(
       response.status,
       data.message || "API request failed",
-      data
+      data,
     );
   }
 

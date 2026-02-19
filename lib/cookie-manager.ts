@@ -12,16 +12,18 @@ class CookieManager {
 
   public saveTokens(data: TokenResponse): void {
     try {
+      const isSecure = process.env.NODE_ENV === "production";
+
       Cookies.set(this.ACCESS_TOKEN_KEY, data.access_token, {
         expires: this.ACCESS_TOKEN_EXPIRY,
-        secure: true,
+        secure: isSecure,
         sameSite: "strict",
         path: "/",
       });
 
       Cookies.set(this.REFRESH_TOKEN_KEY, data.refresh_token, {
         expires: this.REFRESH_TOKEN_EXPIRY,
-        secure: true,
+        secure: isSecure,
         sameSite: "strict",
         path: "/",
       });

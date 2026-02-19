@@ -142,7 +142,6 @@ function FilterDialog({
                     | "Form 2"
                     | "Form 3"
                     | "Form 4"
-                    | "Mixed"
                     | undefined,
                 }))
               }
@@ -330,13 +329,16 @@ const Questions = () => {
     const fetchData = async () => {
       try {
         const accessToken = getAccessToken();
-        const response = await fetch("http://0.0.0.0:8000/overview/questions", {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/admin/overview`,
+          {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${accessToken}`,
+            },
           },
-        });
+        );
 
         const data = await response.json();
         if (data.success) {

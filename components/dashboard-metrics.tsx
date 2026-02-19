@@ -1,5 +1,3 @@
-"use client";
-
 import {
   Users,
   BookOpen,
@@ -11,57 +9,11 @@ import {
   ArrowDown,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
+import type { OverviewData } from "@/lib/api/admin";
 
-const metrics = [
-  {
-    label: "Active Students",
-    value: "12,847",
-    change: "+12.5%",
-    trend: "up" as const,
-    icon: Users,
-    color: "primary",
-  },
-  {
-    label: "Total Questions",
-    value: "3,492",
-    change: "+248",
-    trend: "up" as const,
-    icon: BookOpen,
-    color: "chart-2",
-  },
-  {
-    label: "Quizzes Completed",
-    value: "48,392",
-    change: "+8.3%",
-    trend: "up" as const,
-    icon: Trophy,
-    color: "chart-3",
-  },
-  {
-    label: "Avg. Score",
-    value: "78.5%",
-    change: "+2.1%",
-    trend: "up" as const,
-    icon: Target,
-    color: "chart-4",
-  },
-  {
-    label: "Completion Rate",
-    value: "92.3%",
-    change: "+1.8%",
-    trend: "up" as const,
-    icon: TrendingUp,
-    color: "chart-1",
-  },
-  {
-    label: "Avg. Time/Quiz",
-    value: "4m 32s",
-    change: "-12s",
-    trend: "up" as const,
-    icon: Clock,
-    color: "chart-5",
-  },
-];
+interface DashboardMetricsProps {
+  overview?: OverviewData | null;
+}
 
 const colorClasses: Record<string, { bg: string; text: string; icon: string }> =
   {
@@ -97,7 +49,58 @@ const colorClasses: Record<string, { bg: string; text: string; icon: string }> =
     },
   };
 
-export function DashboardMetrics() {
+export function DashboardMetrics({ overview }: DashboardMetricsProps) {
+  const metrics = [
+    {
+      label: "Active Students",
+      value: overview ? overview.students.total.toLocaleString() : "—",
+      change: overview ? `+${overview.students.new_this_week} this week` : "",
+      trend: "up" as const,
+      icon: Users,
+      color: "primary",
+    },
+    {
+      label: "Total Questions",
+      value: overview ? overview.content.questions.toLocaleString() : "—",
+      change: "",
+      trend: "up" as const,
+      icon: BookOpen,
+      color: "chart-2",
+    },
+    {
+      label: "Total Quizzes",
+      value: overview ? overview.content.quizzes.toLocaleString() : "—",
+      change: "",
+      trend: "up" as const,
+      icon: Trophy,
+      color: "chart-3",
+    },
+    {
+      label: "Total Levels",
+      value: overview ? overview.content.levels.toLocaleString() : "—",
+      change: "",
+      trend: "up" as const,
+      icon: Target,
+      color: "chart-4",
+    },
+    {
+      label: "Active Today",
+      value: overview ? overview.students.active_today.toLocaleString() : "—",
+      change: "",
+      trend: "up" as const,
+      icon: TrendingUp,
+      color: "chart-1",
+    },
+    {
+      label: "Teachers",
+      value: overview ? overview.teachers.total.toLocaleString() : "—",
+      change: "",
+      trend: "up" as const,
+      icon: Clock,
+      color: "chart-5",
+    },
+  ];
+
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
       {metrics.map((metric) => {

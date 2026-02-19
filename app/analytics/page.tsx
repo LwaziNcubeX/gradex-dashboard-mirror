@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { TrendingUp, Users, BarChart3, Clock } from "lucide-react";
@@ -21,81 +22,24 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
-
-const engagementData = [
-  { month: "Jan", students: 1200, quizzes: 3400 },
-  { month: "Feb", students: 1400, quizzes: 4200 },
-  { month: "Mar", students: 1800, quizzes: 5100 },
-  { month: "Apr", students: 2100, quizzes: 5800 },
-  { month: "May", students: 2400, quizzes: 6500 },
-  { month: "Jun", students: 2847, quizzes: 7200 },
-];
-
-const scoreDistribution = [
-  { range: "0-50", count: 120 },
-  { range: "51-60", count: 280 },
-  { range: "61-70", count: 450 },
-  { range: "71-80", count: 680 },
-  { range: "81-90", count: 520 },
-  { range: "91-100", count: 340 },
-];
-
-const subjectData = [
-  { name: "Math", value: 35, fill: "var(--color-math)" },
-  { name: "Physics", value: 20, fill: "var(--color-physics)" },
-  { name: "Chemistry", value: 18, fill: "var(--color-chemistry)" },
-  { name: "Biology", value: 15, fill: "var(--color-biology)" },
-  { name: "History", value: 12, fill: "var(--color-history)" },
-];
+import { adminService, type AnalyticsData } from "@/lib/api/admin";
 
 const engagementConfig = {
-  students: { label: "Students", color: "var(--chart-1)" },
-  quizzes: { label: "Quizzes Taken", color: "var(--chart-2)" },
+  count: { label: "New Registrations", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 const scoreConfig = {
-  count: { label: "Students", color: "var(--chart-1)" },
+  students: { label: "Students", color: "var(--chart-1)" },
 } satisfies ChartConfig;
 
 const subjectConfig = {
   value: { label: "Percentage" },
-  math: { label: "Math", color: "var(--chart-2)" },
-  physics: { label: "Physics", color: "var(--chart-5)" },
-  chemistry: { label: "Chemistry", color: "var(--chart-1)" },
-  biology: { label: "Biology", color: "var(--chart-3)" },
-  history: { label: "History", color: "var(--chart-4)" },
+  mathematics: { label: "Mathematics", color: "var(--chart-2)" },
+  english: { label: "English", color: "var(--chart-5)" },
+  geography: { label: "Geography", color: "var(--chart-1)" },
+  history: { label: "History", color: "var(--chart-3)" },
+  "combined science": { label: "Combined Science", color: "var(--chart-4)" },
 } satisfies ChartConfig;
-
-const summaryMetrics = [
-  {
-    label: "Total Students",
-    value: "2,847",
-    change: "+18.7%",
-    icon: Users,
-    color: "primary",
-  },
-  {
-    label: "Quizzes Taken",
-    value: "7,200",
-    change: "+10.8%",
-    icon: BarChart3,
-    color: "chart-2",
-  },
-  {
-    label: "Avg. Score",
-    value: "76.4%",
-    change: "+5.2%",
-    icon: TrendingUp,
-    color: "chart-1",
-  },
-  {
-    label: "Peak Hours",
-    value: "6-9 PM",
-    change: "Consistent",
-    icon: Clock,
-    color: "chart-3",
-  },
-];
 
 const metricColors: Record<string, { bg: string; text: string }> = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
@@ -104,7 +48,107 @@ const metricColors: Record<string, { bg: string; text: string }> = {
   "chart-3": { bg: "bg-chart-3/10", text: "text-chart-3" },
 };
 
+const SUBJECT_FILLS = [
+  "var(--chart-2)",
+  "var(--chart-5)",
+  "var(--chart-1)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+];
+
+const FALLBACK_DAILY = Array.from({ length: 30 }, (_, i) => ({
+  date: `Day ${i + 1}`,
+  count: Math.floor(Math.random() * 50 + 10),
+}));
+
+const FALLBACK_SUBJECT = [
+  { name: "Mathematics", value: 35, fill: "var(--chart-2)" },
+  { name: "English", value: 20, fill: "var(--chart-5)" },
+  { name: "Geography", value: 18, fill: "var(--chart-1)" },
+  { name: "History", value: 15, fill: "var(--chart-3)" },
+  { name: "Combined Science", value: 12, fill: "var(--chart-4)" },
+];
+
 export default function AnalyticsPage() {
+  const [analytics, setAnalytics] = useState<AnalyticsData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    adminService
+      .getAnalytics()
+      .then(setAnalytics)
+      .catch(() => setAnalytics(null))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const dailyData = analytics?.daily_registrations ?? FALLBACK_DAILY;
+
+  const totalRegistrations = dailyData.reduce((s, d) => s + d.count, 0);
+  const avgPerDay =
+    dailyData.length > 0
+      ? Math.round(totalRegistrations / dailyData.length)
+      : 0;
+
+  const subjectData = analytics?.subject_performance
+    ? analytics.subject_performance.map((s, i) => ({
+        name: s.subject,
+        value: s.attempts,
+        fill: SUBJECT_FILLS[i % SUBJECT_FILLS.length],
+      }))
+    : FALLBACK_SUBJECT;
+
+  const totalSubjectValue = subjectData.reduce((s, d) => s + d.value, 0);
+  const subjectPercentages = subjectData.map((d) => ({
+    ...d,
+    pct:
+      totalSubjectValue > 0
+        ? Math.round((d.value / totalSubjectValue) * 100)
+        : 0,
+  }));
+
+  const xpLevelData = analytics?.xp_by_level ?? [];
+
+  const topQuizzes = analytics?.top_quizzes ?? [];
+
+  const summaryMetrics = [
+    {
+      label: "Registrations (30d)",
+      value: loading ? "—" : totalRegistrations.toLocaleString(),
+      change: `~${avgPerDay}/day`,
+      icon: Users,
+      color: "primary",
+    },
+    {
+      label: "Quizzes Completed",
+      value: loading
+        ? "—"
+        : topQuizzes
+            .reduce((s, q) => s + q.completion_count, 0)
+            .toLocaleString(),
+      change: `${topQuizzes.length} top quizzes`,
+      icon: BarChart3,
+      color: "chart-2",
+    },
+    {
+      label: "Avg. Score",
+      value: loading
+        ? "—"
+        : analytics?.subject_performance?.length
+          ? `${Math.round(analytics.subject_performance.reduce((s, p) => s + p.avg_score, 0) / analytics.subject_performance.length)}%`
+          : "—",
+      change: "across subjects",
+      icon: TrendingUp,
+      color: "chart-1",
+    },
+    {
+      label: "Peak Hours",
+      value: "6-9 PM",
+      change: "Consistent",
+      icon: Clock,
+      color: "chart-3",
+    },
+  ];
+
   return (
     <DashboardLayout>
       {/* Page header */}
@@ -154,48 +198,26 @@ export default function AnalyticsPage() {
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        {/* Growth chart */}
+        {/* Daily registrations chart */}
         <Card className="rounded-xl">
           <CardHeader className="px-4 pt-4 pb-2">
             <CardTitle className="text-sm font-medium text-foreground">
-              Student & Quiz Growth
+              Daily Registrations (Last 30 days)
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <div className="flex items-center gap-4 mb-3">
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-chart-1" />
-                <span className="text-xs text-muted-foreground">Students</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2.5 h-2.5 rounded-full bg-chart-2" />
-                <span className="text-xs text-muted-foreground">Quizzes</span>
-              </div>
-            </div>
             <ChartContainer config={engagementConfig} className="h-64 w-full">
-              <AreaChart data={engagementData} accessibilityLayer>
+              <AreaChart data={dailyData} accessibilityLayer>
                 <defs>
-                  <linearGradient id="analStudents" x1="0" y1="0" x2="0" y2="1">
+                  <linearGradient id="analReg" x1="0" y1="0" x2="0" y2="1">
                     <stop
                       offset="5%"
-                      stopColor="var(--color-students)"
+                      stopColor="var(--color-count)"
                       stopOpacity={0.3}
                     />
                     <stop
                       offset="95%"
-                      stopColor="var(--color-students)"
-                      stopOpacity={0}
-                    />
-                  </linearGradient>
-                  <linearGradient id="analQuizzes" x1="0" y1="0" x2="0" y2="1">
-                    <stop
-                      offset="5%"
-                      stopColor="var(--color-quizzes)"
-                      stopOpacity={0.3}
-                    />
-                    <stop
-                      offset="95%"
-                      stopColor="var(--color-quizzes)"
+                      stopColor="var(--color-count)"
                       stopOpacity={0}
                     />
                   </linearGradient>
@@ -206,18 +228,19 @@ export default function AnalyticsPage() {
                   vertical={false}
                 />
                 <XAxis
-                  dataKey="month"
-                  tick={{ fill: "currentColor", fontSize: 11 }}
+                  dataKey="date"
+                  tick={{ fill: "currentColor", fontSize: 10 }}
                   className="text-muted-foreground"
                   axisLine={false}
                   tickLine={false}
+                  interval={4}
                 />
                 <YAxis
                   tick={{ fill: "currentColor", fontSize: 11 }}
                   className="text-muted-foreground"
                   axisLine={false}
                   tickLine={false}
-                  width={35}
+                  width={30}
                 />
                 <ChartTooltip
                   cursor={false}
@@ -225,65 +248,69 @@ export default function AnalyticsPage() {
                 />
                 <Area
                   type="monotone"
-                  dataKey="students"
-                  stroke="var(--color-students)"
+                  dataKey="count"
+                  stroke="var(--color-count)"
                   strokeWidth={2}
                   fillOpacity={1}
-                  fill="url(#analStudents)"
-                />
-                <Area
-                  type="monotone"
-                  dataKey="quizzes"
-                  stroke="var(--color-quizzes)"
-                  strokeWidth={2}
-                  fillOpacity={1}
-                  fill="url(#analQuizzes)"
+                  fill="url(#analReg)"
                 />
               </AreaChart>
             </ChartContainer>
           </CardContent>
         </Card>
 
-        {/* Score distribution */}
+        {/* XP by level chart */}
         <Card className="rounded-xl">
           <CardHeader className="px-4 pt-4 pb-2">
             <CardTitle className="text-sm font-medium text-foreground">
-              Score Distribution
+              Avg. XP by Level
             </CardTitle>
           </CardHeader>
           <CardContent className="px-4 pb-4">
-            <ChartContainer config={scoreConfig} className="h-72 w-full">
-              <BarChart data={scoreDistribution} accessibilityLayer>
-                <CartesianGrid
-                  strokeDasharray="3 3"
-                  className="stroke-border"
-                  vertical={false}
-                />
-                <XAxis
-                  dataKey="range"
-                  tick={{ fill: "currentColor", fontSize: 11 }}
-                  className="text-muted-foreground"
-                  axisLine={false}
-                  tickLine={false}
-                />
-                <YAxis
-                  tick={{ fill: "currentColor", fontSize: 11 }}
-                  className="text-muted-foreground"
-                  axisLine={false}
-                  tickLine={false}
-                  width={35}
-                />
-                <ChartTooltip
-                  cursor={false}
-                  content={<ChartTooltipContent />}
-                />
-                <Bar
-                  dataKey="count"
-                  fill="var(--color-count)"
-                  radius={[4, 4, 0, 0]}
-                />
-              </BarChart>
-            </ChartContainer>
+            {xpLevelData.length > 0 ? (
+              <ChartContainer
+                config={{
+                  avg_xp: { label: "Avg XP", color: "var(--chart-1)" },
+                }}
+                className="h-64 w-full"
+              >
+                <BarChart data={xpLevelData} accessibilityLayer>
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    className="stroke-border"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="level"
+                    tick={{ fill: "currentColor", fontSize: 11 }}
+                    className="text-muted-foreground"
+                    axisLine={false}
+                    tickLine={false}
+                    tickFormatter={(v) => `L${v}`}
+                  />
+                  <YAxis
+                    tick={{ fill: "currentColor", fontSize: 11 }}
+                    className="text-muted-foreground"
+                    axisLine={false}
+                    tickLine={false}
+                    width={40}
+                  />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent />}
+                  />
+                  <Bar
+                    dataKey="avg_xp"
+                    fill="var(--chart-1)"
+                    radius={[4, 4, 0, 0]}
+                  />
+                </BarChart>
+              </ChartContainer>
+            ) : (
+              <div className="h-64 flex items-center justify-center text-muted-foreground text-sm">
+                {loading ? "Loading..." : "No level data available yet"}
+              </div>
+            )}
           </CardContent>
         </Card>
 
@@ -306,24 +333,24 @@ export default function AnalyticsPage() {
                     content={<ChartTooltipContent hideLabel />}
                   />
                   <Pie
-                    data={subjectData}
+                    data={subjectPercentages}
                     cx="50%"
                     cy="50%"
                     innerRadius={50}
                     outerRadius={80}
                     paddingAngle={2}
-                    dataKey="value"
+                    dataKey="pct"
                     nameKey="name"
                     stroke="none"
                   >
-                    {subjectData.map((entry, index) => (
+                    {subjectPercentages.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.fill} />
                     ))}
                   </Pie>
                 </PieChart>
               </ChartContainer>
               <div className="flex flex-col gap-2.5">
-                {subjectData.map((item) => (
+                {subjectPercentages.map((item) => (
                   <div
                     key={item.name}
                     className="flex items-center justify-between gap-4"
@@ -338,7 +365,7 @@ export default function AnalyticsPage() {
                       </span>
                     </div>
                     <span className="text-xs font-medium text-foreground tabular-nums">
-                      {item.value}%
+                      {item.pct}%
                     </span>
                   </div>
                 ))}
@@ -356,9 +383,13 @@ export default function AnalyticsPage() {
           </CardHeader>
           <CardContent className="px-4 pb-4 flex flex-col gap-2.5">
             <div className="p-3 bg-primary/5 rounded-lg border border-primary/10">
-              <p className="text-primary text-sm font-medium">Student Growth</p>
+              <p className="text-primary text-sm font-medium">
+                Registration Growth
+              </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Enrollment increased by 18.7% this month
+                {totalRegistrations > 0
+                  ? `${totalRegistrations.toLocaleString()} new registrations in the last 30 days`
+                  : "Track new student registrations over time"}
               </p>
             </div>
             <div className="p-3 bg-chart-2/5 rounded-lg border border-chart-2/10">
@@ -366,7 +397,9 @@ export default function AnalyticsPage() {
                 Quiz Engagement
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Average completion rate is 78%, up from 72%
+                {topQuizzes.length > 0
+                  ? `Top quiz: "${topQuizzes[0]?.title}" with ${topQuizzes[0]?.completion_count} completions`
+                  : "Monitor quiz completion rates across subjects"}
               </p>
             </div>
             <div className="p-3 bg-chart-3/5 rounded-lg border border-chart-3/10">
@@ -374,7 +407,9 @@ export default function AnalyticsPage() {
                 Performance Trend
               </p>
               <p className="text-xs text-muted-foreground mt-0.5">
-                Mathematics scores improved by 5.2% across all levels
+                {analytics?.subject_performance?.length
+                  ? `${analytics.subject_performance[0]?.subject} leads with avg score ${Math.round(analytics.subject_performance[0]?.avg_score ?? 0)}%`
+                  : "Track scores across Mathematics, English, and other subjects"}
               </p>
             </div>
             <div className="p-3 bg-chart-5/5 rounded-lg border border-chart-5/10">

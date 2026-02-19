@@ -14,37 +14,47 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart";
+import type { OverviewData } from "@/lib/api/admin";
 
-const data = [
-  { name: "Mathematics", value: 32, fill: "var(--color-mathematics)" },
-  { name: "Science", value: 28, fill: "var(--color-science)" },
-  { name: "English", value: 22, fill: "var(--color-english)" },
-  { name: "History", value: 18, fill: "var(--color-history)" },
+interface SubjectDistributionProps {
+  overview?: OverviewData | null;
+}
+
+const SUBJECT_FILL_VARS = [
+  "var(--chart-2)",
+  "var(--chart-1)",
+  "var(--chart-3)",
+  "var(--chart-4)",
+  "var(--chart-5)",
 ];
 
 const chartConfig = {
-  value: {
-    label: "Percentage",
-  },
-  mathematics: {
-    label: "Mathematics",
-    color: "var(--chart-2)",
-  },
-  science: {
-    label: "Science",
-    color: "var(--chart-1)",
-  },
-  english: {
-    label: "English",
-    color: "var(--chart-3)",
-  },
-  history: {
-    label: "History",
-    color: "var(--chart-4)",
-  },
+  value: { label: "Count" },
+  mathematics: { label: "Mathematics", color: "var(--chart-2)" },
+  english: { label: "English", color: "var(--chart-1)" },
+  geography: { label: "Geography", color: "var(--chart-3)" },
+  history: { label: "History", color: "var(--chart-4)" },
+  "combined science": { label: "Combined Science", color: "var(--chart-5)" },
 } satisfies ChartConfig;
 
-export function SubjectDistribution() {
+export function SubjectDistribution({ overview }: SubjectDistributionProps) {
+  const rawData = overview?.subject_distribution ?? [
+    { subject: "Mathematics", count: 32 },
+    { subject: "English", count: 28 },
+    { subject: "Geography", count: 22 },
+    { subject: "History", count: 18 },
+    { subject: "Combined Science", count: 14 },
+  ];
+
+  const totalCount = rawData.reduce((acc, item) => acc + item.count, 0);
+
+  const data = rawData.map((item, i) => ({
+    name: item.subject,
+    value: totalCount > 0 ? Math.round((item.count / totalCount) * 100) : 0,
+    count: item.count,
+    fill: SUBJECT_FILL_VARS[i % SUBJECT_FILL_VARS.length],
+  }));
+
   const total = data.reduce((acc, item) => acc + item.value, 0);
 
   return (

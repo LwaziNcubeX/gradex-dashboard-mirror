@@ -51,14 +51,9 @@ export function middleware(request: NextRequest) {
   const token = getAccessToken(request);
   const isAuthenticated = token !== null;
 
-  // Check if current path is public
-  const isPublicRoute = publicRoutes.some((route) =>
-    pathname.startsWith(route)
-  );
-
   // Check if current path is protected
   const isProtectedRoute = protectedRoutes.some(
-    (route) => pathname === route || pathname.startsWith(route + "/")
+    (route) => pathname === route || pathname.startsWith(route + "/"),
   );
 
   // If user is authenticated and tries to access /auth, redirect to dashboard

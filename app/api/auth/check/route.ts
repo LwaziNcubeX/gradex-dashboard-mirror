@@ -24,30 +24,30 @@ export async function GET(request: NextRequest) {
     if (!token) {
       return NextResponse.json(
         { authenticated: false, message: "No token found" },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     if (isTokenExpired(token)) {
-      // Clear the expired token
+      // Only clear the access token — keep refresh token so the client can
+      // silently re-authenticate without forcing the user to log in again.
       const response = NextResponse.json(
         { authenticated: false, message: "Token expired" },
-        { status: 401 }
+        { status: 401 },
       );
       response.cookies.delete("accessToken");
-      response.cookies.delete("refreshToken");
       return response;
     }
 
     return NextResponse.json(
       { authenticated: true, message: "User is authenticated" },
-      { status: 200 }
+      { status: 200 },
     );
   } catch (error) {
     console.error("Auth check error:", error);
     return NextResponse.json(
       { authenticated: false, message: "Error checking authentication" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

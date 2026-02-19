@@ -1,37 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DashboardLayout } from "@/components/dashboard-layout";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import {
-  Users,
-  TrendingUp,
-  Award,
-  Clock,
-  Search,
-  ChevronLeft,
-  ChevronRight,
-  ChevronsUpDown,
-} from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Users, TrendingUp, Award, Clock } from "lucide-react";
 import StudentsTable from "@/components/students/students";
-
-const summaryMetrics = [
-  { label: "Total Students", value: "2,847", icon: Users, color: "primary" },
-  { label: "Active Today", value: "1,234", icon: TrendingUp, color: "chart-2" },
-  { label: "Top Performers", value: "156", icon: Award, color: "chart-3" },
-  { label: "Avg. Study Time", value: "45m", icon: Clock, color: "chart-5" },
-];
+import { adminService, type OverviewData } from "@/lib/api/admin";
 
 const metricColors: Record<string, { bg: string; text: string }> = {
   primary: { bg: "bg-primary/10", text: "text-primary" },
@@ -40,18 +14,43 @@ const metricColors: Record<string, { bg: string; text: string }> = {
   "chart-5": { bg: "bg-chart-5/10", text: "text-chart-5" },
 };
 
-const avatarColors = [
-  "bg-primary/20 text-primary",
-  "bg-chart-2/20 text-chart-2",
-  "bg-chart-5/20 text-chart-5",
-  "bg-chart-3/20 text-chart-3",
-  "bg-chart-4/20 text-chart-4",
-  "bg-chart-1/20 text-chart-1",
-  "bg-chart-2/20 text-chart-2",
-  "bg-primary/20 text-primary",
-];
-
 export default function StudentsPage() {
+  const [overview, setOverview] = useState<OverviewData | null>(null);
+
+  useEffect(() => {
+    adminService
+      .getOverview()
+      .then(setOverview)
+      .catch(() => setOverview(null));
+  }, []);
+
+  const summaryMetrics = [
+    {
+      label: "Total Students",
+      value: overview ? overview.students.total.toLocaleString() : "—",
+      icon: Users,
+      color: "primary",
+    },
+    {
+      label: "Active Today",
+      value: overview ? overview.students.active_today.toLocaleString() : "—",
+      icon: TrendingUp,
+      color: "chart-2",
+    },
+    {
+      label: "New This Week",
+      value: overview ? overview.students.new_this_week.toLocaleString() : "—",
+      icon: Award,
+      color: "chart-3",
+    },
+    {
+      label: "Teachers",
+      value: overview ? overview.teachers.total.toLocaleString() : "—",
+      icon: Clock,
+      color: "chart-5",
+    },
+  ];
+
   return (
     <DashboardLayout>
       {/* Summary metrics */}

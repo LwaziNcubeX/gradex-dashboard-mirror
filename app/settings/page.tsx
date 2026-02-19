@@ -10,16 +10,16 @@ import {
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Bell, Shield, Palette, Database, Globe } from "lucide-react";
+  Bell,
+  Shield,
+  Palette,
+  Database,
+  Globe,
+  Lock,
+  CheckCircle2,
+} from "lucide-react";
 import { ProfileSettingsCard } from "@/components/settings/profile-settings";
 
 export default function SettingsPage() {
@@ -95,35 +95,40 @@ export default function SettingsPage() {
                     Security
                   </CardTitle>
                   <CardDescription className="text-xs text-muted-foreground">
-                    Manage security settings
+                    Account security settings
                   </CardDescription>
                 </div>
               </div>
             </CardHeader>
             <CardContent className="px-4 pb-4 flex flex-col gap-3">
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Current Password
-                </Label>
-                <Input
-                  type="password"
-                  placeholder="Enter current password"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
+              <div className="p-3 bg-chart-1/5 border border-chart-1/20 rounded-lg flex items-start gap-2.5">
+                <CheckCircle2 className="h-4 w-4 text-chart-1 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-medium text-foreground">
+                    OTP Authentication Active
+                  </p>
+                  <p className="text-[11px] text-muted-foreground mt-0.5">
+                    GradeX uses secure one-time passcodes sent to your email for
+                    authentication. No password required.
+                  </p>
+                </div>
               </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  New Password
-                </Label>
-                <Input
-                  type="password"
-                  placeholder="Enter new password"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
+              <div className="p-3 bg-secondary/50 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Lock className="h-4 w-4 text-muted-foreground" />
+                  <div>
+                    <p className="text-sm text-foreground font-medium">
+                      Two-Factor Auth
+                    </p>
+                    <p className="text-[11px] text-muted-foreground">
+                      Built-in via OTP login flow
+                    </p>
+                  </div>
+                </div>
+                <Badge className="bg-chart-1/10 text-chart-1 border-chart-1/20 text-[10px]">
+                  Enabled
+                </Badge>
               </div>
-              <Button size="sm" className="w-fit">
-                Update Password
-              </Button>
             </CardContent>
           </Card>
         </div>
@@ -171,18 +176,24 @@ export default function SettingsPage() {
                 </CardTitle>
               </div>
             </CardHeader>
-            <CardContent className="px-4 pb-4">
-              <Select defaultValue="en-us">
-                <SelectTrigger className="bg-secondary border-border h-9 text-sm">
-                  <SelectValue placeholder="Select language" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="en-us">English (US)</SelectItem>
-                  <SelectItem value="es">Spanish</SelectItem>
-                  <SelectItem value="fr">French</SelectItem>
-                  <SelectItem value="de">German</SelectItem>
-                </SelectContent>
-              </Select>
+            <CardContent className="px-4 pb-4 flex flex-col gap-2">
+              <div className="flex items-center justify-between p-2.5 bg-secondary/50 rounded-lg">
+                <div>
+                  <p className="text-foreground text-sm font-medium">
+                    English (US)
+                  </p>
+                  <p className="text-[11px] text-muted-foreground">
+                    Current language
+                  </p>
+                </div>
+                <Badge variant="secondary" className="text-[10px]">
+                  Active
+                </Badge>
+              </div>
+              <p className="text-[11px] text-muted-foreground px-0.5">
+                Platform is configured for English. Additional language support
+                coming soon.
+              </p>
             </CardContent>
           </Card>
 

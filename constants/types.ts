@@ -71,8 +71,9 @@ export const StudentTableHeader = [
 
 export const SubjectsList = [
   "Mathematics",
-  "History",
+  "English",
   "Geography",
+  "History",
   "Combined Science",
 ];
 

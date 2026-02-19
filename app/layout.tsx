@@ -1,6 +1,6 @@
 import type React from "react";
 import type { Metadata } from "next";
-import { Analytics } from "@vercel/analytics/next";
+import { Toaster } from "sonner";
 import "./globals.css";
 import { inter } from "@/components/fonts";
 
@@ -32,10 +32,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <body className={`${inter.className} antialiased`}>
         {children}
-        <Analytics />
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   );

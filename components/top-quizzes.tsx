@@ -2,7 +2,6 @@
 
 import {
   ArrowUp,
-  ArrowDown,
   ChevronsUpDown,
   BookOpen,
   MoreHorizontal,
@@ -31,113 +30,73 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ChartConfig, ChartContainer } from "@/components/ui/chart";
+import type { AnalyticsData } from "@/lib/api/admin";
 
-const quizData = [
+interface TopQuizzesProps {
+  analytics?: AnalyticsData | null;
+}
+
+const subjectColors: Record<string, string> = {
+  Mathematics: "bg-chart-2",
+  English: "bg-chart-3",
+  Geography: "bg-chart-4",
+  History: "bg-chart-4",
+  "Combined Science": "bg-chart-1",
+};
+
+const chartConfig = {
+  value: { label: "Score", color: "var(--chart-1)" },
+} satisfies ChartConfig;
+
+const FALLBACK_QUIZZES = [
   {
-    id: "math-101",
+    id: "1",
     name: "Algebra Basics",
     subject: "Mathematics",
     attempts: 4521,
     avgScore: 82,
-    completion: 94,
-    trend: "up",
-    chartData: [
-      { value: 70 },
-      { value: 72 },
-      { value: 75 },
-      { value: 78 },
-      { value: 76 },
-      { value: 80 },
-      { value: 79 },
-      { value: 82 },
-      { value: 81 },
-      { value: 84 },
-      { value: 82 },
-    ],
+    chartData: Array.from({ length: 11 }, (_, i) => ({ value: 75 + i })),
   },
   {
-    id: "sci-201",
-    name: "Physics Fundamentals",
-    subject: "Science",
-    attempts: 3892,
-    avgScore: 75,
-    completion: 88,
-    trend: "up",
-    chartData: [
-      { value: 65 },
-      { value: 68 },
-      { value: 70 },
-      { value: 69 },
-      { value: 72 },
-      { value: 71 },
-      { value: 73 },
-      { value: 74 },
-      { value: 73 },
-      { value: 76 },
-      { value: 75 },
-    ],
-  },
-  {
-    id: "eng-102",
+    id: "2",
     name: "Grammar Essentials",
     subject: "English",
-    attempts: 5234,
-    avgScore: 68,
-    completion: 91,
-    trend: "down",
-    chartData: [
-      { value: 75 },
-      { value: 73 },
-      { value: 74 },
-      { value: 72 },
-      { value: 70 },
-      { value: 71 },
-      { value: 69 },
-      { value: 70 },
-      { value: 68 },
-      { value: 69 },
-      { value: 68 },
-    ],
+    attempts: 3892,
+    avgScore: 75,
+    chartData: Array.from({ length: 11 }, (_, i) => ({ value: 70 + i })),
   },
   {
-    id: "hist-101",
+    id: "3",
+    name: "Map Skills",
+    subject: "Geography",
+    attempts: 2941,
+    avgScore: 68,
+    chartData: Array.from({ length: 11 }, (_, i) => ({ value: 64 + i })),
+  },
+  {
+    id: "4",
     name: "World History",
     subject: "History",
     attempts: 2847,
     avgScore: 79,
-    completion: 86,
-    trend: "up",
-    chartData: [
-      { value: 72 },
-      { value: 74 },
-      { value: 73 },
-      { value: 76 },
-      { value: 75 },
-      { value: 77 },
-      { value: 76 },
-      { value: 78 },
-      { value: 77 },
-      { value: 80 },
-      { value: 79 },
-    ],
+    chartData: Array.from({ length: 11 }, (_, i) => ({ value: 73 + i })),
   },
 ];
 
-const subjectColors: Record<string, string> = {
-  Mathematics: "bg-chart-2",
-  Science: "bg-chart-1",
-  English: "bg-chart-3",
-  History: "bg-chart-4",
-};
+export function TopQuizzes({ analytics }: TopQuizzesProps) {
+  const quizData = analytics?.top_quizzes
+    ? analytics.top_quizzes.map((q) => ({
+        id: q._id,
+        name: q.title,
+        subject: q.subject,
+        attempts: q.completion_count,
+        avgScore: Math.round(q.average_score),
+        chartData: Array.from({ length: 11 }, (_, i) => ({
+          value: Math.max(0, Math.round(q.average_score) - 5 + i),
+        })),
+      }))
+    : FALLBACK_QUIZZES;
 
-const chartConfig = {
-  value: {
-    label: "Score",
-    color: "var(--chart-1)",
-  },
-} satisfies ChartConfig;
-
-export function TopQuizzes() {
   return (
     <Card className="rounded-2xl">
       <CardHeader className="pb-2">
@@ -173,9 +132,6 @@ export function TopQuizzes() {
               <TableHead className="text-muted-foreground font-medium text-right">
                 Avg. Score
               </TableHead>
-              <TableHead className="text-muted-foreground font-medium text-right">
-                Completion
-              </TableHead>
               <TableHead className="w-10"></TableHead>
             </TableRow>
           </TableHeader>
@@ -183,15 +139,13 @@ export function TopQuizzes() {
             {quizData.map((item, index) => (
               <TableRow
                 key={item.id}
-                className={`group border-border ${
-                  index === 0 ? "bg-primary/5" : ""
-                }`}
+                className={`group border-border ${index === 0 ? "bg-primary/5" : ""}`}
               >
                 <TableCell>
                   <div className="flex items-center gap-3">
                     <div
                       className={`w-9 h-9 rounded-lg ${
-                        subjectColors[item.subject]
+                        subjectColors[item.subject] ?? "bg-muted"
                       } flex items-center justify-center`}
                     >
                       <BookOpen className="h-4 w-4 text-foreground" />
@@ -219,20 +173,12 @@ export function TopQuizzes() {
                         >
                           <stop
                             offset="0%"
-                            stopColor={
-                              item.trend === "up"
-                                ? "var(--chart-1)"
-                                : "var(--destructive)"
-                            }
+                            stopColor="var(--chart-1)"
                             stopOpacity={0.3}
                           />
                           <stop
                             offset="100%"
-                            stopColor={
-                              item.trend === "up"
-                                ? "var(--chart-1)"
-                                : "var(--destructive)"
-                            }
+                            stopColor="var(--chart-1)"
                             stopOpacity={0}
                           />
                         </linearGradient>
@@ -240,11 +186,7 @@ export function TopQuizzes() {
                       <Area
                         type="monotone"
                         dataKey="value"
-                        stroke={
-                          item.trend === "up"
-                            ? "var(--chart-1)"
-                            : "var(--destructive)"
-                        }
+                        stroke="var(--chart-1)"
                         strokeWidth={1.5}
                         fill={`url(#gradient-${item.id})`}
                       />
@@ -254,21 +196,10 @@ export function TopQuizzes() {
                 <TableCell className="text-right text-foreground font-medium text-sm">
                   {item.attempts.toLocaleString()}
                 </TableCell>
-                <TableCell
-                  className={`text-right font-medium text-sm ${
-                    item.trend === "up" ? "text-chart-1" : "text-destructive"
-                  }`}
-                >
-                  {item.avgScore}%
-                </TableCell>
-                <TableCell className="text-right font-medium">
-                  <div className="flex items-center justify-end gap-1 text-foreground text-sm">
-                    {item.trend === "up" ? (
-                      <ArrowUp className="h-3 w-3 text-chart-1" />
-                    ) : (
-                      <ArrowDown className="h-3 w-3 text-destructive" />
-                    )}
-                    {item.completion}%
+                <TableCell className="text-right font-medium text-sm text-chart-1">
+                  <div className="flex items-center justify-end gap-1">
+                    <ArrowUp className="h-3 w-3 text-chart-1" />
+                    {item.avgScore}%
                   </div>
                 </TableCell>
                 <TableCell>
