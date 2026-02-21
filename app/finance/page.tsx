@@ -125,17 +125,6 @@ export default function FinancePage() {
   return (
     <DashboardLayout>
       <div className="flex flex-col gap-6">
-        {/* Header */}
-        <div>
-          <h1 className="text-xl font-semibold text-foreground">
-            Revenue &amp; Finance
-          </h1>
-          <p className="text-sm text-muted-foreground mt-0.5">
-            Track premium upgrade revenue, active subscriptions, and billing
-            history.
-          </p>
-        </div>
-
         {/* Metrics */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <MetricCard
@@ -224,12 +213,18 @@ export default function FinancePage() {
                   />
                   <XAxis
                     dataKey="month"
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{
+                      fontSize: 11,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                     tickLine={false}
                     axisLine={false}
                   />
                   <YAxis
-                    tick={{ fontSize: 11, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{
+                      fontSize: 11,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                     tickLine={false}
                     axisLine={false}
                     tickFormatter={(v) => `$${v}`}
@@ -321,10 +316,7 @@ export default function FinancePage() {
                   </TableHeader>
                   <TableBody>
                     {data.recent_transactions.map((tx, i) => (
-                      <TableRow
-                        key={tx._id || i}
-                        className="border-border"
-                      >
+                      <TableRow key={tx._id || i} className="border-border">
                         <TableCell className="py-2.5 text-sm font-medium text-foreground">
                           <div className="flex items-center gap-1.5">
                             <Crown className="h-3 w-3 text-chart-3 flex-shrink-0" />

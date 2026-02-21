@@ -102,6 +102,7 @@ export function StudentDetailSheet({
   const [updatingStatus, setUpdatingStatus] = useState(false);
   const [premiumDialogOpen, setPremiumDialogOpen] = useState(false);
   const [premiumAmount, setPremiumAmount] = useState("2");
+  const [ecocashApprovalCode, setEcocashApprovalCode] = useState("");
   const [upgradingPremium, setUpgradingPremium] = useState(false);
   const [statusConfirmOpen, setStatusConfirmOpen] = useState(false);
   const [pendingStatus, setPendingStatus] = useState<string | null>(null);
@@ -162,6 +163,7 @@ export function StudentDetailSheet({
       const result = await studentService.upgradeToPremium(
         student.user_id,
         amount,
+        ecocashApprovalCode,
       );
       toast.success(
         result.message || `Premium activated for ${result.data.days} days`,
@@ -505,9 +507,7 @@ export function StudentDetailSheet({
             &apos;s status from{" "}
             <span className="font-medium text-foreground">{statusValue}</span>{" "}
             to{" "}
-            <span className="font-medium text-foreground">
-              {pendingStatus}
-            </span>
+            <span className="font-medium text-foreground">{pendingStatus}</span>
             ?
             {pendingStatus === "disabled" && (
               <span className="block mt-1 text-destructive text-xs">
@@ -569,6 +569,16 @@ export function StudentDetailSheet({
                 onChange={(e) => setPremiumAmount(e.target.value)}
                 placeholder="2"
                 className="bg-secondary border-border h-9 text-sm"
+              />
+              <Label className="text-xs text-muted-foreground mb-1.5 block">
+                Ecocash Approval Code
+              </Label>
+              <Input
+                type="string"
+                placeholder="ghghgghghghghg"
+                className="bg-secondary border-border h-9 text-sm"
+                value={ecocashApprovalCode}
+                onChange={(e) => setEcocashApprovalCode(e.target.value)}
               />
               <p className="text-[10px] text-muted-foreground mt-1">
                 Every $2 = 30 days.{" "}

@@ -24,6 +24,7 @@ const pageTitles: Record<string, string> = {
   "/analytics": "Analytics",
   "/feedback": "Feedback",
   "/settings": "Settings",
+  "/finance": "Revenue & Finance",
 };
 const pageDTitles: Record<string, string> = {
   "/": "Welcome back. Here is what is happening today.",
@@ -32,6 +33,7 @@ const pageDTitles: Record<string, string> = {
   "/analytics": "Track performance and engagement trends.",
   "/feedback": "Review and manage user feedback.",
   "/settings": "Manage your account and preferences.",
+  "/finance": "Track revenue, active subscriptions, and billing history.",
 };
 
 export function Header({

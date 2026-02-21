@@ -174,12 +174,23 @@ class StudentService {
   public async upgradeToPremium(
     userId: string,
     amount: number,
+    ecocashApprovalCode: string,
   ): Promise<PremiumUpgradeResponse> {
+    const ecocash_approval_code = ecocashApprovalCode;
     try {
+      console.log(
+        JSON.stringify({
+          amount,
+          ecocash_approval_code,
+        }),
+      );
       const response = await fetch(`${API_URL}/students/${userId}/premium`, {
-        method: "POST",
+        method: "PATCH",
         headers: getHeaders(),
-        body: JSON.stringify({ amount }),
+        body: JSON.stringify({
+          amount,
+          ecocash_approval_code,
+        }),
       });
       return await handleApiResponse<PremiumUpgradeResponse>(response);
     } catch (error) {
