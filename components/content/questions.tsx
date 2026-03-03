@@ -148,7 +148,10 @@ function QuestionFormDialog({
     if (editingQuestion) {
       setForm({
         question_text: editingQuestion.question_text,
-        answers: editingQuestion.answers.length >= 2 ? editingQuestion.answers : ["", "", "", ""],
+        answers:
+          editingQuestion.answers.length >= 2
+            ? editingQuestion.answers
+            : ["", "", "", ""],
         correct_answer: editingQuestion.correct_answer,
         subject: editingQuestion.subject,
         topic: editingQuestion.topic || "",
@@ -164,11 +167,15 @@ function QuestionFormDialog({
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
-    if (!form.question_text.trim()) errs.question_text = "Question text is required";
+    if (!form.question_text.trim())
+      errs.question_text = "Question text is required";
     const validAnswers = form.answers.filter((a) => a.trim());
-    if (validAnswers.length < 2) errs.answers = "At least 2 answer options required";
-    if (!form.correct_answer.trim()) errs.correct_answer = "Select a correct answer";
-    else if (!validAnswers.includes(form.correct_answer)) errs.correct_answer = "Correct answer must be one of the options";
+    if (validAnswers.length < 2)
+      errs.answers = "At least 2 answer options required";
+    if (!form.correct_answer.trim())
+      errs.correct_answer = "Select a correct answer";
+    else if (!validAnswers.includes(form.correct_answer))
+      errs.correct_answer = "Correct answer must be one of the options";
     if (!form.subject) errs.subject = "Subject is required";
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -209,7 +216,9 @@ function QuestionFormDialog({
       onOpenChange(false);
       onSaved();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to save question");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to save question",
+      );
     } finally {
       setSaving(false);
     }
@@ -227,10 +236,14 @@ function QuestionFormDialog({
         <div className="flex-1 overflow-y-auto space-y-4 px-1 py-2">
           {/* Question Text */}
           <div className="space-y-1.5">
-            <Label className="text-sm text-foreground font-medium">Question Text *</Label>
+            <Label className="text-sm text-foreground font-medium">
+              Question Text *
+            </Label>
             <textarea
               value={form.question_text}
-              onChange={(e) => setForm((p) => ({ ...p, question_text: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, question_text: e.target.value }))
+              }
               placeholder="Enter the question..."
               rows={3}
               className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
@@ -244,13 +257,20 @@ function QuestionFormDialog({
 
           {/* Answer Options */}
           <div className="space-y-2">
-            <Label className="text-sm text-foreground font-medium">Answer Options *</Label>
-            <p className="text-xs text-muted-foreground">Click the radio to mark the correct answer.</p>
+            <Label className="text-sm text-foreground font-medium">
+              Answer Options *
+            </Label>
+            <p className="text-xs text-muted-foreground">
+              Click the radio to mark the correct answer.
+            </p>
             {form.answers.map((ans, i) => (
               <div key={i} className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => ans.trim() && setForm((p) => ({ ...p, correct_answer: ans }))}
+                  onClick={() =>
+                    ans.trim() &&
+                    setForm((p) => ({ ...p, correct_answer: ans }))
+                  }
                   className={`h-4 w-4 rounded-full border-2 flex-shrink-0 transition-colors ${
                     form.correct_answer === ans && ans.trim()
                       ? "border-primary bg-primary"
@@ -266,7 +286,10 @@ function QuestionFormDialog({
                     setForm((p) => ({
                       ...p,
                       answers: updated,
-                      correct_answer: p.correct_answer === oldAns ? e.target.value : p.correct_answer,
+                      correct_answer:
+                        p.correct_answer === oldAns
+                          ? e.target.value
+                          : p.correct_answer,
                     }));
                   }}
                   placeholder={`Option ${String.fromCharCode(65 + i)}`}
@@ -278,11 +301,14 @@ function QuestionFormDialog({
                     size="icon"
                     className="h-8 w-8 flex-shrink-0"
                     onClick={() => {
-                      const updated = form.answers.filter((_, idx) => idx !== i);
+                      const updated = form.answers.filter(
+                        (_, idx) => idx !== i,
+                      );
                       setForm((p) => ({
                         ...p,
                         answers: updated,
-                        correct_answer: p.correct_answer === ans ? "" : p.correct_answer,
+                        correct_answer:
+                          p.correct_answer === ans ? "" : p.correct_answer,
                       }));
                     }}
                   >
@@ -296,7 +322,9 @@ function QuestionFormDialog({
                 variant="outline"
                 size="sm"
                 className="text-xs"
-                onClick={() => setForm((p) => ({ ...p, answers: [...p.answers, ""] }))}
+                onClick={() =>
+                  setForm((p) => ({ ...p, answers: [...p.answers, ""] }))
+                }
               >
                 <Plus className="h-3 w-3 mr-1" /> Add Option
               </Button>
@@ -316,27 +344,41 @@ function QuestionFormDialog({
           {/* Subject & Difficulty */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-sm text-foreground font-medium">Subject *</Label>
-              <Select value={form.subject} onValueChange={(v) => setForm((p) => ({ ...p, subject: v }))}>
+              <Label className="text-sm text-foreground font-medium">
+                Subject *
+              </Label>
+              <Select
+                value={form.subject}
+                onValueChange={(v) => setForm((p) => ({ ...p, subject: v }))}
+              >
                 <SelectTrigger className="bg-secondary border-border h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
                   {SubjectsList.map((s) => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm text-foreground font-medium">Difficulty</Label>
-              <Select value={form.difficulty} onValueChange={(v) => setForm((p) => ({ ...p, difficulty: v }))}>
+              <Label className="text-sm text-foreground font-medium">
+                Difficulty
+              </Label>
+              <Select
+                value={form.difficulty}
+                onValueChange={(v) => setForm((p) => ({ ...p, difficulty: v }))}
+              >
                 <SelectTrigger className="bg-secondary border-border h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
                   {DIFFICULTIES.map((d) => (
-                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -346,23 +388,34 @@ function QuestionFormDialog({
           {/* Topic & Status */}
           <div className="grid grid-cols-2 gap-3">
             <div className="space-y-1.5">
-              <Label className="text-sm text-foreground font-medium">Topic</Label>
+              <Label className="text-sm text-foreground font-medium">
+                Topic
+              </Label>
               <Input
                 value={form.topic}
-                onChange={(e) => setForm((p) => ({ ...p, topic: e.target.value }))}
+                onChange={(e) =>
+                  setForm((p) => ({ ...p, topic: e.target.value }))
+                }
                 placeholder="e.g. Algebra"
                 className="bg-secondary border-border h-9 text-sm"
               />
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm text-foreground font-medium">Status</Label>
-              <Select value={form.status} onValueChange={(v) => setForm((p) => ({ ...p, status: v }))}>
+              <Label className="text-sm text-foreground font-medium">
+                Status
+              </Label>
+              <Select
+                value={form.status}
+                onValueChange={(v) => setForm((p) => ({ ...p, status: v }))}
+              >
                 <SelectTrigger className="bg-secondary border-border h-9 text-sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-card border-border">
                   {STATUSES.map((s) => (
-                    <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
+                    <SelectItem key={s} value={s} className="capitalize">
+                      {s}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -371,10 +424,14 @@ function QuestionFormDialog({
 
           {/* Explanation */}
           <div className="space-y-1.5">
-            <Label className="text-sm text-foreground font-medium">Explanation</Label>
+            <Label className="text-sm text-foreground font-medium">
+              Explanation
+            </Label>
             <textarea
               value={form.explanation}
-              onChange={(e) => setForm((p) => ({ ...p, explanation: e.target.value }))}
+              onChange={(e) =>
+                setForm((p) => ({ ...p, explanation: e.target.value }))
+              }
               placeholder="Explain the correct answer..."
               rows={2}
               className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
@@ -383,7 +440,12 @@ function QuestionFormDialog({
         </div>
 
         <DialogFooter className="gap-2 border-t border-border pt-3">
-          <Button variant="secondary" size="sm" onClick={() => onOpenChange(false)} disabled={saving}>
+          <Button
+            variant="secondary"
+            size="sm"
+            onClick={() => onOpenChange(false)}
+            disabled={saving}
+          >
             Cancel
           </Button>
           <Button size="sm" onClick={handleSubmit} disabled={saving}>
@@ -403,7 +465,11 @@ const Questions = () => {
   const [questions, setQuestions] = useState<QuestionType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [metrics, setMetrics] = useState({ questions: 0, multi_choice: 0, other: 0 });
+  const [metrics, setMetrics] = useState({
+    questions: 0,
+    multi_choice: 0,
+    other: 0,
+  });
 
   // Filters
   const [searchQuery, setSearchQuery] = useState("");
@@ -415,12 +481,16 @@ const Questions = () => {
   const [currentPage, setCurrentPage] = useState(1);
 
   // Sorting
-  const [sortField, setSortField] = useState<"created_at" | "subject" | "difficulty">("created_at");
+  const [sortField, setSortField] = useState<
+    "created_at" | "subject" | "difficulty"
+  >("created_at");
   const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
 
   // CRUD dialogs
   const [formOpen, setFormOpen] = useState(false);
-  const [editingQuestion, setEditingQuestion] = useState<QuestionType | null>(null);
+  const [editingQuestion, setEditingQuestion] = useState<QuestionType | null>(
+    null,
+  );
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [deleteConfirmText, setDeleteConfirmText] = useState("");
   const [deleting, setDeleting] = useState(false);
@@ -433,7 +503,8 @@ const Questions = () => {
       const data = await questionService.fetchQuestions(filters);
       setQuestions(data);
     } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : "Failed to load questions";
+      const msg =
+        err instanceof Error ? err.message : "Failed to load questions";
       setError(msg);
       toast.error(msg);
     } finally {
@@ -474,7 +545,9 @@ const Questions = () => {
   const sortedQuestions = [...filteredQuestions].sort((a, b) => {
     let cmp = 0;
     if (sortField === "created_at") {
-      cmp = new Date(a.created_at || 0).getTime() - new Date(b.created_at || 0).getTime();
+      cmp =
+        new Date(a.created_at || 0).getTime() -
+        new Date(b.created_at || 0).getTime();
     } else if (sortField === "subject") {
       cmp = (a.subject || "").localeCompare(b.subject || "");
     } else if (sortField === "difficulty") {
@@ -483,9 +556,15 @@ const Questions = () => {
     return sortDir === "asc" ? cmp : -cmp;
   });
 
-  const totalPages = Math.max(1, Math.ceil(sortedQuestions.length / ITEMS_PER_PAGE));
+  const totalPages = Math.max(
+    1,
+    Math.ceil(sortedQuestions.length / ITEMS_PER_PAGE),
+  );
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const paginatedQuestions = sortedQuestions.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const paginatedQuestions = sortedQuestions.slice(
+    startIndex,
+    startIndex + ITEMS_PER_PAGE,
+  );
 
   useEffect(() => {
     setCurrentPage(1);
@@ -521,7 +600,9 @@ const Questions = () => {
       setDeleteConfirmText("");
       fetchQuestions();
     } catch (err: unknown) {
-      toast.error(err instanceof Error ? err.message : "Failed to delete question");
+      toast.error(
+        err instanceof Error ? err.message : "Failed to delete question",
+      );
     } finally {
       setDeleting(false);
     }
@@ -618,7 +699,9 @@ const Questions = () => {
           {error ? (
             <div className="flex flex-col items-center justify-center py-12 text-center">
               <AlertTriangle className="h-8 w-8 text-destructive mb-3" />
-              <p className="text-sm font-medium text-foreground mb-1">Failed to load questions</p>
+              <p className="text-sm font-medium text-foreground mb-1">
+                Failed to load questions
+              </p>
               <p className="text-xs text-muted-foreground mb-3">{error}</p>
               <Button variant="outline" size="sm" onClick={fetchQuestions}>
                 Try Again
@@ -642,7 +725,9 @@ const Questions = () => {
                       >
                         <div className="flex items-center gap-1">
                           Subject
-                          <ArrowUpDown className={`h-3 w-3 ${sortField === "subject" ? "text-primary" : ""}`} />
+                          <ArrowUpDown
+                            className={`h-3 w-3 ${sortField === "subject" ? "text-primary" : ""}`}
+                          />
                         </div>
                       </TableHead>
                       <TableHead
@@ -651,7 +736,9 @@ const Questions = () => {
                       >
                         <div className="flex items-center gap-1">
                           Difficulty
-                          <ArrowUpDown className={`h-3 w-3 ${sortField === "difficulty" ? "text-primary" : ""}`} />
+                          <ArrowUpDown
+                            className={`h-3 w-3 ${sortField === "difficulty" ? "text-primary" : ""}`}
+                          />
                         </div>
                       </TableHead>
                       <TableHead className="text-muted-foreground font-medium text-xs hidden lg:table-cell">
@@ -663,7 +750,9 @@ const Questions = () => {
                       >
                         <div className="flex items-center gap-1">
                           Created
-                          <ArrowUpDown className={`h-3 w-3 ${sortField === "created_at" ? "text-primary" : ""}`} />
+                          <ArrowUpDown
+                            className={`h-3 w-3 ${sortField === "created_at" ? "text-primary" : ""}`}
+                          />
                         </div>
                       </TableHead>
                       <TableHead className="w-8" />
@@ -725,12 +814,22 @@ const Questions = () => {
                           <TableCell className="py-2.5">
                             <DropdownMenu>
                               <DropdownMenuTrigger asChild>
-                                <Button variant="ghost" size="icon" className="h-7 w-7">
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                >
                                   <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
                                 </Button>
                               </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end" className="bg-card border-border">
-                                <DropdownMenuItem className="cursor-pointer" onClick={() => handleEdit(q)}>
+                              <DropdownMenuContent
+                                align="end"
+                                className="bg-card border-border"
+                              >
+                                <DropdownMenuItem
+                                  className="cursor-pointer"
+                                  onClick={() => handleEdit(q)}
+                                >
                                   <Edit className="h-3.5 w-3.5 mr-2" /> Edit
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
@@ -756,9 +855,13 @@ const Questions = () => {
               {!loading && totalPages >= 1 && (
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
                   <span className="text-xs text-muted-foreground">
-                    Showing {sortedQuestions.length === 0 ? 0 : startIndex + 1} to{" "}
-                    {Math.min(startIndex + ITEMS_PER_PAGE, sortedQuestions.length)} of{" "}
-                    {sortedQuestions.length} questions
+                    Showing {sortedQuestions.length === 0 ? 0 : startIndex + 1}{" "}
+                    to{" "}
+                    {Math.min(
+                      startIndex + ITEMS_PER_PAGE,
+                      sortedQuestions.length,
+                    )}{" "}
+                    of {sortedQuestions.length} questions
                   </span>
                   <div className="flex items-center gap-1">
                     <Button
@@ -819,14 +922,20 @@ const Questions = () => {
       />
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={!!deleteConfirmId} onOpenChange={() => setDeleteConfirmId(null)}>
+      <Dialog
+        open={!!deleteConfirmId}
+        onOpenChange={() => setDeleteConfirmId(null)}
+      >
         <DialogContent className="bg-card border-border sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Delete Question</DialogTitle>
+            <DialogTitle className="text-foreground">
+              Delete Question
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-2">
             <p className="text-sm text-muted-foreground">
-              Are you sure you want to delete this question? This action cannot be undone.
+              Are you sure you want to delete this question? This action cannot
+              be undone.
             </p>
             {deleteConfirmText && (
               <p className="text-sm text-foreground font-medium bg-secondary/50 p-2 rounded-lg truncate">
@@ -835,10 +944,20 @@ const Questions = () => {
             )}
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="secondary" size="sm" onClick={() => setDeleteConfirmId(null)} disabled={deleting}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setDeleteConfirmId(null)}
+              disabled={deleting}
+            >
               Cancel
             </Button>
-            <Button variant="destructive" size="sm" onClick={handleDelete} disabled={deleting}>
+            <Button
+              variant="destructive"
+              size="sm"
+              onClick={handleDelete}
+              disabled={deleting}
+            >
               {deleting && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
               Delete
             </Button>
@@ -850,77 +969,119 @@ const Questions = () => {
       <Dialog open={showFilters} onOpenChange={setShowFilters}>
         <DialogContent className="bg-card border-border sm:max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-foreground">Filter Questions</DialogTitle>
+            <DialogTitle className="text-foreground">
+              Filter Questions
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-foreground">Subject</Label>
+              <Label className="text-sm font-medium text-foreground">
+                Subject
+              </Label>
               <Select
                 value={tempFilters.subject || "all"}
-                onValueChange={(v) => setTempFilters((p) => ({ ...p, subject: v === "all" ? undefined : v }))}
+                onValueChange={(v) =>
+                  setTempFilters((p) => ({
+                    ...p,
+                    subject: v === "all" ? undefined : v,
+                  }))
+                }
               >
-                <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="All Subjects" /></SelectTrigger>
+                <SelectTrigger className="bg-secondary border-border">
+                  <SelectValue placeholder="All Subjects" />
+                </SelectTrigger>
                 <SelectContent className="bg-card border-border">
                   <SelectItem value="all">All Subjects</SelectItem>
                   {SubjectsList.map((s) => (
-                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                    <SelectItem key={s} value={s}>
+                      {s}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-foreground">Difficulty</Label>
+              <Label className="text-sm font-medium text-foreground">
+                Difficulty
+              </Label>
               <Select
                 value={tempFilters.difficulty || "all"}
                 onValueChange={(v) =>
                   setTempFilters((p) => ({
                     ...p,
-                    difficulty: v === "all" ? undefined : (v as QuestionFilters["difficulty"]),
+                    difficulty:
+                      v === "all"
+                        ? undefined
+                        : (v as QuestionFilters["difficulty"]),
                   }))
                 }
               >
-                <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectTrigger className="bg-secondary border-border">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
                 <SelectContent className="bg-card border-border">
                   <SelectItem value="all">All Difficulties</SelectItem>
                   {DIFFICULTIES.map((d) => (
-                    <SelectItem key={d} value={d}>{d}</SelectItem>
+                    <SelectItem key={d} value={d}>
+                      {d}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-foreground">Status</Label>
+              <Label className="text-sm font-medium text-foreground">
+                Status
+              </Label>
               <Select
                 value={tempFilters.status || "all"}
                 onValueChange={(v) =>
                   setTempFilters((p) => ({
                     ...p,
-                    status: v === "all" ? undefined : (v as QuestionFilters["status"]),
+                    status:
+                      v === "all"
+                        ? undefined
+                        : (v as QuestionFilters["status"]),
                   }))
                 }
               >
-                <SelectTrigger className="bg-secondary border-border"><SelectValue placeholder="All" /></SelectTrigger>
+                <SelectTrigger className="bg-secondary border-border">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
                 <SelectContent className="bg-card border-border">
                   <SelectItem value="all">All Statuses</SelectItem>
                   {STATUSES.map((s) => (
-                    <SelectItem key={s} value={s} className="capitalize">{s}</SelectItem>
+                    <SelectItem key={s} value={s} className="capitalize">
+                      {s}
+                    </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
             </div>
             <div className="space-y-1.5">
-              <Label className="text-sm font-medium text-foreground">Topic</Label>
+              <Label className="text-sm font-medium text-foreground">
+                Topic
+              </Label>
               <Input
                 value={tempFilters.topic || ""}
-                onChange={(e) => setTempFilters((p) => ({ ...p, topic: e.target.value || undefined }))}
+                onChange={(e) =>
+                  setTempFilters((p) => ({
+                    ...p,
+                    topic: e.target.value || undefined,
+                  }))
+                }
                 placeholder="Enter topic..."
                 className="bg-secondary border-border"
               />
             </div>
           </div>
           <DialogFooter className="gap-2">
-            <Button variant="outline" size="sm" onClick={clearFilters}>Clear All</Button>
-            <Button size="sm" onClick={applyFilters}>Apply Filters</Button>
+            <Button variant="outline" size="sm" onClick={clearFilters}>
+              Clear All
+            </Button>
+            <Button size="sm" onClick={applyFilters}>
+              Apply Filters
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
