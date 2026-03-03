@@ -36,15 +36,17 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  ArrowUpDown,
+  AlertTriangle,
+  BookOpen,
 } from "lucide-react";
-import {
-  quizService,
-  type QuizType,
-} from "@/lib/api/quizzes";
+import { quizService, type QuizType } from "@/lib/api/quizzes";
 import { adminService } from "@/lib/api/admin";
 import { toast } from "sonner";
 import { QuizWizard } from "./quiz-wizard";
+import { readableDate } from "@/lib/utils";
 
+// ─── Metric Card ─────────────────────────────────────────
 function MetricCard({
   icon: Icon,
   label,
@@ -82,6 +84,7 @@ function MetricCard({
 export default function QuizzesTab() {
   const [quizzes, setQuizzes] = useState<QuizType[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [pagination, setPagination] = useState({
     page: 1,
@@ -92,16 +95,25 @@ export default function QuizzesTab() {
   });
   const [metrics, setMetrics] = useState({ total: 0, active: 0 });
 
+  // Sorting
+  const [sortField, setSortField] = useState<"created_at" | "subject">(
+    "created_at",
+  );
+  const [sortDir, setSortDir] = useState<"asc" | "desc">("desc");
+
   // Wizard state
   const [wizardOpen, setWizardOpen] = useState(false);
   const [editingQuiz, setEditingQuiz] = useState<QuizType | null>(null);
 
   // Delete state
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [deleteConfirmQuiz, setDeleteConfirmQuiz] = useState<QuizType | null>(
+    null,
+  );
   const [deleting, setDeleting] = useState(false);
 
   const fetchQuizzes = useCallback(async (page = 1, search?: string) => {
     setLoading(true);
+    setError(null);
     try {
       const result = await quizService.fetchQuizzes({
         page,
@@ -116,8 +128,10 @@ export default function QuizzesTab() {
         has_next: result.pagination.has_next,
         has_prev: result.pagination.has_prev,
       });
-    } catch {
-      toast.error("Failed to load quizzes");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "Failed to load quizzes";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setLoading(false);
     }
@@ -133,6 +147,28 @@ export default function QuizzesTab() {
       .catch(() => {});
   }, [fetchQuizzes]);
 
+  // Client-side sorting
+  const sortedQuizzes = [...quizzes].sort((a, b) => {
+    let cmp = 0;
+    if (sortField === "created_at") {
+      cmp =
+        new Date(a.created_at || 0).getTime() -
+        new Date(b.created_at || 0).getTime();
+    } else if (sortField === "subject") {
+      cmp = (a.subject || "").localeCompare(b.subject || "");
+    }
+    return sortDir === "asc" ? cmp : -cmp;
+  });
+
+  const toggleSort = (field: typeof sortField) => {
+    if (sortField === field) {
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+    } else {
+      setSortField(field);
+      setSortDir("asc");
+    }
+  };
+
   const openCreate = () => {
     setEditingQuiz(null);
     setWizardOpen(true);
@@ -143,12 +179,13 @@ export default function QuizzesTab() {
     setWizardOpen(true);
   };
 
-  const handleDelete = async (id: string) => {
+  const handleDelete = async () => {
+    if (!deleteConfirmQuiz) return;
     setDeleting(true);
     try {
-      await quizService.deleteQuiz(id);
-      toast.success("Quiz deleted");
-      setDeleteConfirmId(null);
+      await quizService.deleteQuiz(deleteConfirmQuiz._id);
+      toast.success("Quiz deleted successfully");
+      setDeleteConfirmQuiz(null);
       fetchQuizzes(pagination.page);
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : "Failed to delete quiz");
@@ -159,22 +196,20 @@ export default function QuizzesTab() {
 
   return (
     <div className="flex flex-col gap-4">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-muted-foreground">
           Collections of questions that can be standalone or part of a level.
         </p>
-        <Button
-          size="sm"
-          className="bg-primary text-primary-foreground hover:bg-primary/90"
-          onClick={openCreate}
-        >
+        <Button size="sm" onClick={openCreate}>
           <Plus className="h-4 w-4 mr-1.5" /> Create Quiz
         </Button>
       </div>
 
+      {/* Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
         <MetricCard
-          icon={HelpCircle}
+          icon={BookOpen}
           label="Total Quizzes"
           value={loading ? "—" : String(metrics.total)}
           color="primary"
@@ -193,6 +228,7 @@ export default function QuizzesTab() {
         />
       </div>
 
+      {/* Table Card */}
       <Card className="rounded-xl">
         <CardHeader className="px-4 pt-4 pb-3">
           <div className="flex items-center justify-between">
@@ -215,175 +251,235 @@ export default function QuizzesTab() {
           </div>
         </CardHeader>
         <CardContent className="px-4 pb-4">
-          <div className="overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow className="border-border hover:bg-transparent">
-                  <TableHead className="text-muted-foreground font-medium text-xs">
-                    Quiz Name
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs hidden sm:table-cell">
-                    Subject
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs hidden sm:table-cell">
-                    Level
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs text-right">
-                    Qs
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs text-right hidden md:table-cell">
-                    Attempts
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs text-right hidden md:table-cell">
-                    Avg Score
-                  </TableHead>
-                  <TableHead className="text-muted-foreground font-medium text-xs hidden lg:table-cell">
-                    Status
-                  </TableHead>
-                  <TableHead className="w-8" />
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  Array.from({ length: 6 }).map((_, i) => (
-                    <TableRow key={i} className="border-border">
-                      {Array.from({ length: 7 }).map((_, j) => (
-                        <TableCell key={j} className="py-2.5">
-                          <div className="h-4 w-full bg-secondary rounded animate-pulse" />
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  ))
-                ) : quizzes.length === 0 ? (
-                  <TableRow>
-                    <TableCell
-                      colSpan={8}
-                      className="text-center py-8 text-muted-foreground text-sm"
-                    >
-                      No quizzes found
-                    </TableCell>
-                  </TableRow>
-                ) : (
-                  quizzes.map((quiz) => (
-                    <TableRow key={quiz._id} className="border-border group">
-                      <TableCell className="py-2.5 font-medium text-foreground text-sm">
-                        {quiz.title}
-                      </TableCell>
-                      <TableCell className="py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
-                        {quiz.subject}
-                      </TableCell>
-                      <TableCell className="py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
-                        {quiz.level}
-                      </TableCell>
-                      <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums">
-                        {quiz.questions?.length ?? 0}
-                      </TableCell>
-                      <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums hidden md:table-cell">
-                        {(quiz.completion_count ?? 0).toLocaleString()}
-                      </TableCell>
-                      <TableCell className="py-2.5 text-right hidden md:table-cell">
-                        <span
-                          className={`text-sm font-medium tabular-nums ${
-                            (quiz.average_score ?? 0) >= 80
-                              ? "text-chart-1"
-                              : (quiz.average_score ?? 0) >= 70
-                                ? "text-chart-3"
-                                : "text-destructive"
-                          }`}
-                        >
-                          {((quiz.average_score ?? 0) * 100).toFixed(0)}%
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-2.5 hidden lg:table-cell">
-                        <Badge
-                          variant="secondary"
-                          className={`text-[10px] px-1.5 py-0 ${
-                            quiz.is_active
-                              ? "bg-chart-1/10 text-chart-1 border-chart-1/20"
-                              : "bg-muted text-muted-foreground border-border"
-                          }`}
-                        >
-                          {quiz.is_active ? "active" : "inactive"}
-                        </Badge>
-                      </TableCell>
-                      <TableCell className="py-2.5">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-7 w-7"
-                            >
-                              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="bg-card border-border"
-                          >
-                            <DropdownMenuItem
-                              className="cursor-pointer"
-                              onClick={() => openEdit(quiz)}
-                            >
-                              <Edit className="h-3.5 w-3.5 mr-2" /> Edit
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              className="text-destructive focus:text-destructive cursor-pointer"
-                              onClick={() => setDeleteConfirmId(quiz._id)}
-                            >
-                              <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
-          </div>
-
-          {/* Pagination */}
-          {!loading && pagination.total_pages > 1 && (
-            <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
-              <span className="text-xs text-muted-foreground">
-                Showing {quizzes.length} of {pagination.total_items} quizzes
-              </span>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  disabled={!pagination.has_prev}
-                  onClick={() => fetchQuizzes(pagination.page - 1)}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Button>
-                {Array.from(
-                  { length: Math.min(pagination.total_pages, 5) },
-                  (_, i) => i + 1,
-                ).map((p) => (
-                  <Button
-                    key={p}
-                    variant="outline"
-                    size="sm"
-                    className={`h-7 w-7 ${p === pagination.page ? "bg-primary/10 text-primary border-primary/20" : ""}`}
-                    onClick={() => fetchQuizzes(p)}
-                  >
-                    {p}
-                  </Button>
-                ))}
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="h-7 w-7"
-                  disabled={!pagination.has_next}
-                  onClick={() => fetchQuizzes(pagination.page + 1)}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Button>
-              </div>
+          {error ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <AlertTriangle className="h-8 w-8 text-destructive mb-3" />
+              <p className="text-sm font-medium text-foreground mb-1">
+                Failed to load quizzes
+              </p>
+              <p className="text-xs text-muted-foreground mb-3">{error}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => fetchQuizzes(1)}
+              >
+                Try Again
+              </Button>
             </div>
+          ) : (
+            <>
+              <div className="overflow-x-auto">
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-border hover:bg-transparent">
+                      <TableHead className="text-muted-foreground font-medium text-xs">
+                        Quiz Name
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground font-medium text-xs hidden sm:table-cell cursor-pointer select-none"
+                        onClick={() => toggleSort("subject")}
+                      >
+                        <div className="flex items-center gap-1">
+                          Subject
+                          <ArrowUpDown
+                            className={`h-3 w-3 ${sortField === "subject" ? "text-primary" : ""}`}
+                          />
+                        </div>
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden sm:table-cell">
+                        Level
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right">
+                        Qs
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right hidden md:table-cell">
+                        Attempts
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs text-right hidden md:table-cell">
+                        Avg Score
+                      </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden lg:table-cell">
+                        Status
+                      </TableHead>
+                      <TableHead
+                        className="text-muted-foreground font-medium text-xs hidden lg:table-cell cursor-pointer select-none"
+                        onClick={() => toggleSort("created_at")}
+                      >
+                        <div className="flex items-center gap-1">
+                          Created
+                          <ArrowUpDown
+                            className={`h-3 w-3 ${sortField === "created_at" ? "text-primary" : ""}`}
+                          />
+                        </div>
+                      </TableHead>
+                      <TableHead className="w-8" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {loading ? (
+                      Array.from({ length: 6 }).map((_, i) => (
+                        <TableRow key={i} className="border-border">
+                          {Array.from({ length: 9 }).map((_, j) => (
+                            <TableCell key={j} className="py-2.5">
+                              <div className="h-4 w-full bg-secondary rounded animate-pulse" />
+                            </TableCell>
+                          ))}
+                        </TableRow>
+                      ))
+                    ) : sortedQuizzes.length === 0 ? (
+                      <TableRow>
+                        <TableCell
+                          colSpan={9}
+                          className="text-center py-8 text-muted-foreground text-sm"
+                        >
+                          No quizzes found
+                        </TableCell>
+                      </TableRow>
+                    ) : (
+                      sortedQuizzes.map((quiz) => (
+                        <TableRow
+                          key={quiz._id}
+                          className="border-border group"
+                        >
+                          <TableCell className="py-2.5 font-medium text-foreground text-sm">
+                            {quiz.title}
+                          </TableCell>
+                          <TableCell className="py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
+                            {quiz.subject}
+                          </TableCell>
+                          <TableCell className="py-2.5 text-muted-foreground text-sm hidden sm:table-cell">
+                            {quiz.level}
+                          </TableCell>
+                          <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums">
+                            {quiz.questions?.length ?? 0}
+                          </TableCell>
+                          <TableCell className="py-2.5 text-right text-foreground text-sm tabular-nums hidden md:table-cell">
+                            {(quiz.completion_count ?? 0).toLocaleString()}
+                          </TableCell>
+                          <TableCell className="py-2.5 text-right hidden md:table-cell">
+                            <span
+                              className={`text-sm font-medium tabular-nums ${
+                                (quiz.average_score ?? 0) >= 0.8
+                                  ? "text-chart-1"
+                                  : (quiz.average_score ?? 0) >= 0.7
+                                    ? "text-chart-3"
+                                    : "text-destructive"
+                              }`}
+                            >
+                              {((quiz.average_score ?? 0) * 100).toFixed(0)}%
+                            </span>
+                          </TableCell>
+                          <TableCell className="py-2.5 hidden lg:table-cell">
+                            <Badge
+                              variant="secondary"
+                              className={`text-[10px] px-1.5 py-0 ${
+                                quiz.is_active
+                                  ? "bg-chart-1/10 text-chart-1 border-chart-1/20"
+                                  : "bg-muted text-muted-foreground border-border"
+                              }`}
+                            >
+                              {quiz.is_active ? "active" : "inactive"}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="py-2.5 text-muted-foreground text-xs hidden lg:table-cell tabular-nums">
+                            {quiz.created_at
+                              ? readableDate(quiz.created_at)
+                              : "—"}
+                          </TableCell>
+                          <TableCell className="py-2.5">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  className="h-7 w-7"
+                                >
+                                  <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent
+                                align="end"
+                                className="bg-card border-border"
+                              >
+                                <DropdownMenuItem
+                                  className="cursor-pointer"
+                                  onClick={() => openEdit(quiz)}
+                                >
+                                  <Edit className="h-3.5 w-3.5 mr-2" /> Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem
+                                  className="text-destructive focus:text-destructive cursor-pointer"
+                                  onClick={() => setDeleteConfirmQuiz(quiz)}
+                                >
+                                  <Trash2 className="h-3.5 w-3.5 mr-2" /> Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    )}
+                  </TableBody>
+                </Table>
+              </div>
+
+              {/* Pagination */}
+              {!loading && pagination.total_pages > 1 && (
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-border">
+                  <span className="text-xs text-muted-foreground">
+                    Showing {quizzes.length} of {pagination.total_items} quizzes
+                  </span>
+                  <div className="flex items-center gap-1">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-7 w-7"
+                      disabled={!pagination.has_prev}
+                      onClick={() => fetchQuizzes(pagination.page - 1)}
+                    >
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                    {Array.from(
+                      { length: Math.min(pagination.total_pages, 5) },
+                      (_, i) => {
+                        let page: number;
+                        const tp = pagination.total_pages;
+                        const cp = pagination.page;
+                        if (tp <= 5) {
+                          page = i + 1;
+                        } else if (cp <= 3) {
+                          page = i + 1;
+                        } else if (cp >= tp - 2) {
+                          page = tp - 4 + i;
+                        } else {
+                          page = cp - 2 + i;
+                        }
+                        return (
+                          <Button
+                            key={page}
+                            variant="outline"
+                            size="sm"
+                            className={`h-7 w-7 text-xs ${page === cp ? "bg-primary/10 text-primary border-primary/20" : ""}`}
+                            onClick={() => fetchQuizzes(page)}
+                          >
+                            {page}
+                          </Button>
+                        );
+                      },
+                    )}
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      className="h-7 w-7"
+                      disabled={!pagination.has_next}
+                      onClick={() => fetchQuizzes(pagination.page + 1)}
+                    >
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </CardContent>
       </Card>
@@ -398,22 +494,29 @@ export default function QuizzesTab() {
 
       {/* Delete Confirmation Dialog */}
       <Dialog
-        open={!!deleteConfirmId}
-        onOpenChange={() => setDeleteConfirmId(null)}
+        open={!!deleteConfirmQuiz}
+        onOpenChange={() => setDeleteConfirmQuiz(null)}
       >
         <DialogContent className="bg-card border-border sm:max-w-sm">
           <DialogHeader>
             <DialogTitle className="text-foreground">Delete Quiz</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
-            Are you sure you want to delete this quiz? This action cannot be
-            undone.
-          </p>
+          <div className="space-y-2">
+            <p className="text-sm text-muted-foreground">
+              Are you sure you want to delete this quiz? This action cannot be
+              undone.
+            </p>
+            {deleteConfirmQuiz && (
+              <p className="text-sm text-foreground font-medium bg-secondary/50 p-2 rounded-lg truncate">
+                &ldquo;{deleteConfirmQuiz.title}&rdquo;
+              </p>
+            )}
+          </div>
           <DialogFooter className="gap-2">
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => setDeleteConfirmId(null)}
+              onClick={() => setDeleteConfirmQuiz(null)}
               disabled={deleting}
             >
               Cancel
@@ -421,12 +524,10 @@ export default function QuizzesTab() {
             <Button
               variant="destructive"
               size="sm"
-              onClick={() => deleteConfirmId && handleDelete(deleteConfirmId)}
+              onClick={handleDelete}
               disabled={deleting}
             >
-              {deleting ? (
-                <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-              ) : null}
+              {deleting && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
               Delete
             </Button>
           </DialogFooter>

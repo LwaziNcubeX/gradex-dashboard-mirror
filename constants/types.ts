@@ -51,13 +51,13 @@ export interface StudentType {
 //...................CONSTANTS...................//
 
 export const QuestionTable = [
-  "Select",
   "QUESTION",
   "TOPIC",
   "SUBJECT",
   "DIFFICULTY",
   "STATUS",
-  "TIMES USED",
+  "CREATED",
+  "",
 ];
 
 export const StudentTableHeader = [

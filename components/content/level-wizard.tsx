@@ -30,17 +30,14 @@ import {
   Check,
   Save,
   X,
-  Plus,
+  AlertTriangle,
 } from "lucide-react";
 import {
   levelService,
   type LevelType,
   type CreateLevelPayload,
 } from "@/lib/api/levels";
-import {
-  quizService,
-  type QuizType,
-} from "@/lib/api/quizzes";
+import { quizService, type QuizType } from "@/lib/api/quizzes";
 import { toast } from "sonner";
 import { debounce } from "@/lib/utils";
 
@@ -130,7 +127,7 @@ function StepIndicator({
         return (
           <div key={label} className="flex items-center gap-1 flex-1">
             <div
-              className={`flex items-center justify-center h-6 w-6 rounded-full text-[10px] font-semibold flex-shrink-0 ${
+              className={`flex items-center justify-center h-7 w-7 rounded-full text-xs font-semibold flex-shrink-0 transition-colors ${
                 isDone
                   ? "bg-chart-1 text-white"
                   : isActive
@@ -138,10 +135,10 @@ function StepIndicator({
                     : "bg-secondary text-muted-foreground"
               }`}
             >
-              {isDone ? <Check className="h-3 w-3" /> : step}
+              {isDone ? <Check className="h-3.5 w-3.5" /> : step}
             </div>
             <span
-              className={`text-[11px] truncate ${isActive ? "text-foreground font-medium" : "text-muted-foreground"}`}
+              className={`text-xs truncate ${isActive ? "text-foreground font-medium" : "text-muted-foreground"}`}
             >
               {label}
             </span>
@@ -175,6 +172,10 @@ export function LevelWizard({
   const [formState, setFormState] = useState<LevelFormState>(DEFAULT_FORM);
   const [selectedQuizzes, setSelectedQuizzes] = useState<QuizType[]>([]);
   const [saving, setSaving] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Confirmation dialog
+  const [showConfirm, setShowConfirm] = useState(false);
 
   // Step 2: quiz search
   const [searchQuery, setSearchQuery] = useState("");
@@ -221,6 +222,8 @@ export function LevelWizard({
     }
     setSearchQuery("");
     setSearchResults([]);
+    setErrors({});
+    setShowConfirm(false);
   }, [open, editingLevel]);
 
   // Auto-save
@@ -286,7 +289,13 @@ export function LevelWizard({
     if (step === 2) {
       debouncedSearch(searchQuery, searchSubjectFilter, searchLevelFilter);
     }
-  }, [searchQuery, searchSubjectFilter, searchLevelFilter, step, debouncedSearch]);
+  }, [
+    searchQuery,
+    searchSubjectFilter,
+    searchLevelFilter,
+    step,
+    debouncedSearch,
+  ]);
 
   const toggleQuiz = (quiz: QuizType) => {
     setSelectedQuizzes((prev) => {
@@ -300,7 +309,32 @@ export function LevelWizard({
     setSelectedQuizzes((prev) => prev.filter((q) => q._id !== id));
   };
 
+  const validateStep1 = (): boolean => {
+    const errs: Record<string, string> = {};
+    if (!formState.title.trim()) errs.title = "Title is required";
+    if (
+      !editingLevel &&
+      (!formState.level_number || Number(formState.level_number) < 1)
+    ) {
+      errs.level_number = "Level number must be at least 1";
+    }
+    setErrors(errs);
+    return Object.keys(errs).length === 0;
+  };
+
+  const handleNext = () => {
+    if (step === 1) {
+      if (!validateStep1()) return;
+    }
+    setStep((s) => s + 1);
+  };
+
+  const handleConfirmSubmit = () => {
+    setShowConfirm(true);
+  };
+
   const handleSubmit = async () => {
+    setShowConfirm(false);
     if (!formState.title.trim()) {
       toast.error("Title is required");
       return;
@@ -317,7 +351,7 @@ export function LevelWizard({
           quiz_ids: selectedQuizzes.map((q) => q._id),
         };
         await levelService.updateLevel(editingLevel._id, payload);
-        toast.success("Level updated");
+        toast.success("Level updated successfully");
       } else {
         const payload: CreateLevelPayload = {
           level_number: Number(formState.level_number) || 1,
@@ -331,7 +365,7 @@ export function LevelWizard({
           quiz_ids: selectedQuizzes.map((q) => q._id),
         };
         await levelService.createLevel(payload);
-        toast.success("Level created");
+        toast.success("Level created successfully");
         clearDraft();
       }
       onOpenChange(false);
@@ -357,84 +391,217 @@ export function LevelWizard({
   const STEPS = ["Basic Info", "Quizzes", "Review"];
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="bg-card border-border sm:max-w-2xl max-h-[85vh] flex flex-col">
-        <DialogHeader>
-          <DialogTitle className="text-foreground">
-            {editingLevel ? "Edit Level" : "Create Level"}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="bg-card border-border sm:max-w-2xl max-h-[85vh] flex flex-col">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-semibold text-foreground">
+              {editingLevel ? "Edit Level" : "Create Level"}
+            </DialogTitle>
+          </DialogHeader>
 
-        <StepIndicator currentStep={step} steps={STEPS} />
+          <StepIndicator currentStep={step} steps={STEPS} />
 
-        <div className="flex-1 overflow-y-auto min-h-0 px-1">
-          {/* ─── Step 1: Basic Info ─── */}
-          {step === 1 && (
-            <div className="flex flex-col gap-3">
-              {!editingLevel && (
+          <div className="flex-1 overflow-y-auto min-h-0 px-1">
+            {/* ─── Step 1: Basic Info ─── */}
+            {step === 1 && (
+              <div className="flex flex-col gap-4">
+                {!editingLevel && (
+                  <div>
+                    <Label className="text-sm text-foreground font-medium mb-1.5 block">
+                      Level Number *
+                    </Label>
+                    <Input
+                      type="number"
+                      value={formState.level_number}
+                      onChange={(e) =>
+                        setFormState((p) => ({
+                          ...p,
+                          level_number: e.target.value,
+                        }))
+                      }
+                      placeholder="1"
+                      className="bg-secondary border-border h-9 text-sm"
+                    />
+                    {errors.level_number && (
+                      <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                        <AlertTriangle className="h-3 w-3" />{" "}
+                        {errors.level_number}
+                      </p>
+                    )}
+                  </div>
+                )}
                 <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">
-                    Level Number *
+                  <Label className="text-sm text-foreground font-medium mb-1.5 block">
+                    Title *
                   </Label>
                   <Input
-                    type="number"
-                    value={formState.level_number}
+                    value={formState.title}
+                    onChange={(e) =>
+                      setFormState((p) => ({ ...p, title: e.target.value }))
+                    }
+                    placeholder="e.g. Math Fundamentals"
+                    className="bg-secondary border-border h-9 text-sm"
+                  />
+                  {errors.title && (
+                    <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+                      <AlertTriangle className="h-3 w-3" /> {errors.title}
+                    </p>
+                  )}
+                </div>
+                <div>
+                  <Label className="text-sm text-foreground font-medium mb-1.5 block">
+                    Description
+                  </Label>
+                  <textarea
+                    value={formState.description}
                     onChange={(e) =>
                       setFormState((p) => ({
                         ...p,
-                        level_number: e.target.value,
+                        description: e.target.value,
                       }))
                     }
-                    placeholder="1"
-                    className="bg-secondary border-border h-9 text-sm"
+                    placeholder="Short description..."
+                    rows={2}
+                    className="w-full px-3 py-2 bg-secondary border border-border rounded-lg text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                   />
                 </div>
-              )}
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Title *
-                </Label>
-                <Input
-                  value={formState.title}
-                  onChange={(e) =>
-                    setFormState((p) => ({ ...p, title: e.target.value }))
-                  }
-                  placeholder="e.g. Math Fundamentals"
-                  className="bg-secondary border-border h-9 text-sm"
-                />
-              </div>
-              <div>
-                <Label className="text-xs text-muted-foreground mb-1.5 block">
-                  Description
-                </Label>
-                <Input
-                  value={formState.description}
-                  onChange={(e) =>
-                    setFormState((p) => ({
-                      ...p,
-                      description: e.target.value,
-                    }))
-                  }
-                  placeholder="Short description..."
-                  className="bg-secondary border-border h-9 text-sm"
-                />
-              </div>
-              {!editingLevel && (
+                {!editingLevel && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <Label className="text-sm text-foreground font-medium mb-1.5 block">
+                        Subject *
+                      </Label>
+                      <Select
+                        value={formState.subject}
+                        onValueChange={(v) =>
+                          setFormState((p) => ({ ...p, subject: v }))
+                        }
+                      >
+                        <SelectTrigger className="bg-secondary border-border h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card border-border">
+                          {SUBJECTS.map((s) => (
+                            <SelectItem key={s} value={s}>
+                              {s}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label className="text-sm text-foreground font-medium mb-1.5 block">
+                        Form Level
+                      </Label>
+                      <Select
+                        value={formState.form_level}
+                        onValueChange={(v) =>
+                          setFormState((p) => ({
+                            ...p,
+                            form_level: v as (typeof FORM_LEVELS)[number],
+                          }))
+                        }
+                      >
+                        <SelectTrigger className="bg-secondary border-border h-9 text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent className="bg-card border-border">
+                          {FORM_LEVELS.map((l) => (
+                            <SelectItem key={l} value={l}>
+                              {l}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                )}
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">
-                      Subject
+                    <Label className="text-sm text-foreground font-medium mb-1.5 block">
+                      XP Required
                     </Label>
-                    <Select
-                      value={formState.subject}
-                      onValueChange={(v) =>
-                        setFormState((p) => ({ ...p, subject: v }))
+                    <Input
+                      type="number"
+                      value={formState.xp_required}
+                      onChange={(e) =>
+                        setFormState((p) => ({
+                          ...p,
+                          xp_required: e.target.value,
+                        }))
                       }
+                      placeholder="0"
+                      className="bg-secondary border-border h-9 text-sm"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm text-foreground font-medium mb-1.5 block">
+                      XP Reward
+                    </Label>
+                    <Input
+                      type="number"
+                      value={formState.total_xp_reward}
+                      onChange={(e) =>
+                        setFormState((p) => ({
+                          ...p,
+                          total_xp_reward: e.target.value,
+                        }))
+                      }
+                      placeholder="200"
+                      className="bg-secondary border-border h-9 text-sm"
+                    />
+                  </div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Checkbox
+                    id="starter"
+                    checked={formState.is_starter_level}
+                    onCheckedChange={(c) =>
+                      setFormState((p) => ({ ...p, is_starter_level: !!c }))
+                    }
+                  />
+                  <Label
+                    htmlFor="starter"
+                    className="text-sm text-foreground cursor-pointer"
+                  >
+                    Starter level (auto-unlocked for students)
+                  </Label>
+                </div>
+              </div>
+            )}
+
+            {/* ─── Step 2: Quizzes ─── */}
+            {step === 2 && (
+              <div className="flex flex-col gap-3">
+                <div className="flex items-center justify-between">
+                  <p className="text-sm text-muted-foreground">
+                    {selectedQuizzes.length} quiz
+                    {selectedQuizzes.length !== 1 ? "zes" : ""} selected
+                  </p>
+                </div>
+
+                {/* Search bar */}
+                <div className="flex flex-col gap-2">
+                  <div className="relative">
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      placeholder="Search quizzes by title..."
+                      className="bg-secondary border-border h-9 text-sm pl-9"
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Select
+                      value={searchSubjectFilter}
+                      onValueChange={setSearchSubjectFilter}
                     >
-                      <SelectTrigger className="bg-secondary border-border h-9 text-sm">
-                        <SelectValue />
+                      <SelectTrigger className="bg-secondary border-border h-8 text-xs flex-1">
+                        <SelectValue placeholder="Subject" />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border">
+                        <SelectItem value="all">All Subjects</SelectItem>
                         {SUBJECTS.map((s) => (
                           <SelectItem key={s} value={s}>
                             {s}
@@ -442,24 +609,15 @@ export function LevelWizard({
                         ))}
                       </SelectContent>
                     </Select>
-                  </div>
-                  <div>
-                    <Label className="text-xs text-muted-foreground mb-1.5 block">
-                      Form Level
-                    </Label>
                     <Select
-                      value={formState.form_level}
-                      onValueChange={(v) =>
-                        setFormState((p) => ({
-                          ...p,
-                          form_level: v as (typeof FORM_LEVELS)[number],
-                        }))
-                      }
+                      value={searchLevelFilter}
+                      onValueChange={setSearchLevelFilter}
                     >
-                      <SelectTrigger className="bg-secondary border-border h-9 text-sm">
-                        <SelectValue />
+                      <SelectTrigger className="bg-secondary border-border h-8 text-xs flex-1">
+                        <SelectValue placeholder="Level" />
                       </SelectTrigger>
                       <SelectContent className="bg-card border-border">
+                        <SelectItem value="all">All Levels</SelectItem>
                         {FORM_LEVELS.map((l) => (
                           <SelectItem key={l} value={l}>
                             {l}
@@ -469,402 +627,326 @@ export function LevelWizard({
                     </Select>
                   </div>
                 </div>
-              )}
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">
-                    XP Required
-                  </Label>
-                  <Input
-                    type="number"
-                    value={formState.xp_required}
-                    onChange={(e) =>
-                      setFormState((p) => ({
-                        ...p,
-                        xp_required: e.target.value,
-                      }))
-                    }
-                    placeholder="0"
-                    className="bg-secondary border-border h-9 text-sm"
-                  />
-                </div>
-                <div>
-                  <Label className="text-xs text-muted-foreground mb-1.5 block">
-                    XP Reward
-                  </Label>
-                  <Input
-                    type="number"
-                    value={formState.total_xp_reward}
-                    onChange={(e) =>
-                      setFormState((p) => ({
-                        ...p,
-                        total_xp_reward: e.target.value,
-                      }))
-                    }
-                    placeholder="200"
-                    className="bg-secondary border-border h-9 text-sm"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <Checkbox
-                  id="starter"
-                  checked={formState.is_starter_level}
-                  onCheckedChange={(c) =>
-                    setFormState((p) => ({
-                      ...p,
-                      is_starter_level: !!c,
-                    }))
-                  }
-                />
-                <Label
-                  htmlFor="starter"
-                  className="text-sm text-foreground cursor-pointer"
-                >
-                  Starter level (auto-unlocked)
-                </Label>
-              </div>
-            </div>
-          )}
 
-          {/* ─── Step 2: Quizzes ─── */}
-          {step === 2 && (
-            <div className="flex flex-col gap-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">
-                  {selectedQuizzes.length} quiz
-                  {selectedQuizzes.length !== 1 ? "zes" : ""} selected
-                </p>
-              </div>
-
-              {/* Search bar */}
-              <div className="flex flex-col gap-2">
-                <div className="relative">
-                  <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground" />
-                  <Input
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search quizzes by title..."
-                    className="bg-secondary border-border h-8 text-xs pl-8"
-                  />
+                {/* Search results */}
+                <div className="flex flex-col gap-1.5 max-h-[250px] overflow-y-auto">
+                  {searching ? (
+                    <div className="flex justify-center py-6">
+                      <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                    </div>
+                  ) : searchResults.length > 0 ? (
+                    searchResults.map((q) => {
+                      const isSelected = selectedQuizzes.some(
+                        (sq) => sq._id === q._id,
+                      );
+                      return (
+                        <div
+                          key={q._id}
+                          className={`flex items-start gap-2.5 p-2.5 rounded-lg cursor-pointer transition-colors ${
+                            isSelected
+                              ? "bg-primary/10 border border-primary/30"
+                              : "bg-secondary/50 hover:bg-secondary border border-transparent"
+                          }`}
+                          onClick={() => toggleQuiz(q)}
+                        >
+                          <Checkbox
+                            checked={isSelected}
+                            className="mt-0.5 h-4 w-4"
+                          />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-foreground leading-snug truncate">
+                              {q.title}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <Badge
+                                variant="secondary"
+                                className="text-[10px] px-1.5 py-0"
+                              >
+                                {q.subject}
+                              </Badge>
+                              <Badge
+                                variant="secondary"
+                                className="text-[10px] px-1.5 py-0"
+                              >
+                                {q.level}
+                              </Badge>
+                              <span className="text-[10px] text-muted-foreground">
+                                {q.questions?.length ?? 0} Qs
+                              </span>
+                            </div>
+                          </div>
+                          {isSelected && (
+                            <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                          )}
+                        </div>
+                      );
+                    })
+                  ) : searchQuery.trim() ||
+                    searchSubjectFilter !== "all" ||
+                    searchLevelFilter !== "all" ? (
+                    <p className="text-sm text-muted-foreground text-center py-6">
+                      No quizzes found.
+                    </p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground text-center py-6">
+                      Search for quizzes to add to this level.
+                    </p>
+                  )}
                 </div>
-                <div className="flex gap-2">
-                  <Select
-                    value={searchSubjectFilter}
-                    onValueChange={setSearchSubjectFilter}
-                  >
-                    <SelectTrigger className="bg-secondary border-border h-7 text-xs flex-1">
-                      <SelectValue placeholder="Subject" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="all">All Subjects</SelectItem>
-                      {SUBJECTS.map((s) => (
-                        <SelectItem key={s} value={s}>
-                          {s}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Select
-                    value={searchLevelFilter}
-                    onValueChange={setSearchLevelFilter}
-                  >
-                    <SelectTrigger className="bg-secondary border-border h-7 text-xs flex-1">
-                      <SelectValue placeholder="Level" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-card border-border">
-                      <SelectItem value="all">All Levels</SelectItem>
-                      {FORM_LEVELS.map((l) => (
-                        <SelectItem key={l} value={l}>
-                          {l}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
 
-              {/* Search results */}
-              <div className="flex flex-col gap-1.5 max-h-[250px] overflow-y-auto">
-                {searching ? (
-                  <div className="flex justify-center py-6">
-                    <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
-                  </div>
-                ) : searchResults.length > 0 ? (
-                  searchResults.map((q) => {
-                    const isSelected = selectedQuizzes.some(
-                      (sq) => sq._id === q._id,
-                    );
-                    return (
-                      <div
-                        key={q._id}
-                        className={`flex items-start gap-2 p-2 rounded-lg cursor-pointer transition-colors ${
-                          isSelected
-                            ? "bg-primary/10 border border-primary/30"
-                            : "bg-secondary/50 hover:bg-secondary"
-                        }`}
-                        onClick={() => toggleQuiz(q)}
-                      >
-                        <Checkbox
-                          checked={isSelected}
-                          className="mt-0.5 h-3.5 w-3.5"
-                        />
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-foreground leading-snug truncate">
+                {/* Selected list */}
+                {selectedQuizzes.length > 0 && (
+                  <div>
+                    <p className="text-sm font-medium text-muted-foreground mb-2">
+                      Selected ({selectedQuizzes.length})
+                    </p>
+                    <div className="flex flex-col gap-1.5 max-h-[150px] overflow-y-auto">
+                      {selectedQuizzes.map((q, i) => (
+                        <div
+                          key={q._id}
+                          className="flex items-center gap-2 p-2 bg-secondary/50 rounded-lg"
+                        >
+                          <GripVertical className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
+                          <span className="text-xs text-muted-foreground w-5 flex-shrink-0 tabular-nums">
+                            {i + 1}.
+                          </span>
+                          <p className="text-sm text-foreground flex-1 truncate">
                             {q.title}
                           </p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <Badge
-                              variant="secondary"
-                              className="text-[9px] px-1 py-0"
-                            >
-                              {q.subject}
-                            </Badge>
-                            <Badge
-                              variant="secondary"
-                              className="text-[9px] px-1 py-0"
-                            >
-                              {q.level}
-                            </Badge>
-                            <span className="text-[9px] text-muted-foreground">
-                              {q.questions?.length ?? 0} Qs
-                            </span>
-                          </div>
+                          <span className="text-xs text-muted-foreground flex-shrink-0">
+                            {q.questions?.length ?? 0} Qs
+                          </span>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-6 w-6"
+                            onClick={() => removeQuiz(q._id)}
+                          >
+                            <X className="h-3.5 w-3.5 text-muted-foreground hover:text-destructive" />
+                          </Button>
                         </div>
-                        {isSelected && (
-                          <Check className="h-3.5 w-3.5 text-primary flex-shrink-0 mt-0.5" />
-                        )}
-                      </div>
-                    );
-                  })
-                ) : searchQuery.trim() ||
-                  searchSubjectFilter !== "all" ||
-                  searchLevelFilter !== "all" ? (
-                  <p className="text-xs text-muted-foreground text-center py-4">
-                    No quizzes found.
-                  </p>
-                ) : (
-                  <p className="text-xs text-muted-foreground text-center py-4">
-                    Search for quizzes to add to this level.
-                  </p>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
+            )}
 
-              {/* Selected list */}
-              {selectedQuizzes.length > 0 && (
-                <div>
-                  <p className="text-xs font-medium text-muted-foreground mb-1.5">
-                    Selected ({selectedQuizzes.length})
-                  </p>
-                  <div className="flex flex-col gap-1 max-h-[150px] overflow-y-auto">
-                    {selectedQuizzes.map((q, i) => (
-                      <div
-                        key={q._id}
-                        className="flex items-center gap-2 p-1.5 bg-secondary/50 rounded-md"
-                      >
-                        <GripVertical className="h-3 w-3 text-muted-foreground flex-shrink-0" />
-                        <span className="text-[10px] text-muted-foreground w-4 flex-shrink-0">
-                          {i + 1}.
+            {/* ─── Step 3: Review ─── */}
+            {step === 3 && (
+              <div className="flex flex-col gap-4">
+                <Card className="rounded-lg bg-secondary/30 border-border/50">
+                  <CardContent className="p-4 flex flex-col gap-2.5">
+                    {!editingLevel && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Level #
                         </span>
-                        <p className="text-xs text-foreground flex-1 truncate">
-                          {q.title}
-                        </p>
-                        <span className="text-[9px] text-muted-foreground flex-shrink-0">
-                          {q.questions?.length ?? 0} Qs
+                        <span className="text-sm font-medium text-foreground tabular-nums">
+                          {formState.level_number}
                         </span>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-5 w-5"
-                          onClick={() => removeQuiz(q._id)}
-                        >
-                          <X className="h-3 w-3 text-muted-foreground hover:text-destructive" />
-                        </Button>
                       </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* ─── Step 3: Review ─── */}
-          {step === 3 && (
-            <div className="flex flex-col gap-3">
-              <Card className="rounded-lg bg-secondary/30 border-border/50">
-                <CardContent className="p-3 flex flex-col gap-2">
-                  {!editingLevel && (
+                    )}
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">
-                        Level #
+                      <span className="text-sm text-muted-foreground">
+                        Title
+                      </span>
+                      <span className="text-sm font-medium text-foreground">
+                        {formState.title}
+                      </span>
+                    </div>
+                    {formState.description && (
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">
+                          Description
+                        </span>
+                        <span className="text-sm text-foreground max-w-[60%] text-right">
+                          {formState.description}
+                        </span>
+                      </div>
+                    )}
+                    {!editingLevel && (
+                      <>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">
+                            Subject
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className="text-xs px-2 py-0.5"
+                          >
+                            {formState.subject}
+                          </Badge>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-muted-foreground">
+                            Form Level
+                          </span>
+                          <Badge
+                            variant="secondary"
+                            className="text-xs px-2 py-0.5"
+                          >
+                            {formState.form_level}
+                          </Badge>
+                        </div>
+                      </>
+                    )}
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        XP Required
+                      </span>
+                      <span className="text-sm text-foreground tabular-nums">
+                        {Number(formState.xp_required).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        XP Reward
                       </span>
                       <span className="text-sm font-medium text-foreground tabular-nums">
-                        {formState.level_number}
+                        {Number(formState.total_xp_reward).toLocaleString()}
                       </span>
                     </div>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Title</span>
-                    <span className="text-sm font-medium text-foreground">
-                      {formState.title}
-                    </span>
-                  </div>
-                  {formState.description && (
                     <div className="flex items-center justify-between">
-                      <span className="text-xs text-muted-foreground">
-                        Description
+                      <span className="text-sm text-muted-foreground">
+                        Type
                       </span>
-                      <span className="text-xs text-foreground max-w-[60%] text-right">
-                        {formState.description}
-                      </span>
-                    </div>
-                  )}
-                  {!editingLevel && (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          Subject
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] px-1.5 py-0"
-                        >
-                          {formState.subject}
-                        </Badge>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-muted-foreground">
-                          Form Level
-                        </span>
-                        <Badge
-                          variant="secondary"
-                          className="text-[10px] px-1.5 py-0"
-                        >
-                          {formState.form_level}
-                        </Badge>
-                      </div>
-                    </>
-                  )}
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      XP Required
-                    </span>
-                    <span className="text-sm text-foreground tabular-nums">
-                      {Number(formState.xp_required).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">
-                      XP Reward
-                    </span>
-                    <span className="text-sm font-medium text-foreground tabular-nums">
-                      {Number(formState.total_xp_reward).toLocaleString()}
-                    </span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-muted-foreground">Type</span>
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] px-1.5 py-0"
-                    >
-                      {formState.is_starter_level ? "Starter" : "Standard"}
-                    </Badge>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1.5">
-                  Quizzes ({selectedQuizzes.length})
-                </p>
-                {selectedQuizzes.length === 0 ? (
-                  <p className="text-xs text-muted-foreground text-center py-4 bg-secondary/30 rounded-lg">
-                    No quizzes attached. You can still save without quizzes.
-                  </p>
-                ) : (
-                  <div className="flex flex-col gap-1 max-h-[200px] overflow-y-auto">
-                    {selectedQuizzes.map((q, i) => (
-                      <div
-                        key={q._id}
-                        className="flex items-start gap-2 p-2 bg-secondary/30 rounded-md"
+                      <Badge
+                        variant="secondary"
+                        className="text-xs px-2 py-0.5"
                       >
-                        <span className="text-[10px] text-muted-foreground mt-0.5 w-4 flex-shrink-0 tabular-nums">
-                          {i + 1}.
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-foreground leading-snug">
-                            {q.title}
-                          </p>
-                          <div className="flex items-center gap-1.5 mt-0.5">
-                            <Badge
-                              variant="secondary"
-                              className="text-[9px] px-1 py-0"
-                            >
-                              {q.subject}
-                            </Badge>
-                            <span className="text-[9px] text-muted-foreground">
-                              {q.questions?.length ?? 0} questions
-                            </span>
+                        {formState.is_starter_level ? "Starter" : "Standard"}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground mb-2">
+                    Quizzes ({selectedQuizzes.length})
+                  </p>
+                  {selectedQuizzes.length === 0 ? (
+                    <p className="text-sm text-muted-foreground text-center py-6 bg-secondary/30 rounded-lg">
+                      No quizzes attached. You can still save without quizzes.
+                    </p>
+                  ) : (
+                    <div className="flex flex-col gap-1.5 max-h-[200px] overflow-y-auto">
+                      {selectedQuizzes.map((q, i) => (
+                        <div
+                          key={q._id}
+                          className="flex items-start gap-2 p-2.5 bg-secondary/30 rounded-lg"
+                        >
+                          <span className="text-xs text-muted-foreground mt-0.5 w-5 flex-shrink-0 tabular-nums">
+                            {i + 1}.
+                          </span>
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-foreground leading-snug">
+                              {q.title}
+                            </p>
+                            <div className="flex items-center gap-1.5 mt-1">
+                              <Badge
+                                variant="secondary"
+                                className="text-[10px] px-1.5 py-0"
+                              >
+                                {q.subject}
+                              </Badge>
+                              <span className="text-[10px] text-muted-foreground">
+                                {q.questions?.length ?? 0} questions
+                              </span>
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-          )}
-        </div>
-
-        <DialogFooter className="flex items-center justify-between gap-2 border-t border-border pt-3 mt-2">
-          <div className="flex items-center gap-2">
-            {step > 1 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => setStep((s) => s - 1)}
-              >
-                <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Back
-              </Button>
-            )}
-            {!editingLevel && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-xs h-8"
-                onClick={handleSaveDraft}
-              >
-                <Save className="h-3 w-3 mr-1" /> Save Draft
-              </Button>
             )}
           </div>
-          <div className="flex items-center gap-2">
+
+          <DialogFooter className="flex items-center justify-between gap-2 border-t border-border pt-3 mt-2">
+            <div className="flex items-center gap-2">
+              {step > 1 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setStep((s) => s - 1)}
+                >
+                  <ChevronLeft className="h-3.5 w-3.5 mr-1" /> Back
+                </Button>
+              )}
+              {!editingLevel && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="text-xs h-8"
+                  onClick={handleSaveDraft}
+                >
+                  <Save className="h-3.5 w-3.5 mr-1" /> Save Draft
+                </Button>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => onOpenChange(false)}
+              >
+                Cancel
+              </Button>
+              {step < 3 ? (
+                <Button
+                  size="sm"
+                  onClick={handleNext}
+                  disabled={step === 1 && !canProceedStep1}
+                >
+                  Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
+                </Button>
+              ) : (
+                <Button
+                  size="sm"
+                  onClick={handleConfirmSubmit}
+                  disabled={saving}
+                >
+                  {saving ? (
+                    <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
+                  ) : null}
+                  {editingLevel ? "Save Changes" : "Create Level"}
+                </Button>
+              )}
+            </div>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Confirmation Dialog */}
+      <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
+        <DialogContent className="bg-card border-border sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-foreground">
+              {editingLevel ? "Confirm Update" : "Confirm Creation"}
+            </DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
+            {editingLevel
+              ? `Are you sure you want to update "${formState.title}"? This will overwrite the existing level.`
+              : `Are you sure you want to create level "${formState.title}" with ${selectedQuizzes.length} quiz${selectedQuizzes.length !== 1 ? "zes" : ""}?`}
+          </p>
+          <DialogFooter className="gap-2">
             <Button
               variant="secondary"
               size="sm"
-              onClick={() => onOpenChange(false)}
+              onClick={() => setShowConfirm(false)}
             >
               Cancel
             </Button>
-            {step < 3 ? (
-              <Button
-                size="sm"
-                onClick={() => setStep((s) => s + 1)}
-                disabled={step === 1 && !canProceedStep1}
-              >
-                Next <ChevronRight className="h-3.5 w-3.5 ml-1" />
-              </Button>
-            ) : (
-              <Button size="sm" onClick={handleSubmit} disabled={saving}>
-                {saving ? (
-                  <Loader2 className="h-4 w-4 animate-spin mr-1.5" />
-                ) : null}
-                {editingLevel ? "Save Changes" : "Create Level"}
-              </Button>
-            )}
-          </div>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            <Button size="sm" onClick={handleSubmit} disabled={saving}>
+              {saving && <Loader2 className="h-4 w-4 animate-spin mr-1.5" />}
+              {editingLevel ? "Update Level" : "Create Level"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
   );
 }
