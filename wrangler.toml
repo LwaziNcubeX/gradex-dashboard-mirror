@@ -1,6 +1,6 @@
 "$schema" = "./node_modules/wrangler/config-schema.json"
 main = ".open-next/worker.js"
-name = "gradex"
+name = 'gradex-dashboard'
 compatibility_date = "2026-02-13"
 compatibility_flags = [ "nodejs_compat" ]
 
