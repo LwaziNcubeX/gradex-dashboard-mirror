@@ -46,6 +46,7 @@ export function middleware(request: NextRequest) {
     "/feedback",
     "/analytics",
     "/settings",
+    "/finance",
   ];
 
   const token = getAccessToken(request);

@@ -20,19 +20,19 @@ export interface ResponseType {
 export interface QuestionType {
   _id: string;
   question_text: string;
-  answers: [];
+  answers: string[];
   correct_answer: string;
   difficulty: string;
   subject: string;
   topic: string;
-  tags: [];
+  tags: string[];
   explanation: string;
   hint: string;
   hint_text: string;
   status: string;
   hint_xp_cost: number;
   points: number;
-  time_limit_seconds: 60;
+  time_limit_seconds: number;
   updated_at: string;
   created_at: string;
   created_by: string;

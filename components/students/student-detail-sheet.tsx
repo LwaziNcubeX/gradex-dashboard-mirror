@@ -295,67 +295,83 @@ export function StudentDetailSheet({
               <p className="text-xs font-medium text-muted-foreground mb-1.5">
                 Premium Status
               </p>
-              {profile?.is_premium && profile?.premium_expires_at ? (
-                <div className="flex flex-col gap-2 p-3 bg-chart-3/5 border border-chart-3/20 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-1.5">
-                      <Crown className="h-3.5 w-3.5 text-chart-3" />
-                      <span className="text-sm font-medium text-foreground">
-                        Premium Active
-                      </span>
+              {(() => {
+                const expiresAt =
+                  profile?.premium?.expires_at ?? profile?.premium_expires_at;
+                const isPremiumActive =
+                  profile?.is_premium &&
+                  expiresAt &&
+                  new Date(expiresAt) > new Date();
+                return isPremiumActive ? (
+                  <div className="flex flex-col gap-2 p-3 bg-chart-3/5 border border-chart-3/20 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-1.5">
+                        <Crown className="h-3.5 w-3.5 text-chart-3" />
+                        <span className="text-sm font-medium text-foreground">
+                          Premium Active
+                        </span>
+                      </div>
+                      <Badge className="bg-chart-3/10 text-chart-3 border-chart-3/20 text-[10px] px-1.5 py-0">
+                        Active
+                      </Badge>
                     </div>
-                    <Badge className="bg-chart-3/10 text-chart-3 border-chart-3/20 text-[10px] px-1.5 py-0">
-                      Active
-                    </Badge>
-                  </div>
-                  <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                    <Calendar className="h-3 w-3" />
-                    Expires{" "}
-                    {format(
-                      new Date(profile.premium_expires_at),
-                      "MMM d, yyyy",
+                    <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                      <Calendar className="h-3 w-3" />
+                      Expires {format(new Date(expiresAt!), "MMM d, yyyy")}
+                    </div>
+                    {profile?.premium?.activated_at && (
+                      <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                        <Crown className="h-3 w-3" />
+                        Activated{" "}
+                        {format(
+                          new Date(profile.premium.activated_at),
+                          "MMM d, yyyy",
+                        )}
+                      </div>
                     )}
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full mt-1 h-8 text-xs border-chart-3/30 text-chart-3 hover:bg-chart-3/10"
-                    onClick={() => {
-                      setPremiumAmount("2");
-                      setPremiumDialogOpen(true);
-                    }}
-                  >
-                    <Crown className="h-3 w-3 mr-1" /> Extend Premium
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex flex-col gap-2 p-3 bg-secondary/50 rounded-lg">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">
-                      Free Plan
-                    </span>
-                    <Badge
-                      variant="secondary"
-                      className="text-[10px] px-1.5 py-0"
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="w-full mt-1 h-8 text-xs border-chart-3/30 text-chart-3 hover:bg-chart-3/10"
+                      onClick={() => {
+                        setPremiumAmount("2");
+                        setTransactionId("");
+                        setPremiumDialogOpen(true);
+                      }}
                     >
-                      Free
-                    </Badge>
+                      <Crown className="h-3 w-3 mr-1" /> Extend Premium (+30
+                      days)
+                    </Button>
                   </div>
-                  <Button
-                    size="sm"
-                    className="w-full mt-1 h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
-                    onClick={() => {
-                      setPremiumAmount("2");
-                      setPremiumDialogOpen(true);
-                    }}
-                  >
-                    <Crown className="h-3 w-3 mr-1" /> Upgrade to Premium — $2
-                  </Button>
-                  <p className="text-[10px] text-muted-foreground text-center">
-                    $2 = 30 days of premium access
-                  </p>
-                </div>
-              )}
+                ) : (
+                  <div className="flex flex-col gap-2 p-3 bg-secondary/50 rounded-lg">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-muted-foreground">
+                        Free Plan
+                      </span>
+                      <Badge
+                        variant="secondary"
+                        className="text-[10px] px-1.5 py-0"
+                      >
+                        Free
+                      </Badge>
+                    </div>
+                    <Button
+                      size="sm"
+                      className="w-full mt-1 h-8 text-xs bg-primary text-primary-foreground hover:bg-primary/90"
+                      onClick={() => {
+                        setPremiumAmount("2");
+                        setPremiumDialogOpen(true);
+                      }}
+                    >
+                      <Crown className="h-3 w-3 mr-1" /> Upgrade to Premium — $2
+                    </Button>
+                    <p className="text-[10px] text-muted-foreground text-center">
+                      $2 = 30 days of premium access
+                    </p>
+                  </div>
+                );
+              })()}
             </div>
 
             {/* Account info */}

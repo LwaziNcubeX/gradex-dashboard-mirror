@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import Link from "next/link";
 import { Menu, Search, Bell, Settings, LogOut } from "lucide-react";
 import {
@@ -16,11 +16,12 @@ import {
 } from "@/components/ui/tooltip";
 import Logo from "./logo";
 import { Avatar, AvatarImage } from "@/ui/avatar";
+import { logoutUser } from "@/lib/api";
 
 const pageTitles: Record<string, string> = {
   "/": "Overview",
   "/students": "Students",
-  "/content": "Content Managment",
+  "/content": "Content Management",
   "/analytics": "Analytics",
   "/feedback": "Feedback",
   "/settings": "Settings",
@@ -42,8 +43,18 @@ export function Header({
   onMobileMenuToggle: () => void;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
   const currentPage = pageTitles[pathname] || "Dashboard";
   const currentPageDescription = pageDTitles[pathname];
+
+  const handleLogout = async () => {
+    try {
+      await logoutUser();
+      router.push("/auth");
+    } catch (error) {
+      console.error("Logout failed:", error);
+    }
+  };
 
   return (
     <header className="flex items-center top-0 bg-background backdrop-blur-md py-2 md:py-4 z-50">
@@ -93,7 +104,10 @@ export function Header({
                 Settings
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem className="focus:bg-secondary cursor-pointer text-destructive focus:text-destructive">
+            <DropdownMenuItem
+              onClick={handleLogout}
+              className="focus:bg-secondary cursor-pointer text-destructive focus:text-destructive"
+            >
               <LogOut className="mr-2 h-4 w-4" />
               Logout
             </DropdownMenuItem>

@@ -342,7 +342,12 @@ const Questions = () => {
 
         const data = await response.json();
         if (data.success) {
-          setOverview(data.data);
+          const content = data.data?.content;
+          setOverview({
+            questions: content?.questions ?? 0,
+            multi_choice: content?.questions ?? 0,
+            other: 0,
+          });
         } else {
           setOverview({ questions: 0, multi_choice: 0, other: 0 });
         }

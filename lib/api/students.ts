@@ -11,7 +11,20 @@ export interface StudentDetail {
     created_at: string;
     email: string;
     is_premium?: boolean;
+    /** Flat field (legacy) */
     premium_expires_at?: string;
+    /** Nested premium object returned by backend */
+    premium?: {
+      expires_at?: string;
+      activated_at?: string;
+      amount?: number;
+      days?: number;
+      transaction_id?: string;
+    };
+    trial?: {
+      is_active?: boolean;
+      expires_at?: string;
+    };
   };
   recent_attempts: {
     _id: string;

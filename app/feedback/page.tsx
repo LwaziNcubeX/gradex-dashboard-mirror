@@ -82,7 +82,11 @@ export default function FeedbackPage() {
       const result = await feedbackService.getFeedback(params);
       const totalCount =
         result.pagination.total ?? result.pagination.total_items ?? 0;
-      setFeedbackItems(result.data);
+      if (page === 1) {
+        setFeedbackItems(result.data);
+      } else {
+        setFeedbackItems((prev) => [...prev, ...result.data]);
+      }
       setPagination({
         page: result.pagination.page,
         total: totalCount,

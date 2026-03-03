@@ -235,7 +235,13 @@ export default function FinancePage() {
                       border: "1px solid hsl(var(--border))",
                       borderRadius: "8px",
                       fontSize: "12px",
+                      color: "hsl(var(--foreground))",
                     }}
+                    labelStyle={{
+                      color: "hsl(var(--foreground))",
+                      fontWeight: 600,
+                    }}
+                    itemStyle={{ color: "hsl(var(--muted-foreground))" }}
                     formatter={(value: number, name: string) => [
                       name === "revenue"
                         ? formatCurrency(value)
