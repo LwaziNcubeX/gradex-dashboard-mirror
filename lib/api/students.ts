@@ -46,6 +46,8 @@ export interface PremiumTransaction {
   student_name: string;
   amount: number;
   days: number;
+  transaction_id: string;
+  admin_user_id: string;
   activated_at: string;
   expires_at: string;
 }
@@ -174,22 +176,15 @@ class StudentService {
   public async upgradeToPremium(
     userId: string,
     amount: number,
-    ecocashApprovalCode: string,
+    transactionId: string,
   ): Promise<PremiumUpgradeResponse> {
-    const ecocash_approval_code = ecocashApprovalCode;
     try {
-      console.log(
-        JSON.stringify({
-          amount,
-          ecocash_approval_code,
-        }),
-      );
       const response = await fetch(`${API_URL}/students/${userId}/premium`, {
         method: "PATCH",
         headers: getHeaders(),
         body: JSON.stringify({
           amount,
-          ecocash_approval_code,
+          transaction_id: transactionId,
         }),
       });
       return await handleApiResponse<PremiumUpgradeResponse>(response);

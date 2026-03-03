@@ -300,6 +300,9 @@ export default function FinancePage() {
                       <TableHead className="text-muted-foreground font-medium text-xs hidden sm:table-cell">
                         User ID
                       </TableHead>
+                      <TableHead className="text-muted-foreground font-medium text-xs hidden md:table-cell">
+                        Txn ID
+                      </TableHead>
                       <TableHead className="text-muted-foreground font-medium text-xs text-right">
                         Amount
                       </TableHead>
@@ -325,6 +328,9 @@ export default function FinancePage() {
                         </TableCell>
                         <TableCell className="py-2.5 text-xs text-muted-foreground hidden sm:table-cell font-mono">
                           {tx.user_id}
+                        </TableCell>
+                        <TableCell className="py-2.5 text-xs text-muted-foreground hidden md:table-cell font-mono">
+                          {tx.transaction_id || "—"}
                         </TableCell>
                         <TableCell className="py-2.5 text-right text-sm font-semibold text-chart-1 tabular-nums">
                           ${tx.amount.toFixed(2)}

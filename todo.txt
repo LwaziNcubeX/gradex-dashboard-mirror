@@ -1,0 +1,55 @@
+add token blacklisting on logout
+error handling will use JSONResponse
+
+
+we want to have or migrate some endpoints eg all admin realted endpoints will bein dashboard folder, student realted that will be accessed by a mobile folder in backend and those that are common in common
+
+purge existing game modes, analystics, social learning, my archivements rewards shop, models
+
+the structureof the gradex, we have questions, quizzes, and levels
+
+questions will be used by quizzes and some quizzes will be used by levels, so we can have standalone quizzes that are not tied to any levels
+
+we cant create, update etc questions on dashboard
+we will have a wizard where we can create a quiz, chose existing questions or create a new one,
+
+the same for levels, we can create quizzes, select existing quizzes or create a new quiz for that levels
+
+so we should be able to do that via dashboard,also when selecting existing questions / quzzes, we have to use a search endpoint
+
+
+then we will have game modes, Arcade, speed run, wild card and custom
+
+arcade - > access to all topics grouped by subjects obviously, unlimited practice, timer available but its not a decreasing timer that will be available on the mobile app
+
+gradex is for zimbabweans only so we use utc + 2 as our timer
+
+for arcade we need an algorithm that we auto create quizzes for arcade based on user progression if there is any
+
+so for a question, we will need to track how many times a question all users failed to test record the difficulty of the question based on users but altho we already have the default deficutly this doesnt mean if most users answer the question correctyly then difficult will change to form 1 or 2 that doesnt change we need something robust system that will help users progress in leading
+
+then we have speed run, limitted time to answer a question, if times up the quiz will end, we also need an algo where questions are provided in batches say first 10, then a user can chose to continue with next batch or stop we need somthing robust to based on question data and user progress in considaeration then quzzes will be provided, they earn extra xp bonus points for quick correct answers
+
+then we have wild card - random question accoss all subjects, just to test if u are realy prepaired, its a suprice game mode, points varry based on question difficulty,  same here we need an algo that will auto create quizzes based on user progreassion
+
+then we have custom, this is a comming soon but is open for suggestions
+
+by now u hve notices that this is a big project....
+
+then we will need an endpoint for discover/quiz, like fetch standalone quizzes active only, then we need a search quiz by query end point for students only
+
+we need to have stearks system, rewards that they will earn when completing some quizzes , earn bonus xp, hints, unlock avatars
+
+we have progress xp that will be earnd throughout the app
+
+by defaut a question will have 10 xp points but say a quiz has 10 questions then they will be bonus points where we calculate if they used a hint on each question, time taken to complete the quiz
+
+hints, avatars are parts of the rewards shop, u cant buy them but u earn them via the progressing
+
+premium is 2$ per 30 days make sure necesay premium endpoints are then, billing recods all the finance stuff, revenue...note ony admins can upgrade students to premium
+
+i might have left something or there are improvements ans siggestions that can make things better
+
+when recording who upgraded the student to premium, we need to include the admin (user_id) also we need to include not ecocash id but transaction id from ecocash
+
+lets plan and tell me your suggestions, ask questions if needed
