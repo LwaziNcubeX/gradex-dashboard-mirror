@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,6 +29,7 @@ export function AdminLoginForm({
 }: {
   saveAuth: (data: TokenResponse) => Promise<void>;
 }) {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [otp, setOtp] = useState("");
   const [message, setMessage] = useState("");
@@ -86,6 +88,7 @@ export function AdminLoginForm({
       if (data.success) {
         setIsError(false);
         await saveAuth(data.data);
+        router.push("/");
       } else {
         setIsError(true);
       }
